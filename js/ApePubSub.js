@@ -3,6 +3,10 @@
  */
 
 //-------ApePubSub Starts--------//
+APE.sub = new JSmodule("AS");
+APE.pub = new JSmodule("AP");
+
+
 //Create $ if jQuery is not loaded
 if(typeof $ == "undefined") var $ = {};
 //Start Main Object $.Ape
