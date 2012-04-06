@@ -1,0 +1,31 @@
+.feed {
+	width: 400px;
+	display: inline-block;
+	border: 2px outset #999;
+}
+
+.feed > h1 {
+	margin: 0;
+	padding: 0.2em;
+	background: #f2f2f2;
+	text-align: center;
+	font-size: 2em;
+}
+
+.feed-body {
+	padding: 0.3em;
+	max-height: 200px;
+	overflow: auto;
+}
+
+.feed-send {
+	text-align: center;
+}
+
+.feed-send input {
+	font-size: 1.7em;
+}
+
+.userCounter {
+	display: inline;
+}
