@@ -10,6 +10,7 @@ $.Ape = {
 	user: {},
 	opts: {},
 	ch: {},
+	client: {},
 	debug: true,
 	session: false,
 	activeChannel: "",
@@ -24,38 +25,10 @@ $.Ape = {
 		this.when = $.Ape.when;
 		this.call = $.Ape.call;
 		this.fn = {};//new $.Ape.fnPack();
-		this.users = function(){
-			var ret = [];			
-			for(var pubid in this.pipe.users){
-				if(pubid.length == 32){
-					ret.push(new $.Ape.newUsr(pubid));				
-				}
-			}
-			
-			return ret;
-		}
 	},
-	newUsr: function(pubid){
-		var pipe = $.Ape.client.core.getPipe(pubid);		
-		
-		for(var name in pipe.properties){
-			this[name] = pipe.properties[name];
-		}
-		
-		this.pubid = pubid;
-		this.pipe = pipe;
-		this.fn = {};
-		this.when = $.Ape.when;
-		this.call = $.Ape.call;
-		
-		this.pub = function(msg){
-			this.pipe.send(msg);
-		};
-		
-		return this;
-	},
+	
 	//Starts the ape
-	ready: function(callback){
+	ready: function(callback){		
 		//Exit and callback() if started
 		if(this.isReady){
 			callback();
@@ -72,7 +45,7 @@ $.Ape = {
 			})('mootools-core', 'Core/APE', 'Core/Events', 'Core/Core', 'Pipe/Pipe', 'Pipe/PipeProxy', 'Pipe/PipeMulti', 'Pipe/PipeSingle', 'Request/Request','Request/Request.Stack', 'Request/Request.CycledStack', 'Transport/Transport.longPolling','Transport/Transport.SSE', 'Transport/Transport.XHRStreaming', 'Transport/Transport.JSONP', 'Core/Utility', 'Core/JSON');
 			if($.Ape.session) APE.Config.scripts.push(APE.Config.baseUrl + "/Source/Core/Session.js");
 			
-			APE.Config.scripts.push(APE.Config.baseUrl + "/Plugins/Debug.js");
+			//APE.Config.scripts.push(APE.Config.baseUrl + "/Plugins/Debug.js");
 
 		}else{
 			//Load Compressed files
@@ -107,28 +80,12 @@ $.Ape = {
 			
 			$.Ape.reconnect++
 			
-			if($.Ape.reconnect > 3){
+			if($.Ape.reconnect > 1){
 				debug("Could not reconnect to APE server");
 				return;
 			}
 			
 			$.Ape.ready(callback)
-		});
-		
-		//Live RAW updater - sync
-		client.addEvent("onRaw", function(info){
-			//Sync channel properties
-			if(typeof info.data.pipe != "undefined" && info.data.pipe.casttype == "multi"){
-				var obj = info.data.pipe;
-				var chanName = obj.properties.name;
-				
-				for(var name in obj.properties){
-					$.Ape.channel(chanName)[name] = obj.properties[name];
-				}
-				
-				//Trigger user count
-				$.Ape.ch[chanName].call("onUserCount", parseInt($.Ape.channel(chanName).userCount));
-			}			
 		})
 		
 		//After all scripts are loaded
@@ -160,11 +117,13 @@ $.Ape = {
 			
 			//When user joins a Channel
 			client.addEvent("multiPipeCreate",function(pipe, options){
-				debug(options);
-				debug("Importing user properties from server");				
-				$.Ape.user = new $.Ape.newUsr($.Ape.client.core.user.pubid);
 				
-								
+				debug("Importing user properties from server");
+				for(var name in $.Ape.client.core.user.properties){
+					$.Ape.user[name] = $.Ape.client.core.user.properties[name];
+				}
+				$.Ape.user.pubid = $.Ape.client.core.user.pubid;
+				
 				var chanName = pipe.name;
 				$.Ape.activeChannel = chanName;
 				
@@ -182,37 +141,23 @@ $.Ape = {
 				});
 				
 				//Avoids spam of onJoin events
-				var delay = function(){			
-					pipe.onRaw("join", function(raw){
-						var user, pipe;
-						user = raw.data.user;
-						pipe = raw.data.pipe;
-						
-						var u = user.properties || {};
+				var delay = function(){					
+					pipe.addEvent("userJoin", function(user, pipe){
+						var u = user.properties;
 						u.pubid = user.pubid;
 						
 						$.Ape.ch[chanName].call("onJoin", u, pipe);
-						//Trigger user count
-						$.Ape.ch[chanName].call("onUserCount", parseInt(pipe.properties.userCount));
 					});
 				}
 				
 				//Avoids spam of onJoin events
 				setTimeout(delay,500);
 				
-				//When a user leaves the channel
-				pipe.onRaw("left", function(raw){
-					var user, pipe;
-					user = raw.data.user;
-					pipe = raw.data.pipe;
-					
-					var u = user.properties || {};
-					
+				pipe.addEvent("userLeft", function(user, pipe){
+					var u = user.properties;
 					u.pubid = user.pubid;
 					
 					$.Ape.ch[chanName].call("onLeft", u, pipe);
-					//Trigger user count
-					$.Ape.ch[chanName].call("onUserCount", parseInt(pipe.properties.userCount));
 				});
 				
 				if(typeof $.Ape.ch[chanName] == "undefined"){
@@ -224,19 +169,14 @@ $.Ape = {
 					$.Ape.ch[chanName].pipe = pipe;
 				}
 				
-				debug("Importing the channel ("+chanName+") properties from server");
-				for(var name in pipe.properties){
-					$.Ape.ch[chanName][name] = pipe.properties[name];
-				}
 				
 				debug("Joined channel" + "("+chanName+")");
 				
 				//Call the joined event
-				$.Ape.ch[chanName].call("joined", $.Ape.channel(chanName));
-				//Trigger user count
-				$.Ape.ch[chanName].call("onUserCount", parseInt(pipe.properties.userCount));
+				$.Ape.ch[chanName].call("joined", new $.Ape.channel(chanName));
 				
-			})//END of user join
+				
+			})
 			
 			//Handle errors
 			client.onRaw("ERR", function(raw){
@@ -277,22 +217,12 @@ $.Ape = {
 			this.activeChannel = channel[ch];
 			
 			if(typeof this.ch[curChan] != "undefined" && this.ch[curChan].isReady){
-				debug("Already on (" + curChan +")");
+				debug("Already on " + curChan);
 				
 				if(typeof callback == "function"){
-					//add joined callback function
-					$.Ape.ch[curChan].when("joined",callback);				
-				}else if(typeof callback == "object"){
-					//add all events
-					for(var i in callback){
-						$.Ape.ch[curChan].when(i,callback[i]);
-					}
-				}
-				
-				//Call joined event
-				$.Ape.ch[curChan].call("joined", new $.Ape.channel(curChan));
-				//Trigger user count
-				$.Ape.ch[curChan].call("onUserCount", parseInt($.Ape.channel(curChan).userCount));
+					//add joined callback function and triggered it
+					this.when("joined",callback).call("joined", new $.Ape.channel(curChan));				
+				}	
 				return this;
 			}
 			
@@ -340,10 +270,9 @@ $.Ape = {
 		if(!channel){
 			debug("NOT IN A CHANNEL",true);
 			return;
-		};		
-		
+		};
+		debug(channel);
 		$.Ape.ch[channel].pipe.send(msg);
-		
 	},
 	
 	//Select and return a channel object
@@ -360,7 +289,7 @@ $.Ape = {
 	
 	//Add an event to current object
 	when: function(e,callback){
-		var channel = this.activeChannel || this.name || this.username;
+		var channel = this.activeChannel || this.name;
 		var isApe = typeof this.client;		
 		
 		//debug(isApe);
@@ -369,9 +298,8 @@ $.Ape = {
 			debug("Adding Event ["+e+"] to $.Ape");
 			$.Ape.fn[e] = callback;
 		}else{
-			debug("Adding Event ["+e+"] to channel ("+channel+")");
-			//$.Ape.ch[channel].fn[e] = callback;			
-			this.fn[e] = callback;			
+			debug("Adding Event ["+e+"] to channel ["+channel+"]");
+			$.Ape.ch[channel].fn[e] = callback;			
 		}		
 		
 		return this;
@@ -399,17 +327,9 @@ $.Ape = {
 			debug("No ["+fnName+"] on channel ("+channel+")");			
 		}
 		
-		return this;
 	}
 }
 
-
-
-
-//Work around to global event functions
-//$.Ape.fn = new $.Ape.fnPack();
-$.Ape.client = {};
-///////////////////////
 
 //Debug Function for Browsers console
 function debug($obj){

@@ -22,10 +22,6 @@ $(document).ready(function(){
 		 * 			...other properties and methods
 		 */		
 		joined: function(channel){
-			
-			console.log("===================");
-			console.log(arguments);
-			console.log($.Ape);
 			//(jQuery)Update username in the page
 			$("#username").text($.Ape.user.username);
 		},
@@ -60,7 +56,7 @@ $(document).ready(function(){
 		
 		/*
 		 * Function triggered when a text message is recieved on this channel
-		 * 		+msg = (string) message		 		
+		 * 		+msg = (string) message
 		 * 		+info
 		 * 			-from
 		 * 				...sender(user) properties like username, id, etc
