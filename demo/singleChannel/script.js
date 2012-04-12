@@ -1,19 +1,18 @@
 $(document).ready(function(){	
 	
 	//Options
-	$.Ape.debug = true; //Log to browser's console AND uses decompressed APE files
-	$.Ape.session = false; //Toggles the use of session for APE
+	APE.PubSub.debug = true; //Log to browser's console AND uses decompressed APE files
+	APE.PubSub.session = false; //Toggles the use of session for APE
 	
 	//Current user's properties
-	$.Ape.user = {
+	APE.PubSub.user = {
 		username: "User_"+randomString(5), //Generates a random username
 		//id: 321,
 		//What ever you want to store in the user
 	}
 	
-	//No need to wrap code on an Ape ready function if it is only for a single channel
-	$.Ape.sub("music",{ //Subcribe the channel 'music'
-		
+	
+	var Events = {
 		/*
 		 * Function triggered when current user has joined the channel
 		 * 		+channel
@@ -21,9 +20,10 @@ $(document).ready(function(){
 		 * 			-pipe
 		 * 			...other properties and methods
 		 */		
-		joined: function(channel){
+		userJoin: function(channel){
 			//(jQuery)Update username in the page
-			$("#username").text($.Ape.user.username);
+			debug(arguments)
+			$("#username").text(APE.PubSub.user.username);
 		},
 		
 		/*
@@ -66,23 +66,32 @@ $(document).ready(function(){
 		 * 				-pipe
 		 * 				...other properties and methods
 		 */		
-		onMessage: function(msg,info){
+		data: function(info, pipe){
+			debug(arguments);
 			//(jQuery)Append a Message to DIV container
-			$("#feed-music .feed-body").prepend("<div><b>"+info.from.username+":</b> "+msg+"</div>")
+			var from = APE.PubSub.client.core.getPipe(info.data.from.pubid);
+			debug(from);
+			$("#feed-music .feed-body").prepend("<div><b>"+info.data.from.pubid+":</b> "+info.data.msg+"</div>")
 				//Scroll div to top
 				.prop("scrollTop", 0);	
 		}
-	});
-		
+	};
+	
+	/*
+	 * Subscribe to channel
+	 */
+	
+	Sub("music");
+	addEventOn("music", Events);
+	
 	//To publish to a channel is as simple as getting the channel and pub
-	// channel
 	/*
 	 * To publish to a channel is as simple as getting the channel and pub(
 	 * channel.pub("Hello World")
 	 * 
 	 * All the code below is mostly gathering some generic info
 	 * 
-	 * If you are only using one channel you could use $.Ape.pub("Hello World") inestead
+	 * If you are only using one channel you could use APE.PubSub.pub("Hello World") inestead
 	 */
 	
 	//(jQuery)Binds event to  the SEND button
@@ -100,12 +109,10 @@ $(document).ready(function(){
 		}
 		
 		//Add current pubid data
-		data.pubid = $.Ape.user.pubid;		
+		data.pubid = APE.PubSub.user.pubid;	
 		
-		//Get the channel by its name
-		$.Ape.channel(data.channel)
-			//Publish message to channel
-			.pub(data.message);
+		//Send message
+		Pub("music", data.message);
 		
 		//Clear input and focus
 		formInput.val("").focus();
