@@ -6,7 +6,7 @@ $(document).ready(function(){
 	
 	//Current user's properties
 	APE.PubSub.user = {
-		username: "User_"+randomString(5), //Generates a random username
+		name: "User_"+randomString(5), //Generates a random username
 		//id: 321,
 		//What ever you want to store in the user
 	}
@@ -14,28 +14,17 @@ $(document).ready(function(){
 	
 	var Events = {
 		/*
-		 * Function triggered when current user has joined the channel
-		 * 		+channel
-		 * 			-name
-		 * 			-pipe
-		 * 			...other properties and methods
-		 */		
-		userJoin: function(channel){
-			//(jQuery)Update username in the page
-			debug(arguments)
-			$("#username").text(APE.PubSub.user.username);
-		},
-		
-		/*
 		 * Function triggered when other users join the channel
 		 * 		+user
 		 * 			...user properties like username, id, etc...
 		 * 			-pubid
 		 * 		+pipe
-		 */		
-		onJoin: function(user, pipe){
+		 */
+		join: function(info, channel){
+			var user = info.user.properties;
+			
 			//Append a Message to DIV container
-			$("#feed-music .feed-body").prepend("<hr>>> <b>"+user.username+"</b> has join...<hr>")
+			$("#feed-music .feed-body").prepend("<hr>>> <b>"+user.name+"</b> has join...<hr>")
 				//Scroll div to top
 				.prop("scrollTop", 0);	
 		},
@@ -47,9 +36,10 @@ $(document).ready(function(){
 		 * 			-pubid
 		 * 		+pipe
 		 */		
-		onLeft: function(user, pipe){
+		left: function(info, channel){
+			var user = info.user.properties;
 			//(jQuery)Append a Message to DIV container
-			$("#feed-music .feed-body").prepend("<hr><< <b>"+user.username+"</b> has left...<hr>")
+			$("#feed-music .feed-body").prepend("<hr><< <b>"+user.name+"</b> has left...<hr>")
 				//Scroll div to top
 				.prop("scrollTop", 0);	
 		},
@@ -66,12 +56,10 @@ $(document).ready(function(){
 		 * 				-pipe
 		 * 				...other properties and methods
 		 */		
-		data: function(info, pipe){
-			debug(arguments);
+		data: function(info, channel){
 			//(jQuery)Append a Message to DIV container
-			var from = APE.PubSub.client.core.getPipe(info.data.from.pubid);
-			debug(from);
-			$("#feed-music .feed-body").prepend("<div><b>"+info.data.from.pubid+":</b> "+info.data.msg+"</div>")
+			var user = info.from.properties;
+			$("#feed-music .feed-body").prepend("<div><b>"+user.name+":</b> "+info.msg+"</div>")
 				//Scroll div to top
 				.prop("scrollTop", 0);	
 		}
@@ -81,8 +69,9 @@ $(document).ready(function(){
 	 * Subscribe to channel
 	 */
 	
-	Sub("music");
-	addEventOn("music", Events);
+	Sub("music", Events, function(joinRes, channel){
+		$("#username").text(APE.PubSub.user.name);
+	});
 	
 	//To publish to a channel is as simple as getting the channel and pub
 	/*

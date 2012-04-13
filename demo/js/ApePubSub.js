@@ -3,23 +3,47 @@
  */
 
 //-------ApePubSub Starts--------//
+
 APE.PubSub = {
 	user: {},
 	opts: {},
 	channels: {},
+	eventQueue: {},
 	client: {},
-	reEvents: {},
 	debug: true,
 	session: false,
 	isReady: false,
 	hooks: {}
 };
 
+APE.PubSub.addEvent = function(chanName, Events, action){
+	if(typeof Events == "object"){
+		//add events to queue
+		if(typeof this.eventQueue[chanName] != "object")
+			this.eventQueue[chanName] = {};
+		
+		for(var $event in Events){
+			var action = Events[$event];
+			
+			if(typeof this.eventQueue[chanName][$event] != "array")
+				this.eventQueue[chanName][$event] = [];
+			this.eventQueue[chanName][$event].push(action);
+			
+			debug("Adding ["+chanName+"] event '"+$event+"' to queue");
+		}
+	}else{
+		var xnew = Object();
+		xnew[Events] = action;
+		this.addEvent(chanName,xnew);
+	};
+}
+
 APE.PubSub.fn = {
-	
-	//Starts the ape
+//Starts the ape
 	APE_start: function(callback){
-		var $this = this;
+		//define scope
+		var $this =this;
+		
 		//Exit and callback() if started
 		if(this.isReady){
 			callback();
@@ -27,7 +51,7 @@ APE.PubSub.fn = {
 		};
 		
 		//Add Files to APE loader
-		//Load Defaults scripts to ape
+		//Load Defaults escripts to ape
 		APE.Config.scripts = [];
 		if(this.debug){
 			//Load uncompress files
@@ -65,7 +89,7 @@ APE.PubSub.fn = {
 			debug("BAD SESSION");
 			debug("Reconnecting to server");
 			
-			if(typeof this.reconnect == "undefined") $.reconnect = 0;
+			if(typeof $this.reconnect == "undefined") $this.reconnect = 0;
 			
 			$this.reconnect++;
 			
@@ -74,6 +98,7 @@ APE.PubSub.fn = {
 				return;
 			}
 			
+			//client.fireEvent('apeReconnect');
 			APE_start(callback);
 		})
 		
@@ -96,13 +121,13 @@ APE.PubSub.fn = {
 				//Call the core start function to connect to APE Server
 				client.core.start({user: $this.user, opts: $this.opts});
 			}
-		})		
+		});		
 		
 		//When connected to server
 		client.addEvent('ready',function(){
 			$this.isReady = true;
 			
-			//Reset reconnection counter
+			//Reset the reconnect count
 			$this.reconnect = 0;
 			
 			debug('Your client is now connected');
@@ -111,44 +136,81 @@ APE.PubSub.fn = {
 			client.addEvent("multiPipeCreate",function(pipe, options){
 				
 				debug("Importing user properties from server");
-				for(var name in client.core.user.properties){
-					$this.user[name] = client.core.user.properties[name];
+				for(var name in $this.client.core.user.properties){
+					$this.user[name] = $this.client.core.user.properties[name];
 				}
-				$this.user.pubid = client.core.user.pubid;
-				var chanName = pipe.properties.name;
+				$this.user.pubid = $this.client.core.user.pubid;
 				
-				//Create Channel Pointer
-				$this.channels[chanName] = pipe;
+				var chanName = pipe.name;
 				
-				//Check for pending events
-				debug("Adding pending events to ["+chanName+"]")
-				if($this.reEvents[chanName]){
-					for(var $event in $this.reEvents[chanName]){
-						for(var i in $this.reEvents[chanName][$event]){	
-							addEventOn(chanName, $event, $this.reEvents[chanName][$event][i]);
+				pipe.on = function($event, action){
+					this.addEvent("on_"+$event, action);
+					debug("Adding event '"+$event+"' to ["+chanName+"]");
+				}
+				
+				//Add events from queue
+				if($this.eventQueue[chanName]){
+					for(var $event in $this.eventQueue[chanName]){
+						for(var i in $this.eventQueue[chanName][$event]){
+							pipe.addEvent($event,$this.eventQueue[chanName][$event][i]);
+							debug("Adding event '"+$event+"' to ["+chanName+"]");
 						}
 					}
 				}
-				
-				debug("Joined channel" + "("+pipe.properties.name+")");				
-			});
-			
-			//Handle errors
-			client.onRaw("ERR", function(raw){
-				debug("Error["+raw.data.code+"]: "+raw.data.value);
+				//save channel
+				$this.channels[chanName] = pipe;
+				pipe.fireEvent("callback");
+				debug("Joined channel" + "("+chanName+")");
 			});
 			
 			//call the Callback function if is not a session restore
 			if(!client.core.options.restore) callback();
 		})
 		
+		client.addEvent("onRaw", function(res, channel){
+			debug(">>>>"+res.raw+"<<<<");
+			switch(res.raw.toLowerCase()){
+				case "login": case "ident": case "close":
+					return this;
+				break;
+			}
+			
+			var info = res.data;
+			if(info.msg){
+				info.msg = unescape(info.msg);
+			}
+			
+			try{
+				info.msg = JSON.parse(info.msg);
+			}catch(e){}
+			
+			//debug(res);
+			//debug(info);
+			
+			channel.fireEvent("on_"+res.raw.toLowerCase(),[info,channel]);
+			
+			return this;
+		})
+		/*
+		 * Update Channel properties on LEFT and JOIN events
+		 */		
+		client.onRaw("JOIN", function(res){
+			var channel = res.data.pipe.properties;
+			getChan(channel.name).properties = channel;
+		});
+		
+		client.onRaw("LEFT", function(res){
+			var channel = res.data.pipe.properties;
+			getChan(channel.name).properties = channel;
+		});
+		
 		this.client = client;
 		
 		return true;
 	},
-
+	
 	//Subscribe user to channel
-	Sub: function(chanName, events){
+	Sub: function(chanName, Events, callback){
 		var $args = arguments;
 		
 		if(!this.isReady){
@@ -157,92 +219,89 @@ APE.PubSub.fn = {
 			})
 			return;
 		}
-			
-		if(typeof chanName != "object"){
-			var channel = Array(chanName);
-		}else{
-			var channel = chanName.slice();
-		};		
-		this.client.core.join(channel);
 		
-		if(typeof events == "object"){
-			for(var ev in events){
-				this.addEventOn
+		//Handle the events
+		if(typeof Events == "object"){
+			for(var i in Events){
+				if(i.indexOf("_") > -1) continue;
+				
+				Events["on_"+i] = Events[i];
+				delete Events[i];
 			}
+			this.addEvent(chanName, Events);
 		}
 		
+		//Handle callback
+		if(typeof callback == "function"){
+			this.addEvent(chanName,"callback", callback);
+		}
+		
+		this.client.core.join(chanName);
 		return this;
 	},
-
+	
 	//Unsubscribe from a channel
 	unSub: function(channel){
 		debug(channel);
 		if(channel == "") return;
 		
-		APE.PubSub.channel(channel).pipe.left();
+		getChan(channel).left();
 		
-		delete APE.PubSub.ch[channel];
+		delete APE.PubSub.channels[channel];
 		
 		debug("Unsubscribed from ("+channel+")");
 	},
-
+	
 	//Send Message throught channel
 	Pub: function(channel, data){
+		
 		if(!channel){
 			debug("NOT IN A CHANNEL",true);
 			return;
 		};
 		debug("Sending \"" + data + "\" through [" +channel+ "]");
-		if(typeof this.channels[channel] == "object"){
-			this.channels[channel].send(data);		
-		}else{
-			debug("You are not a member of channel [" +channel+"]");
-		}
 		
-		return this;
+		switch(typeof data){
+			case "string":
+				getChan(channel).send(data);
+				break;
+				
+			case "object":
+			case "array":
+				getChan(channel).request.send("SEND", {msg: JSON.stringify(data), type: "json"});
+				//getChan(channel).send(JSON.stringify(data));
+		}
 	},
 	
-	addEventOn: function(channel,eventName,func){
-		if(typeof this.channels[channel] == 'object'){
-			if(typeof eventName == "object"){
-				//Multiple events
-				for(var $event in eventName){
-					addEventOn(channel, $event, eventName[$event]);
-				}
-				return;
-			}else{
-				//Single event
-				this.channels[channel].onRaw(eventName,func);
-				debug("Added '"+eventName+"' event to ["+channel+"]");				
+	//function to get the channel
+	getChan:  function(channel){
+		if(typeof this.channels[channel] == "object"){
+			return this.channels[channel];
+		}
+		return false;
+	},
+	
+	queueEvent: function(chanName, Events, action){
+		//Handle the events
+		if(typeof Events == "object"){
+			//add events to queue
+			this.eventQueue[chanName] = {};
+			for(var $event in Events){
+				var action = Events[$event];
+				this.eventQueue[chanName]["raw_"+$event] = action;
+				debug("Adding ["+chanName+"] raw event '"+$event+"' to queue");
 			}
 		}else{
-			if(!this.reEvents[channel]){
-				this.reEvents[channel] = {};
-				this.reEvents[channel][eventName] = [];
-			}else if(!this.reEvents[channel][eventName]){
-				this.reEvents[channel][eventName] = [];
-			}
-			
-			if(typeof eventName == "object"){
-				//Multiple events
-				for(var $event in eventName){
-					addEventOn(channel, $event, eventName[$event]);
-				}
-			}else{
-				//Single event				
-				this.reEvents[channel][eventName].push(func);
-				debug("No ["+channel+"] to add event '"+eventName+"' to");
-			}
-			
-		}
+			this.eventQueue
+		};	
 	}
-}
+}; //End of APE.PubSub.fn
+
 /*
- * Make functions globals and Bind PubSub
+ * Export and bind functions
  */
 for(func in APE.PubSub.fn){
-	window[func] = APE.PubSub.fn[func];
-	window[func] = window[func].bind(APE.PubSub);
+	window[func] = APE.PubSub.fn[func].bind(APE.PubSub);
 }
 delete func;
 
