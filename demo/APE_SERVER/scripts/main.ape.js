@@ -10,5 +10,8 @@ Ape.addEvent("init", function() {
 	//include("utils/checkTool.js"); //Just needed for the APE JSF diagnostic tool, once APE is installed you can removeit 
 	//clude("examples/ircserver.js");
 	//include("framework/http_auth.js");
+	include("commands/pub.js");
 	include("modules/PubSub.js");
+	include("modules/stockTicker.js");
+	//include("modules/debug.js");
 });

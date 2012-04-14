@@ -1,4 +1,4 @@
-$(document).ready(function(){	
+$(document).ready(function(){
 	
 	//Options
 	APE.PubSub.debug = true; //Log to browser's console AND uses decompressed APE files
@@ -6,7 +6,7 @@ $(document).ready(function(){
 	
 	//Current user's properties
 	APE.PubSub.user = {
-		name: "User_"+randomString(5), //Generates a random username
+		name: "User_"+randomString(5), //Generates a random name
 		//id: 321,
 		//What ever you want to store in the user
 	}
@@ -16,14 +16,12 @@ $(document).ready(function(){
 		/*
 		 * Function triggered when other users join the channel
 		 * 		+user
-		 * 			...user properties like username, id, etc...
+		 * 			...user properties like name, id, etc...
 		 * 			-pubid
-		 * 		+pipe
+		 * 		+channel
 		 */
-		join: function(info, channel){
-			var user = info.user.properties;
-			
-			//Append a Message to DIV container
+		join: function(user, channel){
+			//prepend a Message to DIV container
 			$("#feed-music .feed-body").prepend("<hr>>> <b>"+user.name+"</b> has join...<hr>")
 				//Scroll div to top
 				.prop("scrollTop", 0);	
@@ -32,13 +30,12 @@ $(document).ready(function(){
 		/*
 		 * Function triggered when other users leave the channel
 		 * 		+user
-		 * 			...user properties like username, id, etc...
+		 * 			...user properties like name, id, etc...
 		 * 			-pubid
-		 * 		+pipe
+		 * 		+channel
 		 */		
-		left: function(info, channel){
-			var user = info.user.properties;
-			//(jQuery)Append a Message to DIV container
+		left: function(user, channel){
+			//(jQuery)prepend a Message to DIV container
 			$("#feed-music .feed-body").prepend("<hr><< <b>"+user.name+"</b> has left...<hr>")
 				//Scroll div to top
 				.prop("scrollTop", 0);	
@@ -49,19 +46,19 @@ $(document).ready(function(){
 		 * 		+msg = (string) message
 		 * 		+info
 		 * 			-from
-		 * 				...sender(user) properties like username, id, etc
+		 * 				...sender(user) properties like name, id, etc
 		 * 				-pubid
 		 * 			-channel
 		 * 				-name
 		 * 				-pipe
 		 * 				...other properties and methods
 		 */		
-		data: function(info, channel){
+		message: function(message, from, channel){
 			//(jQuery)Append a Message to DIV container
-			var user = info.from.properties;
-			$("#feed-music .feed-body").prepend("<div><b>"+user.name+":</b> "+info.msg+"</div>")
+			var user = from.properties;
+			$("#feed-music .feed-body").prepend("<div><b>"+user.name+":</b> "+message+"</div>")
 				//Scroll div to top
-				.prop("scrollTop", 0);	
+				.prop("scrollTop", 0);
 		}
 	};
 	
@@ -73,14 +70,12 @@ $(document).ready(function(){
 		$("#username").text(APE.PubSub.user.name);
 	});
 	
-	//To publish to a channel is as simple as getting the channel and pub
 	/*
-	 * To publish to a channel is as simple as getting the channel and pub(
-	 * channel.pub("Hello World")
+	 * To publish to a channel use the Pub() function
+	 * Pub(channel_name, message_or_object);
 	 * 
-	 * All the code below is mostly gathering some generic info
-	 * 
-	 * If you are only using one channel you could use APE.PubSub.pub("Hello World") inestead
+	 * All the code below is mostly gathering the form data to publish
+	 *  
 	 */
 	
 	//(jQuery)Binds event to  the SEND button

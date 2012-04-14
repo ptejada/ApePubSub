@@ -121,7 +121,7 @@ APE.PubSub.fn = {
 				//Call the core start function to connect to APE Server
 				client.core.start({user: $this.user, opts: $this.opts});
 			}
-		});		
+		});
 		
 		//When connected to server
 		client.addEvent('ready',function(){
@@ -167,33 +167,42 @@ APE.PubSub.fn = {
 			if(!client.core.options.restore) callback();
 		})
 		
+		/*
+		 * Bind raw_left and raw_join to on_join and on_left respectively
+		 */
 		client.addEvent("onRaw", function(res, channel){
 			debug(">>>>"+res.raw+"<<<<");
 			switch(res.raw.toLowerCase()){
-				case "login": case "ident": case "close":
+				case "join": case "left":
+					var user = res.data.user.properties;
+					user.pubid = res.data.user.pubid;
+					
+					channel.fireGlobalEvent("on_"+res.raw.toLowerCase(), [user, channel]);
 					return this;
 				break;
 			}
+		});
+		
+		/*
+		 * Handle the PUBDATA raw
+		 */
+		client.onRaw("PUBDATA", function(raw, pipe){
+			var data = raw.data;
 			
-			var info = res.data;
-			if(info.msg){
-				info.msg = unescape(info.msg);
-			}
+			if(data.type == "message")
+				data.content = unescape(data.content);
 			
-			try{
-				info.msg = JSON.parse(info.msg);
-			}catch(e){}
-			
-			//debug(res);
-			//debug(info);
-			
-			channel.fireEvent("on_"+res.raw.toLowerCase(),[info,channel]);
-			
+			pipe.fireGlobalEvent("on_"+data.type, [data.content, data.from, pipe]);
 			return this;
-		})
+		});
+		/*
+		 * Handle Erros
+		 */
+		 
+		
 		/*
 		 * Update Channel properties on LEFT and JOIN events
-		 */		
+		 */
 		client.onRaw("JOIN", function(res){
 			var channel = res.data.pipe.properties;
 			getChan(channel.name).properties = channel;
@@ -261,16 +270,11 @@ APE.PubSub.fn = {
 		};
 		debug("Sending \"" + data + "\" through [" +channel+ "]");
 		
-		switch(typeof data){
-			case "string":
-				getChan(channel).send(data);
-				break;
-				
-			case "object":
-			case "array":
-				getChan(channel).request.send("SEND", {msg: JSON.stringify(data), type: "json"});
-				//getChan(channel).send(JSON.stringify(data));
-		}
+		var cmd = {type: getChan(channel).type};
+		
+		cmd.data = data;
+		
+		getChan(channel).request.send("PUB", cmd);
 	},
 	
 	//function to get the channel
