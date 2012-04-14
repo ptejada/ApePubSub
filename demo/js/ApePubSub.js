@@ -1,7 +1,9 @@
 /**
  * @author Pablo
  */
-
+APE.Client.prototype.on = function($event, func){
+	this.addEvent("on_"+$event, func);
+}
 //-------ApePubSub Starts--------//
 
 APE.PubSub = {
@@ -13,6 +15,7 @@ APE.PubSub = {
 	debug: true,
 	session: false,
 	isReady: false,
+	reconnect: 0,
 	hooks: {}
 };
 
@@ -44,6 +47,9 @@ APE.PubSub.fn = {
 		//define scope
 		var $this =this;
 		
+		if(typeof callback != "function")
+			callback = function(){};
+		
 		//Exit and callback() if started
 		if(this.isReady){
 			callback();
@@ -72,24 +78,24 @@ APE.PubSub.fn = {
 			}
 		}
 		
-		if(this.session) debug("Using APE sessions");
-		
 		//Check the Callback function
 		if(typeof callback != "function"){
 			callback = function(){};
 		}
 		
 		var client = new APE.Client();
-				
 		//Load All scripts
-		client.load();
+		//client.load();
 		
 		//Bad Session
 		client.onError("004", function(){
+			
+			$this.isReady = false;
+			//$this.client.core.stopPoller();
+			
 			debug("BAD SESSION");
 			debug("Reconnecting to server");
-			
-			if(typeof $this.reconnect == "undefined") $this.reconnect = 0;
+			client.fireEvent("on_reconnect");
 			
 			$this.reconnect++;
 			
@@ -98,24 +104,72 @@ APE.PubSub.fn = {
 				return;
 			}
 			
-			//client.fireEvent('apeReconnect');
+			//Remove old frame
+			var element = document.getElementById("ape_undefined");
+			element.parentNode.removeChild(element);
+			
+			//Empty this stupid prototype property, huge headache
+			APE.Client.prototype.eventProxy = [];
+			
 			APE_start(callback);
 		})
 		
-		//After all scripts are loaded
+		client.addEvent("apeDisconnect", function(){
+			debug("Lost Connection to Server");
+			client.fireEvent("error_004");
+		});
+		
+		client.on("reconnect", function(){
+			debug("========================");
+		});
+		
+		client.addEvent("restoreStart", function(){
+			debug("Restoring Session...");
+		});
+		
+		client.addEvent("restoreEnd", function(){
+			debug("Session Restored...");
+			//client.fireEvent("ready");
+		});
+		
+		//When user joins a Channel
+		client.addEvent("multiPipeCreate",function(pipe, options){
+			
+			debug("Importing user properties from server");
+			for(var name in $this.client.core.user.properties){
+				$this.user[name] = $this.client.core.user.properties[name];
+			}
+			$this.user.pubid = $this.client.core.user.pubid;
+			
+			var chanName = pipe.name;
+			
+			pipe.on = function($event, action){
+				this.addEvent("on_"+$event, action);
+				debug("Adding event '"+$event+"' to ["+chanName+"]");
+			}
+			
+			//Add events from queue
+			if($this.eventQueue[chanName]){
+				for(var $event in $this.eventQueue[chanName]){
+					for(var i in $this.eventQueue[chanName][$event]){
+						pipe.addEvent($event,$this.eventQueue[chanName][$event][i]);
+						debug("Adding event '"+$event+"' to ["+chanName+"]");
+					}
+				}
+			}
+			//save channel
+			$this.channels[chanName] = pipe;
+			pipe.fireEvent("callback");
+			debug("Joined channel" + "["+chanName+"]");
+		});
+		
+		//After all scripts are loaded connect to remote server
 		client.addEvent('load',function(){
 			debug("Starting APE core");
-				
-			if(client.core.options.restore){
+			
+			if($this.session && client.core.options.restore){
 				//Calling start(); without arguments will ask the APE Server for a user session
 				client.core.start();
-				
-				client.addEvent("restoreEnd", function(par1, par2){
-					debug("Is a Session Restoration");
-					
-					//The Callbackk function
-					callback();
-				});
 			}else{
 				//It's not a session restoration
 				//Call the core start function to connect to APE Server
@@ -132,39 +186,8 @@ APE.PubSub.fn = {
 			
 			debug('Your client is now connected');
 			
-			//When user joins a Channel
-			client.addEvent("multiPipeCreate",function(pipe, options){
-				
-				debug("Importing user properties from server");
-				for(var name in $this.client.core.user.properties){
-					$this.user[name] = $this.client.core.user.properties[name];
-				}
-				$this.user.pubid = $this.client.core.user.pubid;
-				
-				var chanName = pipe.name;
-				
-				pipe.on = function($event, action){
-					this.addEvent("on_"+$event, action);
-					debug("Adding event '"+$event+"' to ["+chanName+"]");
-				}
-				
-				//Add events from queue
-				if($this.eventQueue[chanName]){
-					for(var $event in $this.eventQueue[chanName]){
-						for(var i in $this.eventQueue[chanName][$event]){
-							pipe.addEvent($event,$this.eventQueue[chanName][$event][i]);
-							debug("Adding event '"+$event+"' to ["+chanName+"]");
-						}
-					}
-				}
-				//save channel
-				$this.channels[chanName] = pipe;
-				pipe.fireEvent("callback");
-				debug("Joined channel" + "("+chanName+")");
-			});
-			
 			//call the Callback function if is not a session restore
-			if(!client.core.options.restore) callback();
+			callback();
 		})
 		
 		/*
@@ -181,6 +204,15 @@ APE.PubSub.fn = {
 					return this;
 				break;
 			}
+		});
+		
+		client.addEvent("onCmd", function(cmd, data){
+			debug("<<<<"+cmd+">>>>");
+			debug(data);
+		});
+		
+		client.onRaw("ERR", function(cmd, data){
+			debug(arguments);
 		});
 		
 		/*
@@ -213,6 +245,8 @@ APE.PubSub.fn = {
 			getChan(channel.name).properties = channel;
 		});
 		
+		//Start the APE client
+		client.load();
 		this.client = client;
 		
 		return true;
@@ -223,8 +257,9 @@ APE.PubSub.fn = {
 		var $args = arguments;
 		
 		if(!this.isReady){
+			var $this = this;
 			APE_start(function(){
-				Sub.apply(this, $args);
+				Sub.apply($this, $args);
 			})
 			return;
 		}

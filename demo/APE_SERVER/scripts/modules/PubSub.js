@@ -1,6 +1,8 @@
 var userlist = new $H;
 
 Ape.registerHookCmd("connect", function(params, cmd){
+	if(!$defined(params)) return 1;
+	
 	if($defined(params.user)){
 		
 		if (params.user.name.length > 16 || params.user.name.test('[^_a-zA-Z0-9]', 'i')) return ["006", "BAD_NICK"];
@@ -12,6 +14,7 @@ Ape.registerHookCmd("connect", function(params, cmd){
 		
 		return 1;
 	}
+	return 1;
 });
 
 //Ape.registerHookCmd("")

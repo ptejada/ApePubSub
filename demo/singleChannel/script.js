@@ -2,7 +2,7 @@ $(document).ready(function(){
 	
 	//Options
 	APE.PubSub.debug = true; //Log to browser's console AND uses decompressed APE files
-	APE.PubSub.session = false; //Toggles the use of session for APE
+	APE.PubSub.session = true; //Toggles the use of session for APE
 	
 	//Current user's properties
 	APE.PubSub.user = {
