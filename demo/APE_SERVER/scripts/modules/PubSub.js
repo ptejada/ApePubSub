@@ -38,13 +38,13 @@ Ape.addEvent("mkchan", function(channel) {
 Ape.addEvent("beforeJoin", function(user, channel) {
 	channel.userCount++;
 	channel.setProperty("userCount", channel.userCount);
-	Ape.log(channel.userCount +" users In channel "+ channel.getProperty("name"));
+	//Ape.log(channel.userCount +" users In channel "+ channel.getProperty("name"));
 });
 
 Ape.addEvent("left", function(user, channel) {
 	channel.userCount--;
 	channel.setProperty("userCount", channel.userCount);
-	Ape.log(channel.userCount +" users In channel "+ channel.getProperty("name"));
+	//Ape.log(channel.userCount +" users In channel "+ channel.getProperty("name"));
 });
 
 

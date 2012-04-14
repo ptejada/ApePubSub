@@ -21,10 +21,9 @@ $(document).ready(function(){
 		 * 		+channel
 		 */
 		join: function(user, channel){
-			//prepend a Message to DIV container
-			$("#feed-music .feed-body").prepend("<hr>>> <b>"+user.name+"</b> has join...<hr>")
-				//Scroll div to top
-				.prop("scrollTop", 0);	
+			$("#feed-music .feed-body")
+				.append("<div class='bot'> >>> <b>"+user.name+"</b> has joined <<< </div>")
+				.trigger("newLine");
 		},
 		
 		/*
@@ -35,10 +34,9 @@ $(document).ready(function(){
 		 * 		+channel
 		 */		
 		left: function(user, channel){
-			//(jQuery)prepend a Message to DIV container
-			$("#feed-music .feed-body").prepend("<hr><< <b>"+user.name+"</b> has left...<hr>")
-				//Scroll div to top
-				.prop("scrollTop", 0);	
+			$("#feed-music .feed-body")
+				.append("<div class='bot'> <<< <b>"+user.name+"</b> has left >>> </div>")
+				.trigger("newLine");
 		},
 		
 		/*
@@ -56,9 +54,9 @@ $(document).ready(function(){
 		message: function(message, from, channel){
 			//(jQuery)Append a Message to DIV container
 			var user = from.properties;
-			$("#feed-music .feed-body").prepend("<div><b>"+user.name+":</b> "+message+"</div>")
-				//Scroll div to top
-				.prop("scrollTop", 0);
+			$("#feed-music .feed-body")
+				.append("<div><b>"+user.name+":</b> "+message+"</div>")
+				.trigger("newLine");
 		}
 	};
 	
@@ -78,8 +76,7 @@ $(document).ready(function(){
 	 *  
 	 */
 	
-	//(jQuery)Binds event to  the SEND button
-	$(".feed-send").bind("submit", function(e){
+	$(".feed-send").on("submit", function(e){
 		e.preventDefault();
 		
 		var formInput = $(this).find("[name='message']");
@@ -93,7 +90,7 @@ $(document).ready(function(){
 		}
 		
 		//Add current pubid data
-		data.pubid = APE.PubSub.user.pubid;	
+		data.pubid = APE.PubSub.user.pubid;
 		
 		//Send message
 		Pub("music", data.message);
@@ -103,10 +100,20 @@ $(document).ready(function(){
 		
 		//Post My message on container
 		//Append a Message to DIV container
-		$("#feed-"+data.channel+" .feed-body").prepend("<div><b>Me:</b> "+data.message+"</div>")
-			//Scroll div to top
-			.prop("scrollTop", 0);	
+		$("#feed-"+data.channel+" .feed-body").append("<div><b>Me:</b> "+data.message+"</div>")
+			.trigger("newLine");
 		
 		return false;
 	})
+	
+	/*
+	 * Animate feed on new line message
+	 */
+	$(".feed-body").on("newLine", function(){
+		$this = $(this);
+		
+		$this.animate({scrollTop: $this.prop("scrollHeight") - $this.height()},{
+			queue: true			
+		});
+	});
 })

@@ -21,43 +21,42 @@ $(document).ready(function(){
 		 * 		+channel
 		 */
 		join: function(user, channel){
-			//Append a Message to DIV container
-			$("#feed-"+channel.name+" .feed-body").prepend("<hr>>> <b>"+user.name+"</b> has join...<hr>")
-				//Scroll div to top
-				.prop("scrollTop", 0);	
+			$("#feed-"+channel.name+" .feed-body")
+				.append("<div class='bot'> >>> <b>"+user.name+"</b> has joined <<< </div>")
+				.trigger("newLine");
 		},
 		
 		/*
-		 * Function triggered when other users leaves the channel
+		 * Function triggered when other users leave the channel
 		 * 		+user
 		 * 			...user properties like name, id, etc...
 		 * 			-pubid
 		 * 		+channel
 		 */		
 		left: function(user, channel){
-			//(jQuery)Append a Message to DIV container
-			$("#feed-"+channel.name+" .feed-body").prepend("<hr><< <b>"+user.name+"</b> has left...<hr>")
-				//Scroll div to top
-				.prop("scrollTop", 0);	
+			$("#feed-"+channel.name+" .feed-body")
+				.append("<div class='bot'> <<< <b>"+user.name+"</b> has left >>> </div>")
+				.trigger("newLine");
 		},
 		
 		/*
 		 * Function triggered when a text message is recieved on this channel
-		 * 		+message = (string) message
-		 * 		+from
-		 * 			...sender(user) properties like name, id, etc
-		 * 			-pubid
-		 * 		+channel
-		 * 			-name
-		 * 			-pipe
-		 * 			...other properties and methods
+		 * 		+msg = (string) message
+		 * 		+info
+		 * 			-from
+		 * 				...sender(user) properties like name, id, etc
+		 * 				-pubid
+		 * 			-channel
+		 * 				-name
+		 * 				-pipe
+		 * 				...other properties and methods
 		 */		
 		message: function(message, from, channel){
 			//(jQuery)Append a Message to DIV container
 			var user = from.properties;
-			$("#feed-"+channel.name+" .feed-body").prepend("<div><b>"+user.name+":</b> "+message+"</div>")
-				//Scroll div to top
-				.prop("scrollTop", 0);
+			$("#feed-"+channel.name+" .feed-body")
+				.append("<div><b>"+user.name+":</b> "+message+"</div>")
+				.trigger("newLine");
 		}
 	};
 	
@@ -67,20 +66,19 @@ $(document).ready(function(){
 	
 	Sub("music", Events, function(joinRes, channel){
 		$("#username").text(APE.PubSub.user.name);
-		Sub("dance",Events);
-		Sub("movies",Events);
+		Sub("movies", Events);
+		Sub("dance", Events);
 	});
 	
 	/*
-	 * To publish to a channel using the Pub() function
-	 * Pub(channel_name, message_or_object)
+	 * To publish to a channel use the Pub() function
+	 * Pub(channel_name, message_or_object);
 	 * 
-	 * All the code below is mostly gathering data from the form to publish
-	 * 
+	 * All the code below is mostly gathering the form data to publish
+	 *  
 	 */
 	
-	//(jQuery)Binds event to  the SEND button
-	$(".feed-send").bind("submit", function(e){
+	$(".feed-send").on("submit", function(e){
 		e.preventDefault();
 		
 		var formInput = $(this).find("[name='message']");
@@ -96,7 +94,7 @@ $(document).ready(function(){
 		//Add current pubid data
 		data.pubid = APE.PubSub.user.pubid;
 		
-		//Publish message
+		//Send message
 		Pub(data.channel, data.message);
 		
 		//Clear input and focus
@@ -104,10 +102,20 @@ $(document).ready(function(){
 		
 		//Post My message on container
 		//Append a Message to DIV container
-		$("#feed-"+data.channel+" .feed-body").prepend("<div><b>Me:</b> "+data.message+"</div>")
-			//Scroll div to top
-			.prop("scrollTop", 0);
+		$("#feed-"+data.channel+" .feed-body").append("<div><b>Me:</b> "+data.message+"</div>")
+			.trigger("newLine");
 		
 		return false;
 	})
+	
+	/*
+	 * Animate feed on new line message
+	 */
+	$(".feed-body").on("newLine", function(){
+		$this = $(this);
+		
+		$this.animate({scrollTop: $this.prop("scrollHeight") - $this.height()},{
+			queue: true			
+		});
+	});
 })

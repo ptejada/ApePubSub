@@ -1,27 +1,49 @@
 .feed {
 	width: 400px;
 	display: inline-block;
-	border: 2px outset #999;
+	border: 2px solid #999;
+	background: #AAA;
 }
 
 .feed > h1 {
 	margin: 0;
 	padding: 0.2em;
-	background: #f2f2f2;
 	text-align: center;
 	font-size: 2em;
 }
 
 .feed-body {
-	padding: 0.3em;
-	max-height: 200px;
+	height: 200px;
 	overflow: auto;
+	font-size: 1.2em;
+	background: #eee;
 }
-
+.feed-body > div {
+	padding: 0.5em;
+	background: #fafafa;
+}
+.feed-body > div:nth-child(odd) {
+	background: #efefef;
+}
+.feed-body > div.bot {
+	background: #555;
+	color: #fff;
+	font-size: 0.9em;
+	text-align: center;
+	padding: 0.2em;
+	border: solid 1px #777;	
+}
 .feed-send {
 	text-align: center;
+	width: 100%;
 }
 
+.feed-send input[type="text"] {
+	width: 78.5%;
+}
+.feed-send input[type="submit"] {
+	width: 20%;
+}
 .feed-send input {
-	font-size: 1.7em;
+	font-size: 1.5em;
 }
