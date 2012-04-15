@@ -16,6 +16,7 @@ APE.PubSub = {
 	session: false,
 	isReady: false,
 	reconnect: 0,
+	startOpt: {},
 	hooks: {}
 };
 
@@ -41,11 +42,15 @@ APE.PubSub.addEvent = function(chanName, Events, action){
 	};
 }
 
+Function.prototype.run = function(args, bind){
+	return this.apply(bind, [args]);
+}
+
 APE.PubSub.fn = {
 //Starts the ape
-	APE_start: function(callback){
+	APE_load: function(callback){
 		//define scope
-		var $this =this;
+		var $this = this;
 		
 		if(typeof callback != "function")
 			callback = function(){};
@@ -86,59 +91,70 @@ APE.PubSub.fn = {
 		var client = new APE.Client();
 		//Load All scripts
 		//client.load();
+		client.addEvent("apeReconnect", function(){
+			debug("><><><><>Reconecting<><><><><");
+		});
+		client.addEvent("apeDisconnect", function(){
+			debug("Lost Connection to Server");
+			//client.fireEvent("error_004");
+		});
+		
+		client.on("reconnect", function(){
+			debug("|Reconnecting======"+$this.reconnect+"===========>");
+			//client.core.status = 1;
+		});
+		
+		client.addEvent("restoreStart", function(){
+			debug("Restoring Session...");
+			this.restoring = true;
+		});
+		
+		client.addEvent("restoreEnd", function(){
+			debug("Session Restored");
+			this.restoring = false;
+			client.fireEvent("ready");
+		});
+		
 		
 		//Bad Session
-		client.onError("004", function(){
-			
+		client.onError("004", function(){			
 			$this.isReady = false;
-			//$this.client.core.stopPoller();
+			//$this.client.core.stopPoller();			
+			
+			$this.reconnect++;
+			
+			if($this.reconnect > 3){
+				debug("Could not reconnect to APE server");
+				client.fireEvent("apeDisconnect");
+				//client.core.clearSession();
+				return;
+			}
 			
 			debug("BAD SESSION");
 			debug("Reconnecting to server");
 			client.fireEvent("on_reconnect");
 			
-			$this.reconnect++;
+			/*
+			 * Force to get a new session
+			 */			
+			this.core.removeInstance(this.core.options.identifier);
+			this.core.saveCookie();
 			
-			if($this.reconnect > 1){
-				debug("Could not reconnect to APE server");
-				return;
-			}
+			this.core.stopPoller();
+			this.core.cancelRequest();
 			
-			//Remove old frame
-			var element = document.getElementById("ape_undefined");
-			element.parentNode.removeChild(element);
-			
-			//Empty this stupid prototype property, huge headache
-			APE.Client.prototype.eventProxy = [];
-			
-			APE_start(callback);
+			//Reload the client
+			client.load();
 		})
 		
-		client.addEvent("apeDisconnect", function(){
-			debug("Lost Connection to Server");
-			client.fireEvent("error_004");
-		});
-		
-		client.on("reconnect", function(){
-			debug("========================");
-		});
-		
-		client.addEvent("restoreStart", function(){
-			debug("Restoring Session...");
-		});
-		
-		client.addEvent("restoreEnd", function(){
-			debug("Session Restored...");
-			//client.fireEvent("ready");
-		});
-		
 		//When user joins a Channel
-		client.addEvent("multiPipeCreate",function(pipe, options){
+		client.onRaw("CHANNEL",function(res, pipe){
 			
 			debug("Importing user properties from server");
 			for(var name in $this.client.core.user.properties){
 				$this.user[name] = $this.client.core.user.properties[name];
 			}
+			
 			$this.user.pubid = $this.client.core.user.pubid;
 			
 			var chanName = pipe.name;
@@ -157,6 +173,7 @@ APE.PubSub.fn = {
 					}
 				}
 			}
+			
 			//save channel
 			$this.channels[chanName] = pipe;
 			pipe.fireEvent("callback");
@@ -167,18 +184,26 @@ APE.PubSub.fn = {
 		client.addEvent('load',function(){
 			debug("Starting APE core");
 			
+			//Channels
+			this.core.options.channel = $this.startOpt.channel || null;
+			
+			//Delete Buging default events
+			client.core.$events["error_004"].splice(0,1);
+			
 			if($this.session && client.core.options.restore){
 				//Calling start(); without arguments will ask the APE Server for a user session
-				client.core.start();
+				client.core.start(null, $this.starOpt);
 			}else{
 				//It's not a session restoration
 				//Call the core start function to connect to APE Server
-				client.core.start({user: $this.user, opts: $this.opts});
+				client.core.start({user: $this.user, opts: $this.opts}, $this.starOpt);
 			}
 		});
 		
-		//When connected to server
+		//Connected to server
 		client.addEvent('ready',function(){
+			//if(this.restoring) return this
+			
 			$this.isReady = true;
 			
 			//Reset the reconnect count
@@ -186,7 +211,7 @@ APE.PubSub.fn = {
 			
 			debug('Your client is now connected');
 			
-			//call the Callback function if is not a session restore
+			//call the Callback function
 			callback();
 		})
 		
@@ -208,7 +233,10 @@ APE.PubSub.fn = {
 		
 		client.addEvent("onCmd", function(cmd, data){
 			debug("<<<<"+cmd+">>>>");
-			debug(data);
+			switch(cmd){
+				case "": 
+					debug(data);
+			}
 		});
 		
 		client.onRaw("ERR", function(cmd, data){
@@ -230,7 +258,6 @@ APE.PubSub.fn = {
 		/*
 		 * Handle Erros
 		 */
-		 
 		
 		/*
 		 * Update Channel properties on LEFT and JOIN events
@@ -238,12 +265,26 @@ APE.PubSub.fn = {
 		client.onRaw("JOIN", function(res){
 			var channel = res.data.pipe.properties;
 			getChan(channel.name).properties = channel;
+			debug(res.time);
 		});
 		
 		client.onRaw("LEFT", function(res){
 			var channel = res.data.pipe.properties;
 			getChan(channel.name).properties = channel;
 		});
+		
+		
+		/*
+		 * Help trigger apeDisconnect
+		 */
+		/*
+		client.onCmd("connect", function(){
+			//client.core.status = -1;
+		});
+		client.onCmd("session", function(){
+			//client.core.status = 0;
+		});
+		*/
 		
 		//Start the APE client
 		client.load();
@@ -254,16 +295,6 @@ APE.PubSub.fn = {
 	
 	//Subscribe user to channel
 	Sub: function(chanName, Events, callback){
-		var $args = arguments;
-		
-		if(!this.isReady){
-			var $this = this;
-			APE_start(function(){
-				Sub.apply($this, $args);
-			})
-			return;
-		}
-		
 		//Handle the events
 		if(typeof Events == "object"){
 			for(var i in Events){
@@ -280,7 +311,16 @@ APE.PubSub.fn = {
 			this.addEvent(chanName,"callback", callback);
 		}
 		
-		this.client.core.join(chanName);
+		if(!this.isReady){
+			var $this = this;
+			this.startOpt.channel = this.startOpt.channel || [];
+			this.startOpt.channel.push(chanName);
+			
+			APE_load();
+		}else{
+			this.client.core.join(chanName);				
+		}
+		
 		return this;
 	},
 	

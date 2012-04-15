@@ -60,6 +60,9 @@ $(document).ready(function(){
 		}
 	};
 	
+	
+	
+	//return;
 	/*
 	 * Subscribe to channel
 	 */
@@ -110,7 +113,7 @@ $(document).ready(function(){
 	 * Animate feed on new line message
 	 */
 	$(".feed-body").on("newLine", function(){
-		$this = $(this);
+		var $this = $(this);
 		
 		$this.animate({scrollTop: $this.prop("scrollHeight") - $this.height()},{
 			queue: true			
