@@ -13,6 +13,6 @@ APE.PubSub = {
 	session: false,
 	isReady: false,
 	reconnect: 0,
-	startOpt: {},
-	hooks: {}
+	restoring: false,
+	startOpt: {}
 };

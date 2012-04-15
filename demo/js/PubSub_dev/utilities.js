@@ -7,7 +7,7 @@ for(func in APE.PubSub.fn){
 delete func;
 
 //Debug Function for Browsers console
-function debug($obj){
+APE.debug = function($obj){
 	if(!APE.PubSub.debug) return;
 	
     var pre = "[APE] ";

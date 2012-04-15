@@ -2,6 +2,7 @@ APE.PubSub.load = function(callback){
 	//define scope
 	var $this = this;
 	
+	//Check callback
 	if(typeof callback != "function")
 		callback = function(){};
 	
@@ -10,9 +11,9 @@ APE.PubSub.load = function(callback){
 		callback();
 		return false;
 	};
-	
-	//Add Files to APE loader
-	//Load Defaults escripts to ape
+	/*
+	 * Add Script Files for APE.Config.scripts
+	 */
 	APE.Config.scripts = [];
 	if(this.debug){
 		//Load uncompress files
@@ -31,52 +32,53 @@ APE.PubSub.load = function(callback){
 		}else{
 			APE.Config.scripts.push(APE.Config.baseUrl + "/Build/yuiCompressor/apeCore.js");
 		}
-	}
+	}	
 	
-	//Check the Callback function
-	if(typeof callback != "function"){
-		callback = function(){};
-	}
-	
+	/*
+	 * Instantiate APE Client
+	 */
 	var client = new APE.Client();
-	//Load All scripts
-	//client.load();
+	
+	/*
+	 * Events to output debug data
+	 */
+	client.addEvent("onRaw", function(res, channel){
+		debug(">>>>"+res.raw+"<<<<");
+	});
+	
+	client.addEvent("onCmd", function(cmd, data){
+		debug("<<<<"+cmd+">>>>");
+	});
+	
+	client.onRaw("ERR", function(raw){
+		debug("Error: ["+raw.data.code+"] "+raw.data.value);
+	});
+	
+	/*
+	 * Events to handle Errors
+	 */	
 	client.addEvent("apeReconnect", function(){
 		debug("><><><><>Reconecting<><><><><");
 	});
 	client.addEvent("apeDisconnect", function(){
 		debug("Lost Connection to Server");
-		//client.fireEvent("error_004");
 	});
 	
 	client.on("reconnect", function(){
 		debug("|Reconnecting======"+$this.reconnect+"===========>");
-		//client.core.status = 1;
-	});
-	
-	client.addEvent("restoreStart", function(){
-		debug("Restoring Session...");
-		this.restoring = true;
-	});
-	
-	client.addEvent("restoreEnd", function(){
-		debug("Session Restored");
-		this.restoring = false;
-		client.fireEvent("ready");
-	});
-	
+	});	
 	
 	//Bad Session
 	client.onError("004", function(){			
 		$this.isReady = false;
-		//$this.client.core.stopPoller();			
 		
 		$this.reconnect++;
 		
 		if($this.reconnect > 3){
 			debug("Could not reconnect to APE server");
 			client.fireEvent("apeDisconnect");
-			//client.core.clearSession();
+			client.fireEvent("on_disconnec");
+			client.core.clearSession();
 			return;
 		}
 		
@@ -95,20 +97,22 @@ APE.PubSub.load = function(callback){
 		
 		//Reload the client
 		client.load();
-	})
+	});
 	
-	//When user joins a Channel
+	/*
+	 * Events to Handle incoming RAW
+	 */
 	client.onRaw("CHANNEL",function(res, pipe){
-		
-		debug("Importing user properties from server");
-		for(var name in $this.client.core.user.properties){
-			$this.user[name] = $this.client.core.user.properties[name];
-		}
-		
-		$this.user.pubid = $this.client.core.user.pubid;
-		
+	//When user joins joins a channel
 		var chanName = pipe.name;
 		
+		debug("Joined channel" + "["+chanName+"]");
+		
+		debug("Updating user properties from channel");
+		for(var name in $this.client.core.user.properties){
+			$this.user[name] = $this.client.core.user.properties[name];
+		}	
+				
 		pipe.on = function($event, action){
 			this.addEvent("on_"+$event, action);
 			debug("Adding event '"+$event+"' to ["+chanName+"]");
@@ -127,10 +131,59 @@ APE.PubSub.load = function(callback){
 		//save channel
 		$this.channels[chanName] = pipe;
 		pipe.fireEvent("callback");
-		debug("Joined channel" + "["+chanName+"]");
 	});
 	
-	//After all scripts are loaded connect to remote server
+	client.onRaw("PUBDATA", function(raw, pipe){
+	//Route incoming messages and data to proper events
+		var data = raw.data;
+		
+		if(data.type == "message")
+			data.content = unescape(data.content);
+		
+		pipe.fireGlobalEvent("on_"+data.type, [data.content, data.from, pipe]);
+		return this;
+	});
+	
+	client.onRaw("LEFT", function(res,pipe){
+	//Update Channel properties on LEFT events
+		pipe.properties = res.data.pipe.properties;
+		
+	//Trigger on_left event
+		var user = res.data.user.properties || {};
+		user.pubid = res.data.user.pubid;
+		
+		pipe.fireGlobalEvent("on_"+res.raw.toLowerCase(), [user, pipe]);
+	});
+	
+	client.onRaw("JOIN", function(res, pipe){
+	//Update Channel properties on JOIN events
+		pipe.properties = res.data.pipe.properties;
+		
+	//Trigger on_left event
+		var user = res.data.user.properties || {};
+		user.pubid = res.data.user.pubid;
+		
+		pipe.fireGlobalEvent("on_"+res.raw.toLowerCase(), [user, pipe]);
+	});
+	
+	/*
+	 * Events for sessions
+	 */
+	client.addEvent("restoreStart", function(){
+		debug("Restoring Session...");
+		this.restoring = true;
+	});
+	
+	client.addEvent("restoreEnd", function(){
+		debug("Session Restored");
+		this.restoring = false;
+		client.fireEvent("ready");
+	});
+
+	/*
+	 * After all scripts have loaded
+	 * Start the client core to start a connection to the server
+	 */
 	client.addEvent('load',function(){
 		debug("Starting APE core");
 		
@@ -150,9 +203,9 @@ APE.PubSub.load = function(callback){
 		}
 	});
 	
-	//Connected to server
 	client.addEvent('ready',function(){
-		//if(this.restoring) return this
+	//Your client is now connected
+		if(this.restoring) return this
 		
 		$this.isReady = true;
 		
@@ -166,79 +219,10 @@ APE.PubSub.load = function(callback){
 	})
 	
 	/*
-	 * Bind raw_left and raw_join to on_join and on_left respectively
+	 * The trigger to start everything up
 	 */
-	client.addEvent("onRaw", function(res, channel){
-		debug(">>>>"+res.raw+"<<<<");
-		switch(res.raw.toLowerCase()){
-			case "join": case "left":
-				var user = res.data.user.properties;
-				user.pubid = res.data.user.pubid;
-				
-				channel.fireGlobalEvent("on_"+res.raw.toLowerCase(), [user, channel]);
-				return this;
-			break;
-		}
-	});
-	
-	client.addEvent("onCmd", function(cmd, data){
-		debug("<<<<"+cmd+">>>>");
-		switch(cmd){
-			case "": 
-				debug(data);
-		}
-	});
-	
-	client.onRaw("ERR", function(cmd, data){
-		debug(arguments);
-	});
-	
-	/*
-	 * Handle the PUBDATA raw
-	 */
-	client.onRaw("PUBDATA", function(raw, pipe){
-		var data = raw.data;
-		
-		if(data.type == "message")
-			data.content = unescape(data.content);
-		
-		pipe.fireGlobalEvent("on_"+data.type, [data.content, data.from, pipe]);
-		return this;
-	});
-	/*
-	 * Handle Erros
-	 */
-	
-	/*
-	 * Update Channel properties on LEFT and JOIN events
-	 */
-	client.onRaw("JOIN", function(res){
-		var channel = res.data.pipe.properties;
-		getChan(channel.name).properties = channel;
-		debug(res.time);
-	});
-	
-	client.onRaw("LEFT", function(res){
-		var channel = res.data.pipe.properties;
-		getChan(channel.name).properties = channel;
-	});
-	
-	
-	/*
-	 * Help trigger apeDisconnect
-	 */
-	/*
-	client.onCmd("connect", function(){
-		//client.core.status = -1;
-	});
-	client.onCmd("session", function(){
-		//client.core.status = 0;
-	});
-	*/
-	
-	//Start the APE client
 	client.load();
 	this.client = client;
 	
-	return true;
+	return this;
 }

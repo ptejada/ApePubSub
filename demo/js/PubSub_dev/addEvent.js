@@ -1,4 +1,4 @@
-APE.PubSub.addEvent = function(chanName, Events, action){
+APE.PubSub.addEvent2 = function(chanName, Events, action){
 	if(typeof Events == "object"){
 		//add events to queue
 		if(typeof this.eventQueue[chanName] != "object")

@@ -15,7 +15,7 @@ APE.PubSub.fn = {
 		
 		//Handle callback
 		if(typeof callback == "function"){
-			this.addEvent(chanName,"callback", callback);
+			onChan(chanName,"callback", callback);
 		}
 		
 		if(!this.isReady){
