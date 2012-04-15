@@ -33,7 +33,7 @@ APE.PubSub.addEvent = function(chanName, Events, action){
 				this.eventQueue[chanName][$event] = [];
 			this.eventQueue[chanName][$event].push(action);
 			
-			debug("Adding ["+chanName+"] event '"+$event+"' to queue");
+			APE.debug("Adding ["+chanName+"] event '"+$event+"' to queue");
 		}
 	}else{
 		var xnew = Object();
@@ -86,25 +86,25 @@ APE.PubSub.load = function(callback){
 	//Load All scripts
 	//client.load();
 	client.addEvent("apeReconnect", function(){
-		debug("><><><><>Reconecting<><><><><");
+		APE.debug("><><><><>Reconecting<><><><><");
 	});
 	client.addEvent("apeDisconnect", function(){
-		debug("Lost Connection to Server");
+		APE.debug("Lost Connection to Server");
 		//client.fireEvent("error_004");
 	});
 	
 	client.on("reconnect", function(){
-		debug("|Reconnecting======"+$this.reconnect+"===========>");
+		APE.debug("|Reconnecting======"+$this.reconnect+"===========>");
 		//client.core.status = 1;
 	});
 	
 	client.addEvent("restoreStart", function(){
-		debug("Restoring Session...");
+		APE.debug("Restoring Session...");
 		this.restoring = true;
 	});
 	
 	client.addEvent("restoreEnd", function(){
-		debug("Session Restored");
+		APE.debug("Session Restored");
 		this.restoring = false;
 		client.fireEvent("ready");
 	});
@@ -118,14 +118,14 @@ APE.PubSub.load = function(callback){
 		$this.reconnect++;
 		
 		if($this.reconnect > 3){
-			debug("Could not reconnect to APE server");
+			APE.debug("Could not reconnect to APE server");
 			client.fireEvent("apeDisconnect");
 			//client.core.clearSession();
 			return;
 		}
 		
-		debug("BAD SESSION");
-		debug("Reconnecting to server");
+		APE.debug("BAD SESSION");
+		APE.debug("Reconnecting to server");
 		client.fireEvent("on_reconnect");
 		
 		/*
@@ -144,7 +144,7 @@ APE.PubSub.load = function(callback){
 	//When user joins a Channel
 	client.onRaw("CHANNEL",function(res, pipe){
 		
-		debug("Importing user properties from server");
+		APE.debug("Importing user properties from server");
 		for(var name in $this.client.core.user.properties){
 			$this.user[name] = $this.client.core.user.properties[name];
 		}
@@ -155,7 +155,7 @@ APE.PubSub.load = function(callback){
 		
 		pipe.on = function($event, action){
 			this.addEvent("on_"+$event, action);
-			debug("Adding event '"+$event+"' to ["+chanName+"]");
+			APE.debug("Adding event '"+$event+"' to ["+chanName+"]");
 		}
 		
 		//Add events from queue
@@ -163,7 +163,7 @@ APE.PubSub.load = function(callback){
 			for(var $event in $this.eventQueue[chanName]){
 				for(var i in $this.eventQueue[chanName][$event]){
 					pipe.addEvent($event,$this.eventQueue[chanName][$event][i]);
-					debug("Adding event '"+$event+"' to ["+chanName+"]");
+					APE.debug("Adding event '"+$event+"' to ["+chanName+"]");
 				}
 			}
 		}
@@ -171,12 +171,12 @@ APE.PubSub.load = function(callback){
 		//save channel
 		$this.channels[chanName] = pipe;
 		pipe.fireEvent("callback");
-		debug("Joined channel" + "["+chanName+"]");
+		APE.debug("Joined channel" + "["+chanName+"]");
 	});
 	
 	//After all scripts are loaded connect to remote server
 	client.addEvent('load',function(){
-		debug("Starting APE core");
+		APE.debug("Starting APE core");
 		
 		//Channels
 		this.core.options.channel = $this.startOpt.channel || null;
@@ -203,7 +203,7 @@ APE.PubSub.load = function(callback){
 		//Reset the reconnect count
 		$this.reconnect = 0;
 		
-		debug('Your client is now connected');
+		APE.debug('Your client is now connected');
 		
 		//call the Callback function
 		callback();
@@ -213,7 +213,7 @@ APE.PubSub.load = function(callback){
 	 * Bind raw_left and raw_join to on_join and on_left respectively
 	 */
 	client.addEvent("onRaw", function(res, channel){
-		debug(">>>>"+res.raw+"<<<<");
+		APE.debug(">>>>"+res.raw+"<<<<");
 		switch(res.raw.toLowerCase()){
 			case "join": case "left":
 				var user = res.data.user.properties;
@@ -226,15 +226,15 @@ APE.PubSub.load = function(callback){
 	});
 	
 	client.addEvent("onCmd", function(cmd, data){
-		debug("<<<<"+cmd+">>>>");
+		APE.debug("<<<<"+cmd+">>>>");
 		switch(cmd){
 			case "": 
-				debug(data);
+				APE.debug(data);
 		}
 	});
 	
 	client.onRaw("ERR", function(cmd, data){
-		debug(arguments);
+		APE.debug(arguments);
 	});
 	
 	/*
@@ -259,7 +259,7 @@ APE.PubSub.load = function(callback){
 	client.onRaw("JOIN", function(res){
 		var channel = res.data.pipe.properties;
 		getChan(channel.name).properties = channel;
-		debug(res.time);
+		APE.debug(res.time);
 	});
 	
 	client.onRaw("LEFT", function(res){
@@ -321,24 +321,24 @@ APE.PubSub.fn = {
 	
 	//Unsubscribe from a channel
 	unSub: function(channel){
-		debug(channel);
+		APE.debug(channel);
 		if(channel == "") return;
 		
 		getChan(channel).left();
 		
 		delete APE.PubSub.channels[channel];
 		
-		debug("Unsubscribed from ("+channel+")");
+		APE.debug("Unsubscribed from ("+channel+")");
 	},
 	
 	//Send Message throught channel
 	Pub: function(channel, data){
 		
 		if(!channel){
-			debug("NOT IN A CHANNEL",true);
+			APE.debug("NOT IN A CHANNEL",true);
 			return;
 		};
-		debug("Sending \"" + data + "\" through [" +channel+ "]");
+		APE.debug("Sending \"" + data + "\" through [" +channel+ "]");
 		
 		var cmd = {type: getChan(channel).type};
 		
@@ -363,7 +363,7 @@ APE.PubSub.fn = {
 			for(var $event in Events){
 				var action = Events[$event];
 				this.eventQueue[chanName]["raw_"+$event] = action;
-				debug("Adding ["+chanName+"] raw event '"+$event+"' to queue");
+				APE.debug("Adding ["+chanName+"] raw event '"+$event+"' to queue");
 			}
 		}else{
 			this.eventQueue
@@ -380,7 +380,7 @@ for(func in APE.PubSub.fn){
 delete func;
 
 //Debug Function for Browsers console
-function debug($obj){
+function APE.debug($obj){
 	if(!APE.PubSub.debug) return;
 	
     var pre = "[APE] ";

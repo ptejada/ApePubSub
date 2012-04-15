@@ -34,24 +34,24 @@ APE.PubSub.fn = {
 	
 	//Unsubscribe from a channel
 	unSub: function(channel){
-		debug(channel);
+		APE.debug(channel);
 		if(channel == "") return;
 		
 		getChan(channel).left();
 		
 		delete APE.PubSub.channels[channel];
 		
-		debug("Unsubscribed from ("+channel+")");
+		APE.debug("Unsubscribed from ("+channel+")");
 	},
 	
 	//Send Message throught channel
 	Pub: function(channel, data){
 		
 		if(!channel){
-			debug("NOT IN A CHANNEL",true);
+			APE.debug("NOT IN A CHANNEL",true);
 			return;
 		};
-		debug("Sending \"" + data + "\" through [" +channel+ "]");
+		APE.debug("Sending \"" + data + "\" through [" +channel+ "]");
 		
 		var cmd = {type: getChan(channel).type};
 		
@@ -81,7 +81,7 @@ APE.PubSub.fn = {
 					this.eventQueue[chanName][$event] = [];
 				this.eventQueue[chanName][$event].push(action);
 				
-				debug("Adding ["+chanName+"] event '"+$event+"' to queue");
+				APE.debug("Adding ["+chanName+"] event '"+$event+"' to queue");
 			}
 		}else{
 			var xnew = Object();

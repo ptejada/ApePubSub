@@ -8,10 +8,10 @@ delete func;
 
 //Debug Function for Browsers console
 APE.debug = function($obj){
-	if(!APE.PubSub.debug) return;
+	if(!this.PubSub.debug) return;
 	
     var pre = "[APE] ";
-    if(typeof $obj == "string"){ 
+    if(typeof $obj == "string"){
         window.console.log(pre+$obj);
     }else{
     	window.console.log(pre+"[Object]");
@@ -20,7 +20,7 @@ APE.debug = function($obj){
 };
 
 //Generate a random string
-function randomString(l) {
+function randomString(l){
 	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
 	var string_length = l;
 	var randomstring = '';

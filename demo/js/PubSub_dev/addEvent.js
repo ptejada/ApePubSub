@@ -11,7 +11,7 @@ APE.PubSub.addEvent2 = function(chanName, Events, action){
 				this.eventQueue[chanName][$event] = [];
 			this.eventQueue[chanName][$event].push(action);
 			
-			debug("Adding ["+chanName+"] event '"+$event+"' to queue");
+			APE.debug("Adding ["+chanName+"] event '"+$event+"' to queue");
 		}
 	}else{
 		var xnew = Object();

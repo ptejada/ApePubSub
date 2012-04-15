@@ -56,7 +56,7 @@ $.Ape = {
 			}
 		}		
 		
-		if(this.session) debug("Using APE sessions");
+		if(this.session) APE.debug("Using APE sessions");
 		
 		//Check the Callback function
 		if(typeof callback != "function"){
@@ -73,15 +73,15 @@ $.Ape = {
 		
 		//Bad Session
 		client.onError("004", function(){
-			debug("BAD SESSION");
-			debug("Reconnecting to server");
+			APE.debug("BAD SESSION");
+			APE.debug("Reconnecting to server");
 			
 			if(typeof $.Ape.reconnect == "undefined") $.Ape.reconnect = 0;
 			
 			$.Ape.reconnect++
 			
 			if($.Ape.reconnect > 1){
-				debug("Could not reconnect to APE server");
+				APE.debug("Could not reconnect to APE server");
 				return;
 			}
 			
@@ -90,14 +90,14 @@ $.Ape = {
 		
 		//After all scripts are loaded
 		client.addEvent('load',function(){
-			debug("Starting APE core");
+			APE.debug("Starting APE core");
 				
 			if(client.core.options.restore){
 				//Calling start(); without arguments will ask the APE Server for a user session
 				client.core.start();
 				
 				client.addEvent("restoreEnd", function(par1, par2){
-					debug("Is a Session Restoration");
+					APE.debug("Is a Session Restoration");
 					
 					//The Callbackk function
 					callback();	
@@ -113,12 +113,12 @@ $.Ape = {
 		client.addEvent('ready',function(){
 			$.Ape.isReady = true;			
 			
-			debug('Your client is now connected');				
+			APE.debug('Your client is now connected');				
 			
 			//When user joins a Channel
 			client.addEvent("multiPipeCreate",function(pipe, options){
 				
-				debug("Importing user properties from server");
+				APE.debug("Importing user properties from server");
 				for(var name in $.Ape.client.core.user.properties){
 					$.Ape.user[name] = $.Ape.client.core.user.properties[name];
 				}
@@ -162,7 +162,7 @@ $.Ape = {
 				
 				if(typeof $.Ape.ch[chanName] == "undefined"){
 					$.Ape.ch[chanName] = new $.Ape.newCh(chanName,pipe);
-					debug("["+chanName+"]>> CREATING newCh()");
+					APE.debug("["+chanName+"]>> CREATING newCh()");
 				}else{
 					
 					$.Ape.ch[chanName].isReady = true;
@@ -170,7 +170,7 @@ $.Ape = {
 				}
 				
 				
-				debug("Joined channel" + "("+chanName+")");
+				APE.debug("Joined channel" + "("+chanName+")");
 				
 				//Call the joined event
 				$.Ape.ch[chanName].call("joined", new $.Ape.channel(chanName));
@@ -180,7 +180,7 @@ $.Ape = {
 			
 			//Handle errors
 			client.onRaw("ERR", function(raw){
-				debug("Error["+raw.data.code+"]: "+raw.data.value);
+				APE.debug("Error["+raw.data.code+"]: "+raw.data.value);
 				//Custom error function
 				$.Ape.call("onError",raw.data);
 			});
@@ -217,7 +217,7 @@ $.Ape = {
 			this.activeChannel = channel[ch];
 			
 			if(typeof this.ch[curChan] != "undefined" && this.ch[curChan].isReady){
-				debug("Already on " + curChan);
+				APE.debug("Already on " + curChan);
 				
 				if(typeof callback == "function"){
 					//add joined callback function and triggered it
@@ -249,7 +249,7 @@ $.Ape = {
 	unSub: function(){
 		var channel = this.activeChannel || this.name;
 		
-		debug(channel);
+		APE.debug(channel);
 		if(channel == "") return;
 		
 		this.activeChannel = "";
@@ -258,7 +258,7 @@ $.Ape = {
 		
 		delete $.Ape.ch[channel];
 		
-		debug("Unsubscribed from ("+channel+")");
+		APE.debug("Unsubscribed from ("+channel+")");
 	},
 	
 	//Send Message throught channel
@@ -268,16 +268,16 @@ $.Ape = {
 		}
 		
 		if(!channel){
-			debug("NOT IN A CHANNEL",true);
+			APE.debug("NOT IN A CHANNEL",true);
 			return;
 		};
-		debug(channel);
+		APE.debug(channel);
 		$.Ape.ch[channel].pipe.send(msg);
 	},
 	
 	//Select and return a channel object
 	channel: function(channel){
-		//debug(typeof $.Ape.ch[channel]);
+		//APE.debug(typeof $.Ape.ch[channel]);
 		if(typeof $.Ape.ch[channel] == "object" && $.Ape.ch[channel].isReady){
 			$.Ape.activeChannel = channel;
 			
@@ -292,13 +292,13 @@ $.Ape = {
 		var channel = this.activeChannel || this.name;
 		var isApe = typeof this.client;		
 		
-		//debug(isApe);
+		//APE.debug(isApe);
 		
 		if(isApe == "object"){
-			debug("Adding Event ["+e+"] to $.Ape");
+			APE.debug("Adding Event ["+e+"] to $.Ape");
 			$.Ape.fn[e] = callback;
 		}else{
-			debug("Adding Event ["+e+"] to channel ["+channel+"]");
+			APE.debug("Adding Event ["+e+"] to channel ["+channel+"]");
 			$.Ape.ch[channel].fn[e] = callback;			
 		}		
 		
@@ -312,19 +312,19 @@ $.Ape = {
 		//Global Function
 		//Check that Function exists
 		if(typeof $.Ape.fn[fnName] == "function"){
-			debug("Calling Global ["+fnName+"] in reference to channel ("+channel+")->["+fnName+"]");			
+			APE.debug("Calling Global ["+fnName+"] in reference to channel ("+channel+")->["+fnName+"]");			
 			$.Ape.fn[fnName](opt, extra, channel);
 		}else{
-			debug("No Global ["+fnName+"] on $.Ape");
+			APE.debug("No Global ["+fnName+"] on $.Ape");
 		}
 		
 		//Channel specific function
 		//Check that Function exists
 		if(typeof $.Ape.ch[channel].fn[fnName] == "function"){
-			debug("Calling ["+fnName+"] on channel ("+channel+")");
+			APE.debug("Calling ["+fnName+"] on channel ("+channel+")");
 			$.Ape.ch[channel].fn[fnName](opt, extra, channel);
 		}else{
-			debug("No ["+fnName+"] on channel ("+channel+")");			
+			APE.debug("No ["+fnName+"] on channel ("+channel+")");			
 		}
 		
 	}
@@ -332,7 +332,7 @@ $.Ape = {
 
 
 //Debug Function for Browsers console
-function debug($obj){
+function APE.debug($obj){
 	if(!$.Ape.debug) return;
 	
     var pre = "-->>";

@@ -43,29 +43,29 @@ APE.PubSub.load = function(callback){
 	 * Events to output debug data
 	 */
 	client.addEvent("onRaw", function(res, channel){
-		debug(">>>>"+res.raw+"<<<<");
+		APE.debug(">>>>"+res.raw+"<<<<");
 	});
 	
 	client.addEvent("onCmd", function(cmd, data){
-		debug("<<<<"+cmd+">>>>");
+		APE.debug("<<<<"+cmd+">>>>");
 	});
 	
 	client.onRaw("ERR", function(raw){
-		debug("Error: ["+raw.data.code+"] "+raw.data.value);
+		APE.debug("Error: ["+raw.data.code+"] "+raw.data.value);
 	});
 	
 	/*
 	 * Events to handle Errors
 	 */	
 	client.addEvent("apeReconnect", function(){
-		debug("><><><><>Reconecting<><><><><");
+		APE.debug("><><><><>Reconecting<><><><><");
 	});
 	client.addEvent("apeDisconnect", function(){
-		debug("Lost Connection to Server");
+		APE.debug("Lost Connection to Server");
 	});
 	
 	client.on("reconnect", function(){
-		debug("|Reconnecting======"+$this.reconnect+"===========>");
+		APE.debug("|Reconnecting======"+$this.reconnect+"===========>");
 	});	
 	
 	//Bad Session
@@ -75,15 +75,15 @@ APE.PubSub.load = function(callback){
 		$this.reconnect++;
 		
 		if($this.reconnect > 3){
-			debug("Could not reconnect to APE server");
+			APE.debug("Could not reconnect to APE server");
 			client.fireEvent("apeDisconnect");
 			client.fireEvent("on_disconnec");
 			client.core.clearSession();
 			return;
 		}
 		
-		debug("BAD SESSION");
-		debug("Reconnecting to server");
+		APE.debug("BAD SESSION");
+		APE.debug("Reconnecting to server");
 		client.fireEvent("on_reconnect");
 		
 		/*
@@ -106,16 +106,16 @@ APE.PubSub.load = function(callback){
 	//When user joins joins a channel
 		var chanName = pipe.name;
 		
-		debug("Joined channel" + "["+chanName+"]");
+		APE.debug("Joined channel" + "["+chanName+"]");
 		
-		debug("Updating user properties from channel");
+		APE.debug("Updating user properties from channel");
 		for(var name in $this.client.core.user.properties){
 			$this.user[name] = $this.client.core.user.properties[name];
 		}	
 				
 		pipe.on = function($event, action){
 			this.addEvent("on_"+$event, action);
-			debug("Adding event '"+$event+"' to ["+chanName+"]");
+			APE.debug("Adding event '"+$event+"' to ["+chanName+"]");
 		}
 		
 		//Add events from queue
@@ -123,7 +123,7 @@ APE.PubSub.load = function(callback){
 			for(var $event in $this.eventQueue[chanName]){
 				for(var i in $this.eventQueue[chanName][$event]){
 					pipe.addEvent($event,$this.eventQueue[chanName][$event][i]);
-					debug("Adding event '"+$event+"' to ["+chanName+"]");
+					APE.debug("Adding event '"+$event+"' to ["+chanName+"]");
 				}
 			}
 		}
@@ -170,12 +170,12 @@ APE.PubSub.load = function(callback){
 	 * Events for sessions
 	 */
 	client.addEvent("restoreStart", function(){
-		debug("Restoring Session...");
+		APE.debug("Restoring Session...");
 		this.restoring = true;
 	});
 	
 	client.addEvent("restoreEnd", function(){
-		debug("Session Restored");
+		APE.debug("Session Restored");
 		this.restoring = false;
 		client.fireEvent("ready");
 	});
@@ -185,7 +185,7 @@ APE.PubSub.load = function(callback){
 	 * Start the client core to start a connection to the server
 	 */
 	client.addEvent('load',function(){
-		debug("Starting APE core");
+		APE.debug("Starting APE core");
 		
 		//Channels
 		this.core.options.channel = $this.startOpt.channel || null;
@@ -212,7 +212,7 @@ APE.PubSub.load = function(callback){
 		//Reset the reconnect count
 		$this.reconnect = 0;
 		
-		debug('Your client is now connected');
+		APE.debug('Your client is now connected');
 		
 		//call the Callback function
 		callback();
