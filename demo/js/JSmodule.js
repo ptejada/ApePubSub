@@ -3,7 +3,7 @@ function JSmodule(ModuleID){
 	var scope = this;
 	
 	//debug function
-	function APE.debug(data){
+	function debug(data){
 		if(!opts.debug) return {};
 		console.log("["+opts.app+"] >> ",data);
 		return this;
@@ -77,18 +77,18 @@ function JSmodule(ModuleID){
 		
 		//exit if no callback
 		if(!hooks[func]){
-			//APE.debug("No " + func + " hooks");
+			//debug("No " + func + " hooks");
 			return;
 		}
 		
-		APE.debug("Applying "+when+" hook function[" + func +"] to ["+funcName+"]");
+		debug("Applying "+when+" hook function[" + func +"] to ["+funcName+"]");
 		var cont;
 		
 		//Apply function
 		for(var i in hooks[func]){
 			cont = hooks[func][i].apply(this,args);
 			
-			APE.debug("Hook "+func+"()["+i+"] returned: "+cont);
+			debug("Hook "+func+"()["+i+"] returned: "+cont);
 			if(cont === false) return false; //Return false to cancel further execution when before_call
 		}
 				
@@ -109,8 +109,8 @@ function JSmodule(ModuleID){
 			
 		hooks[hook].push(callback);
 		
-		$.iD.APE.debug("++++++Adding hook: "+hook);
-		$.iD.APE.debug(callback);
+		$.iD.debug("++++++Adding hook: "+hook);
+		$.iD.debug(callback);
 	}
 	
 	/*
@@ -119,7 +119,7 @@ function JSmodule(ModuleID){
 	constructor.clearHooks = function(when, funcName){
 		var func = opts.app +"::"+ when +"_" + funcName;
 		
-		APE.debug("Clearing ["+func+"] hooks");
+		debug("Clearing ["+func+"] hooks");
 		
 		hooks[func] = [];
 	}

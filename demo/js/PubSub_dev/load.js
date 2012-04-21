@@ -39,6 +39,14 @@ APE.PubSub.load = function(callback){
 	 */
 	var client = new APE.Client();
 	
+	for(var name in this.globalEventQueue){
+		var stack = this.globalEventQueue[name];
+		
+		for(var i in stack){
+			client.addEvent(name, stack[i]);
+		}
+	}
+	
 	/*
 	 * Events to output debug data
 	 */
@@ -56,7 +64,7 @@ APE.PubSub.load = function(callback){
 	
 	/*
 	 * Events to handle Errors
-	 */	
+	 */
 	client.addEvent("apeReconnect", function(){
 		APE.debug("><><><><>Reconecting<><><><><");
 	});
@@ -65,11 +73,11 @@ APE.PubSub.load = function(callback){
 	});
 	
 	client.on("reconnect", function(){
-		APE.debug("|Reconnecting======"+$this.reconnect+"===========>");
+		APE.debug("|Reconnecting======("+$this.reconnect+")===========>");
 	});	
 	
 	//Bad Session
-	client.onError("004", function(){			
+	client.onError("004", function(){
 		$this.isReady = false;
 		
 		$this.reconnect++;
@@ -88,7 +96,7 @@ APE.PubSub.load = function(callback){
 		
 		/*
 		 * Force to get a new session
-		 */			
+		 */
 		this.core.removeInstance(this.core.options.identifier);
 		this.core.saveCookie();
 		
@@ -111,10 +119,12 @@ APE.PubSub.load = function(callback){
 		APE.debug("Updating user properties from channel");
 		for(var name in $this.client.core.user.properties){
 			$this.user[name] = $this.client.core.user.properties[name];
-		}	
-				
+		}
+		
 		pipe.on = function($event, action){
-			this.addEvent("on_"+$event, action);
+			$event = "on_" + $event;
+			
+			this.addEvent($event, action);
 			APE.debug("Adding event '"+$event+"' to ["+chanName+"]");
 		}
 		

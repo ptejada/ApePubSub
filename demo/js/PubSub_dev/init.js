@@ -8,6 +8,7 @@ APE.PubSub = {
 	opts: {},
 	channels: {},
 	eventQueue: {},
+	globalEventQueue: [],
 	client: {},
 	debug: true,
 	session: false,

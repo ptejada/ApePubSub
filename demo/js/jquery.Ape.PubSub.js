@@ -332,7 +332,7 @@ $.Ape = {
 
 
 //Debug Function for Browsers console
-function APE.debug($obj){
+function debug($obj){
 	if(!$.Ape.debug) return;
 	
     var pre = "-->>";

@@ -380,7 +380,7 @@ for(func in APE.PubSub.fn){
 delete func;
 
 //Debug Function for Browsers console
-function APE.debug($obj){
+function debug($obj){
 	if(!APE.PubSub.debug) return;
 	
     var pre = "[APE] ";

@@ -26,7 +26,7 @@ APE.PubSub.fn = {
 			//APE.PubSub.load();
 			this.load();
 		}else{
-			this.client.core.join(chanName);				
+			this.client.core.join(chanName);
 		}
 		
 		return this;
@@ -60,7 +60,7 @@ APE.PubSub.fn = {
 		getChan(channel).request.send("PUB", cmd);
 	},
 	
-	//function to get the channel
+	//function to get a channel/pipe by name
 	getChan:  function(channel){
 		if(typeof this.channels[channel] == "object"){
 			return this.channels[channel];
@@ -68,6 +68,7 @@ APE.PubSub.fn = {
 		return false;
 	},
 	
+	//To add event to channel
 	onChan: function(chanName, Events, action){
 		if(typeof Events == "object"){
 			//add events to queue
@@ -77,8 +78,11 @@ APE.PubSub.fn = {
 			for(var $event in Events){
 				var action = Events[$event];
 				
+				$event = "on_" + $event;
+				
 				if(typeof this.eventQueue[chanName][$event] != "array")
 					this.eventQueue[chanName][$event] = [];
+				
 				this.eventQueue[chanName][$event].push(action);
 				
 				APE.debug("Adding ["+chanName+"] event '"+$event+"' to queue");
@@ -87,6 +91,29 @@ APE.PubSub.fn = {
 			var xnew = Object();
 			xnew[Events] = action;
 			onChan(chanName,xnew);
+		};
+	},
+	
+	onAllChan: function(Events, action){
+		if(typeof Events == "object"){
+			//add events to queue
+			
+			for(var $event in Events){
+				var action = Events[$event];
+				
+				$event = "on_" + $event;
+				
+				if(typeof this.globalEventQueue[$event] != "array")
+					this.globalEventQueue[$event] = [];
+				
+				this.globalEventQueue[$event].push(action);
+				
+				APE.debug("Adding Global event '"+$event+"' to queue");
+			}
+		}else{
+			var xnew = {};
+			xnew[Events] = action;
+			onAllChan(xnew);
 		};
 	}
 }; //End of APE.PubSub.fn
