@@ -11,8 +11,11 @@ $(document).ready(function(){
 		//What ever you want to store in the user
 	}
 	
-	
-	var Events = {
+    /*
+     * Add global events which will apply to all channels 
+     * including existing and future ones
+     */
+    onAllChan({
 		/*
 		 * Function triggered when other users join the channel
 		 * 		+user
@@ -58,17 +61,20 @@ $(document).ready(function(){
 				.append("<div><b>"+user.name+":</b> "+message+"</div>")
 				.trigger("newLine");
 		}
-	};
+	});
 	
 	/*
-	 * Subscribe to channel
+	 * Subscribe to channels
 	 */
-	
-	Sub("music", Events, function(joinRes, channel){
+	Sub("music");
+	Sub("movies");
+	Sub("dance");
+    APE_start(function(){
 		$("#username").text(APE.PubSub.user.name);
-		Sub("movies", Events);
-		Sub("dance", Events);
-	});
+        
+        
+    });
+	
 	
 	/*
 	 * To publish to a channel use the Pub() function

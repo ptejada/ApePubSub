@@ -1,21 +1,15 @@
 APE.PubSub.fn = {
-	
+
 	//Subscribe user to channel
 	Sub: function(chanName, Events, callback){
 		//Handle the events
 		if(typeof Events == "object"){
-			for(var i in Events){
-				if(i.indexOf("_") > -1) continue;
-				
-				Events["on_"+i] = Events[i];
-				delete Events[i];
-			}
 			onChan(chanName, Events);
 		}
 		
 		//Handle callback
 		if(typeof callback == "function"){
-			onChan(chanName,"callback", callback);
+		onChan(chanName,"callback", callback);
 		}
 		
 		if(!this.isReady){
@@ -24,7 +18,8 @@ APE.PubSub.fn = {
 			this.startOpt.channel.push(chanName);
 			
 			//APE.PubSub.load();
-			this.load();
+			if(this.client.core.status < 1)
+		this.load();
 		}else{
 			this.client.core.join(chanName);
 		}
@@ -95,14 +90,20 @@ APE.PubSub.fn = {
 	},
 	
 	onAllChan: function(Events, action){
-		if(typeof Events == "object"){
-			//add events to queue
-			
+		if(typeof Events == "object"){						
 			for(var $event in Events){
 				var action = Events[$event];
 				
 				$event = "on_" + $event;
 				
+				//add to client
+				if(this.client instanceof APE.Client){
+    		        APE.debug("Ape client is ready")
+    		        this.client.addEvent($event, action)
+    		        continue;
+    		    }
+    		    
+				//add events to queue
 				if(typeof this.globalEventQueue[$event] != "array")
 					this.globalEventQueue[$event] = [];
 				
@@ -115,5 +116,9 @@ APE.PubSub.fn = {
 			xnew[Events] = action;
 			onAllChan(xnew);
 		};
+	},
+	
+	APE_start: function(callback){
+	    this.load(callback)
 	}
 }; //End of APE.PubSub.fn

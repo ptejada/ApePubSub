@@ -39,6 +39,9 @@ APE.PubSub.load = function(callback){
 	 */
 	var client = new APE.Client();
 	
+	/*
+	 * Import client queue events
+	 */
 	for(var name in this.globalEventQueue){
 		var stack = this.globalEventQueue[name];
 		
@@ -140,7 +143,7 @@ APE.PubSub.load = function(callback){
 		
 		//save channel
 		$this.channels[chanName] = pipe;
-		pipe.fireEvent("callback");
+		pipe.fireEvent("on_callback");
 	});
 	
 	client.onRaw("PUBDATA", function(raw, pipe){

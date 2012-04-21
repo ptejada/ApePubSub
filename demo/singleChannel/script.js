@@ -38,19 +38,7 @@ $(document).ready(function(){
 				.append("<div class='bot'> <<< <b>"+user.name+"</b> has left >>> </div>")
 				.trigger("newLine");
 		},
-		
-		connecting: function(){
-			$("#feed-music .feed-body")
-				.append("<div class='bot'> Connecting... </div>")
-				.trigger("newLine");
-		},
-		
-		connected: function(){
-			$("#feed-music .feed-body")
-				.append("<div class='bot'> Connected to ["+channel.name+"]</div>")
-				.trigger("newLine");
-		},
-		
+			
 		/*
 		 * Function triggered when a text message is recieved on this channel
 		 * 		+msg = (string) message
