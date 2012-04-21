@@ -10,13 +10,13 @@ delete func;
 APE.debug = function($obj){
 	if(!this.PubSub.debug) return;
 	
-    var pre = "[APE] ";
-    if(typeof $obj == "string"){
-        window.console.log(pre+$obj);
-    }else{
-    	window.console.log(pre+"[Object]");
-    	window.console.log($obj);
-    }
+	var pre = "[APE] ";
+	if(typeof $obj == "string"){
+		window.console.log(pre+$obj);
+	}else{
+		window.console.log(pre+"[Object]");
+		window.console.log($obj);
+	}
 };
 
 //Generate a random string

@@ -23,7 +23,7 @@ class ApePubSub{
 			  'fromType'	=> $this->fromType,
 			  'to'			=> $this->to,
 			  'toType'		=> $this->toType,
-			  'data'      	=> $this->data
+			  'data'	  	=> $this->data
 		);
 		
 		$params["password"] = $this->password;

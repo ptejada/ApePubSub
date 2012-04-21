@@ -98,11 +98,11 @@ APE.PubSub.fn = {
 				
 				//add to client
 				if(this.client instanceof APE.Client){
-    		        APE.debug("Ape client is ready")
-    		        this.client.addEvent($event, action)
-    		        continue;
-    		    }
-    		    
+					APE.debug("Ape client is ready")
+					this.client.addEvent($event, action)
+					continue;
+				}
+				
 				//add events to queue
 				if(typeof this.globalEventQueue[$event] != "array")
 					this.globalEventQueue[$event] = [];
@@ -119,6 +119,6 @@ APE.PubSub.fn = {
 	},
 	
 	APE_start: function(callback){
-	    this.load(callback)
+		this.load(callback)
 	}
 }; //End of APE.PubSub.fn

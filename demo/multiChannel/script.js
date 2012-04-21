@@ -11,11 +11,11 @@ $(document).ready(function(){
 		//What ever you want to store in the user
 	}
 	
-    /*
-     * Add global events which will apply to all channels 
-     * including existing and future ones
-     */
-    onAllChan({
+	/*
+	 * Add global events which will apply to all channels 
+	 * including existing and future ones
+	 */
+	onAllChan({
 		/*
 		 * Function triggered when other users join the channel
 		 * 		+user
@@ -69,11 +69,11 @@ $(document).ready(function(){
 	Sub("music");
 	Sub("movies");
 	Sub("dance");
-    APE_start(function(){
+	APE_start(function(){
 		$("#username").text(APE.PubSub.user.name);
-        
-        
-    });
+		
+		
+	});
 	
 	
 	/*
