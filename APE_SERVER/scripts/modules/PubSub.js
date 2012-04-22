@@ -5,7 +5,7 @@ Ape.registerHookCmd("connect", function(params, cmd){
 	
 	if($defined(params.user)){
 		
-		if (params.user.name.length > 16 || params.user.name.test('[^_a-zA-Z0-9]', 'i')) return ["006", "BAD_NICK"];
+		if(params.user.name.length > 16 || params.user.name.test('[^_a-zA-Z0-9]', 'i')) return ["006", "BAD_NICK"];
 		
 		for(var index in params.user){
 			cmd.user.setProperty(index, params.user[index]);
@@ -17,9 +17,7 @@ Ape.registerHookCmd("connect", function(params, cmd){
 	return 1;
 });
 
-//Ape.registerHookCmd("")
-
-//Global server wide users list
+//Global server wide users list events
 Ape.addEvent('adduser', function(user) {
 	if(typeof user.getProperty('name') != "undefined"){
 		userlist.set(user.getProperty('name').toLowerCase(), true);
