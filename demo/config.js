@@ -3,7 +3,7 @@
  */
 
 //The Path where you uploaded APE_JSF
-APE.Config.baseUrl = 'http://ape.crusthq.com/js';
+APE.Config.baseUrl = 'https://raw.github.com/APE-Project/APE_JSF/master';
 
 //Your APE server URL
 APE.Config.server = 'ape.crusthq.com';
