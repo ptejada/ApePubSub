@@ -33,7 +33,7 @@ APE.PubSub.load = function(callback){
 		}else{
 			APE.Config.scripts.push(APE.Config.baseUrl + "/Build/yuiCompressor/apeCore.js");
 		}
-	}	
+	}
 	
 	/*
 	 * Instantiate APE Client
@@ -236,7 +236,10 @@ APE.PubSub.load = function(callback){
 	/*
 	 * The trigger to start everything up
 	 */
-	client.load();
+	client.load({
+		identifier: "PubSub",
+		domain: "auto"
+	});
 	this.client = client;
 	
 	return this;

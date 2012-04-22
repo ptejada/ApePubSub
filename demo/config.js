@@ -1,11 +1,20 @@
-//Regular Ape Configuration
 /***
  * APE JSF Setup
  */
-APE.Config.baseUrl = 'http://ape.crusthq.com/js'; //APE JSF 
-APE.Config.domain = 'auto'; 
-APE.Config.server = 'ape.crusthq.com'; //APE server URL
-APE.Config.frequency = 5; 
-APE.Config.transport = 2; // 2 JSONP
-APE.Config.identifier = "ApePubSub";
-APE.Config.secure = false;
+
+//The Path where you uploaded APE_JSF
+APE.Config.baseUrl = 'http://ape.crusthq.com/js';
+
+//Your APE server URL
+APE.Config.server = 'ape.crusthq.com';
+
+/**
+ * The Method of communication with the server 
+ *
+ * 0 => long polling
+ * 1 => XHRStreaming
+ * 2 => JSONP (crossdmain)
+ * 3 => SSE / JSONP
+ * 4 => SSE / XHR
+ */
+APE.Config.transport = 2;
