@@ -6,7 +6,7 @@
 	 
 	 include "php/lib/jsmin.php";
 	 
-	$path = "js/PubSub_dev/";
+	$path = "js/dev/";
 	$files = array("init","load", "fn", "utilities");
 	
 	$date = date("Y-m-d \@ h:i");
