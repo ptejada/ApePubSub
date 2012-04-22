@@ -10,7 +10,8 @@ APE.PubSub.load = function(callback){
 	if(this.isReady){
 		callback();
 		return false;
-	};
+	}
+	
 	/*
 	 * Add Script Files for APE.Config.scripts
 	 */
@@ -229,6 +230,7 @@ APE.PubSub.load = function(callback){
 		
 		//call the Callback function
 		callback();
+		client.fireEvent("on_connected");
 	})
 	
 	/*

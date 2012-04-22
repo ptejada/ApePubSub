@@ -12,7 +12,7 @@ APE.PubSub = {
 	client: {},
 	debug: true,
 	session: false,
-	isReady: false,
+	state: 0,
 	reconnect: 0,
 	restoring: false,
 	startOpt: {}

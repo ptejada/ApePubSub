@@ -19,9 +19,12 @@ $(document).ready(function(){
 		/*
 		 * Function triggered when other users join the channel
 		 * 		+user
-		 * 			...user properties like name, id, etc...
 		 * 			-pubid
+		 * 			...dynamic user properties like name, id, etc...
 		 * 		+channel
+		 * 			-name
+		 * 			-pipe
+		 * 			...more
 		 */
 		join: function(user, channel){
 			$("#feed-"+channel.name+" .feed-body")
@@ -32,9 +35,12 @@ $(document).ready(function(){
 		/*
 		 * Function triggered when other users leave the channel
 		 * 		+user
-		 * 			...user properties like name, id, etc...
 		 * 			-pubid
+		 * 			...dynamic user properties like name, id, etc...
 		 * 		+channel
+		 * 			-name
+		 * 			-pipe
+		 * 			...more
 		 */		
 		left: function(user, channel){
 			$("#feed-"+channel.name+" .feed-body")
@@ -45,43 +51,62 @@ $(document).ready(function(){
 		/*
 		 * Function triggered when a text message is recieved on this channel
 		 * 		+msg = (string) message
-		 * 		+info
-		 * 			-from
-		 * 				...sender(user) properties like name, id, etc
-		 * 				-pubid
-		 * 			-channel
-		 * 				-name
-		 * 				-pipe
-		 * 				...other properties and methods
-		 */		
+		 * 		+from = sender(user) properties like name, id, pubid ... etc
+		 * 		+channel = multipipe object where the message came through
+		 */
 		message: function(message, from, channel){
+			APE.debug(channel);
 			//(jQuery)Append a Message to DIV container
 			var user = from.properties;
 			$("#feed-"+channel.name+" .feed-body")
 				.append("<div><b>"+user.name+":</b> "+message+"</div>")
 				.trigger("newLine");
+		},
+		
+		/*
+		 * This event is exclusive to onAllChan() and is only triggered once when a connection to the
+		 * server has been stablished
+		 */
+		connected: function(){
+			$("#username").text(APE.PubSub.user.name);
 		}
 	});
 	
-	/*
-	 * Subscribe to channels
-	 */
-	Sub("music");
-	Sub("movies");
-	Sub("dance");
-	APE_start(function(){
-		$("#username").text(APE.PubSub.user.name);
-		
-		
-	});
 	
+	/*
+	 * Since all channels will have the same events and have already been added then above using onAllChan()
+	 * we can make the simple call below to subscribe to all our channels
+	 */
+	Sub(["music","games","dance"]);
+	
+	/*
+	 * There are many ways to achive the same results, subscribe to multiple channels.
+	 * For example if you would rather have every channel with their own events you could 
+	 * wrap all your Sub() calls in an APE_ready()
+	
+			APE_ready(function(){
+				Sub("music", musicEvents, callback);
+				Sub("games", gamesEvents, callback);
+				Sub("dance", danceEvents, callback);
+			});
+	
+	 * The reason we should call parallel Sub() requests inside an APE_ready() is to avoid
+	 * the framework from been reinitialzed on every request. Is also save to Subsribe to a
+	 * channel from any callback or event triggered after the server is connected, for example:
+	
+			Sub("music", musicEvents, function(){
+				Sub("games", gamesEvents, callback);
+				Sub("dance", danceEvents, callback);
+			});
+	
+	 */
 	
 	/*
 	 * To publish to a channel use the Pub() function
 	 * Pub(channel_name, message_or_object);
 	 * 
-	 * All the code below is mostly gathering the form data to publish
-	 *  
+	 * All the code below is mostly gathering the form data to publish 
+	 * and adding some basic effects to the chat box 
 	 */
 	
 	$(".feed-send").on("submit", function(e){

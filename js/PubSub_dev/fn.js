@@ -2,6 +2,18 @@ APE.PubSub.fn = {
 
 	//Subscribe user to channel
 	Sub: function(chanName, Events, callback){
+		//Handle multiple channels
+		if(typeof chanName == "object" && !this.isReady){
+			var $args = arguments;
+			var $this = this;
+			
+			this.load(function(){
+				Sub.apply($this, $args);
+			})
+			
+			return this;
+		}
+		
 		//Handle the events
 		if(typeof Events == "object"){
 			onChan(chanName, Events);
@@ -9,19 +21,18 @@ APE.PubSub.fn = {
 		
 		//Handle callback
 		if(typeof callback == "function"){
-		onChan(chanName,"callback", callback);
+			onChan(chanName,"callback", callback);
 		}
 		
-		if(!this.isReady){
-			var $this = this;
-			this.startOpt.channel = this.startOpt.channel || [];
-			this.startOpt.channel.push(chanName);
-			
-			//APE.PubSub.load();
-			if(this.client.core.status < 1)
-		this.load();
-		}else{
+		this.startOpt.channel = this.startOpt.channel || [];
+		this.startOpt.channel.push(chanName);
+		
+		if(this.isReady){
 			this.client.core.join(chanName);
+			
+		}else{
+			this.load();
+			
 		}
 		
 		return this;
@@ -118,7 +129,7 @@ APE.PubSub.fn = {
 		};
 	},
 	
-	APE_start: function(callback){
+	APE_ready: function(callback){
 		this.load(callback)
 	}
 }; //End of APE.PubSub.fn

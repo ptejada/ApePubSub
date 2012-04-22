@@ -1,7 +1,7 @@
 $(document).ready(function(){
 	
 	//Options
-	APE.PubSub.debug = true; //Log to browser's console AND uses decompressed APE files
+	APE.PubSub.debug = true; //If true: Log to browser's console AND uses decompressed APE_JSF files
 	APE.PubSub.session = true; //Toggles the use of session for APE
 	
 	//Current user's properties
@@ -9,16 +9,18 @@ $(document).ready(function(){
 		name: "User_"+randomString(5), //Generates a random name
 		//id: 321,
 		//What ever you want to store in the user
-	}
-	
+	}	
 	
 	var Events = {
 		/*
 		 * Function triggered when other users join the channel
 		 * 		+user
-		 * 			...user properties like name, id, etc...
 		 * 			-pubid
+		 * 			...dynamic user properties like name, id, etc...
 		 * 		+channel
+		 * 			-name
+		 * 			-pipe
+		 * 			...more
 		 */
 		join: function(user, channel){
 			$("#feed-music .feed-body")
@@ -29,9 +31,12 @@ $(document).ready(function(){
 		/*
 		 * Function triggered when other users leave the channel
 		 * 		+user
-		 * 			...user properties like name, id, etc...
 		 * 			-pubid
+		 * 			...dynamic user properties like name, id, etc...
 		 * 		+channel
+		 * 			-name
+		 * 			-pipe
+		 * 			...more
 		 */		
 		left: function(user, channel){
 			$("#feed-music .feed-body")
@@ -42,15 +47,9 @@ $(document).ready(function(){
 		/*
 		 * Function triggered when a text message is recieved on this channel
 		 * 		+msg = (string) message
-		 * 		+info
-		 * 			-from
-		 * 				...sender(user) properties like name, id, etc
-		 * 				-pubid
-		 * 			-channel
-		 * 				-name
-		 * 				-pipe
-		 * 				...other properties and methods
-		 */		
+		 * 		+from = sender(user) properties like name, id, pubid ... etc
+		 * 		+channel = multipipe object where the message came through
+		 */
 		message: function(message, from, channel){
 			//(jQuery)Append a Message to DIV container
 			var user = from.properties;
@@ -60,13 +59,10 @@ $(document).ready(function(){
 		}
 	};
 	
-	
-	
-	//return;
+
 	/*
 	 * Subscribe to channel
 	 */
-	
 	Sub("music", Events, function(joinRes, channel){
 		$("#username").text(APE.PubSub.user.name);
 	});
