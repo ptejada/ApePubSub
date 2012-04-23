@@ -1,6 +1,6 @@
 /**
  * @author Pablo Tejada
- * Built on 2012-04-22 @ 01:36
+ * Built on 2012-04-23 @ 03:21
  */
  
 	APE.Client.prototype.on = function($event, func){
@@ -59,7 +59,7 @@ APE.PubSub.load = function(callback){
 		}else{
 			APE.Config.scripts.push(APE.Config.baseUrl + "/Build/yuiCompressor/apeCore.js");
 		}
-	}	
+	}
 	
 	/*
 	 * Instantiate APE Client
@@ -250,19 +250,26 @@ APE.PubSub.load = function(callback){
 		$this.isReady = true;
 		
 		//Reset the reconnect count
-		$this.reconnect = 0;
+		if($this.reconnect > 0 ){
+			$this.reconnect = 0;
+			client.fireEvent("on_reconnected");
+		}else{
+			client.fireEvent("on_connected");
+		}
 		
 		APE.debug('Your client is now connected');
 		
 		//call the Callback function
 		callback();
-		client.fireEvent("on_connected");
 	})
 	
 	/*
 	 * The trigger to start everything up
 	 */
-	client.load();
+	client.load({
+		identifier: "PubSub",
+		domain: "auto"
+	});
 	this.client = client;
 	
 	return this;
