@@ -1,11 +1,12 @@
-APE.PubSub.fn = {
-
+APE.fn = {
 	//Subscribe user to channel
 	Sub: function(chanName, Events, callback){
 		//Handle multiple channels
 		if(typeof chanName == "object" && !this.isReady){
 			var $args = arguments;
 			var $this = this;
+			
+			this.join(chanName);
 			
 			this.load(function(){
 				Sub.apply($this, $args);
@@ -101,7 +102,7 @@ APE.PubSub.fn = {
 	},
 	
 	onAllChan: function(Events, action){
-		if(typeof Events == "object"){						
+		if(typeof Events == "object"){
 			for(var $event in Events){
 				var action = Events[$event];
 				

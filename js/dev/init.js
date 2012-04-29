@@ -1,7 +1,7 @@
-APE.Client.prototype.on = function($event, func){
-	this.addEvent("on_"+$event, func);
-}
 //-------ApePubSub Starts--------//
+APE.server = "ape2.crusthq.com";
+
+APS = new APE(APE.server);
 
 APE.PubSub = {
 	user: {},

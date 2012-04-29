@@ -1,11 +1,6 @@
 $(document).ready(function(){
-	
-	//Options
-	APE.PubSub.debug = true; //If true: Log to browser's console AND uses decompressed APE_JSF files
-	APE.PubSub.session = true; //Toggles the use of session for APE
-	
 	//Current user's properties
-	APE.PubSub.user = {
+	window.user = {
 		name: "User_"+randomString(5), //Generates a random name
 		//id: 321,
 		//What ever you want to store in the user
@@ -63,8 +58,9 @@ $(document).ready(function(){
 	/*
 	 * Subscribe to channel
 	 */
+	
 	Sub("music", Events, function(joinRes, channel){
-		$("#username").text(APE.PubSub.user.name);
+		$("#username").text(APS.user.name);
 	});
 	
 	/*
