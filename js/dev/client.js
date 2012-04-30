@@ -1,11 +1,10 @@
-
-function APE(server, events, options){
+﻿function APE( server, events, options ){
 	this.options = {
 		'poll': 25000
 	}
 	this.version = 'draft-v2';
 	this.state = 0;
-	this.events = {};
+	this.events = {_queue: {}};
 	this.chl = 0;
 	this.user = {};
 	this.pipes = {};
@@ -38,6 +37,8 @@ APE.prototype.trigger = function(ev, args){
 	for(var i in this.events[ev]){
 		if(this.events[ev].hasOwnProperty(i)) this.events[ev][i].apply(this, args);
 	}
+	
+	APE.log("{{{ " + ev + " }}}");
 }
 
 APE.prototype.on = function(ev, fn){
@@ -106,17 +107,13 @@ APE.prototype.sub = function(channel, Events, callback){
 	
 	//Handle the events
 	if(typeof Events == "object"){
-		if(channel in this.channels){
-			this.channels[channel].on(Events);
-		}else{
-			this.
-		}
+		onChan(channel, Events);
 	}
 	
 	//Handle callback
 	if(typeof callback == "function"){
-		//onChan(chanName,"callback", callback);
+		onChan(channel, "joined", callback);
 	}
 	
-	if(this.state == 0) this.connect(user);
+	if(this.state == 0) this.connect({user: user});
 }

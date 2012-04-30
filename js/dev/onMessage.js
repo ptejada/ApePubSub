@@ -1,4 +1,5 @@
 APE.prototype.onMessage = function(data){
+	//var data = data;
 	
 	try { data = JSON.parse(data) }
 	catch(e){
@@ -17,7 +18,7 @@ APE.prototype.onMessage = function(data){
 		switch(cmd){
 			case 'LOGIN':
 				this.state = 1;
-				this.user = args;
+				this.session_id = args.sessid;
 				this.trigger('ready');
 				this.poll();
 			break;
@@ -28,6 +29,8 @@ APE.prototype.onMessage = function(data){
 				
 				var u = args.users;
 				var user;
+				
+				//import users from channel to client
 				for(var i = 0; i < u.length; i++){
 					user = this.pipes[u[i].pubid]
 					if(!user){
@@ -37,11 +40,25 @@ APE.prototype.onMessage = function(data){
 
 					user.channels[pipe.pubid] = pipe;
 					pipe.users[user.pubid] = user;
-
-					this.trigger('join', [user, pipe]);
+					
+					//No Need to trigger this event
+					//this.trigger('join', [user, pipe]);
 				}
 				
-				this.trigger('joined', pipe);
+				//Add events from queue
+				if(pipe.name in this.events._queue){
+					var queue = this.events._queue[pipe.name];
+					var ev, fn;
+					for(var i in queue){
+						ev = queue[i][0];
+						fn = queue[i][1];
+						
+						pipe.on(ev,fn);
+					}
+				}
+				
+				pipe.trigger('joined',this.user, pipe);
+				this.trigger('newChannel', pipe);
 				
 			break;
 			case 'JOIN':
@@ -51,9 +68,12 @@ APE.prototype.onMessage = function(data){
 				if(!user){
 					user = new APE.user(args.user, this);
 					this.pipes[user.pubid] = user;
-				} 
+				}
+				
+				//Add user's own pipe to channels list
 				user.channels[pipe.pubid] = user;
-				this.trigger('join', [user, pipe]);
+				
+				pipe.trigger('join', [user, pipe]);
 			break;
 			case 'LEFT':
 				pipe = this.pipes[args.pipe.pubid];
@@ -63,10 +83,12 @@ APE.prototype.onMessage = function(data){
 					if(u.channels.hasOwnProperty(i)) delete this.pipes[args.user.pubid];
 					break;
 				}
-				this.trigger('left', [u, pipe]);
+				pipe.trigger('left', [u, pipe]);
 			break;
 			case 'IDENT':
+				this.user = args.user.properties;
 				this.user.pubid = args.user.pubid;
+				this.user.sessid = this.session_id;
 			break;
 			case 'ERR' :
 				if(this.transport.id == 0 && cmd == 'ERR' &&(args.code > 100 || args.code == "001")) this.check();

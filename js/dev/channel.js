@@ -16,4 +16,5 @@ APE.channel = function(pipe, ape) {
 	}
 	
 	this.on = APE.prototype.on.bind(this);
+	this.trigger = APE.prototype.trigger.bind(this);
 }

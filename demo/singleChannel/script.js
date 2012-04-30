@@ -59,8 +59,8 @@ $(document).ready(function(){
 	 * Subscribe to channel
 	 */
 	
-	Sub("music", Events, function(joinRes, channel){
-		$("#username").text(APS.user.name);
+	Sub("music", Events, function(user, channel){
+		$("#username").text(user.name);
 	});
 	
 	/*

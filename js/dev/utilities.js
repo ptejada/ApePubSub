@@ -11,6 +11,8 @@ APE.debug = function($obj){
 	}
 };
 
+APE.log = APE.debug;
+
 //Generate a random string
 function randomString(l){
 	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
