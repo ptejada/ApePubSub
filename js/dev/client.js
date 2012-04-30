@@ -1,6 +1,7 @@
 ﻿function APE( server, events, options ){
 	this.options = {
-		'poll': 25000
+		'poll': 25000,
+		debug: true
 	}
 	this.version = 'draft-v2';
 	this.state = 0;
@@ -9,7 +10,6 @@
 	this.user = {};
 	this.pipes = {};
 	this.channels = {};
-	this.debug = true;
 	
 	//Add Events
 	this.on(events);

@@ -1,5 +1,5 @@
 APE.prototype.log = function($obj){
-	if(!this.debug) return;
+	if(!this.options.debug) return;
 	
 	var args =  Array.prototype.slice.call(arguments);
 	args.unshift("[APE]");
@@ -8,7 +8,7 @@ APE.prototype.log = function($obj){
 };
 
 APE.prototype.info = function($obj){
-	if(!this.debug) return;
+	if(!this.options.debug) return;
 	
 	var args =  Array.prototype.slice.call(arguments);
 	args.unshift("[APE]");

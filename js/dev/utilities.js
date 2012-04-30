@@ -1,6 +1,6 @@
 //Debug Function for Browsers console
 APE.debug = function($obj){
-	if(!this.PubSub.debug) return;
+	if(!APS.options.debug) return;
 	
 	var pre = "[APE] ";
 	if(typeof $obj == "string"){

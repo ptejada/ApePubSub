@@ -54,7 +54,9 @@ $(document).ready(function(){
 		}
 	};
 	
-
+	APS.connect({user: user});
+	return;
+	
 	/*
 	 * Subscribe to channel
 	 */

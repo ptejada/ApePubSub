@@ -29,6 +29,8 @@ APE.transport = function(server, callback, options){
 		}
 
 		frame.setAttribute('src', 'http://' + server + '/?[{"cmd":"frame","params": {"origin":"'+window.location.protocol+'//'+window.location.host+'"}}]');
+		
+		document.body.appendChild(frame);
 
 		if('addEventListener' in window){
 			window.addEventListener('message', this.frameMessage.bind(this), 0);
@@ -37,7 +39,6 @@ APE.transport = function(server, callback, options){
 			window.attachEvent('onmessage', this.frameMessage.bind(this));
 		}
 
-		document.body.appendChild(frame);
 
 		APE.transport.prototype.send = APE.transport.prototype.postMessage;
 	}
