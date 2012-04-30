@@ -1,8 +1,8 @@
 APE.prototype.onMessage = function(data){
 	//var data = data;
-	
-	try { data = JSON.parse(data) }
-	catch(e){
+	try { 
+		data = JSON.parse(data)
+	}catch(e){
 		this.check();
 	}
 	
@@ -18,6 +18,7 @@ APE.prototype.onMessage = function(data){
 		switch(cmd){
 			case 'LOGIN':
 				this.state = 1;
+				this.user.sessid = args.sessid;
 				this.session_id = args.sessid;
 				this.trigger('ready');
 				this.poll();
@@ -86,9 +87,11 @@ APE.prototype.onMessage = function(data){
 				pipe.trigger('left', [u, pipe]);
 			break;
 			case 'IDENT':
-				this.user = args.user.properties;
-				this.user.pubid = args.user.pubid;
+				this.user = new APE.user(args.user, this);
 				this.user.sessid = this.session_id;
+				this.pipes[this.user.pubid] = this.user;
+				
+				this.poll();
 			break;
 			case 'ERR' :
 				if(this.transport.id == 0 && cmd == 'ERR' &&(args.code > 100 || args.code == "001")) this.check();
@@ -100,6 +103,6 @@ APE.prototype.onMessage = function(data){
 			this.check();
 		}
 
-		this.trigger('message', [cmd, args, pipe]);
+		//this.trigger('message', [cmd, args, pipe]);
 	}
 }
