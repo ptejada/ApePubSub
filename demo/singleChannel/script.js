@@ -47,15 +47,11 @@ $(document).ready(function(){
 		 */
 		message: function(message, from, channel){
 			//(jQuery)Append a Message to DIV container
-			var user = from.properties;
 			$("#feed-music .feed-body")
-				.append("<div><b>"+user.name+":</b> "+message+"</div>")
+				.append("<div><b>"+from.name+":</b> "+message+"</div>")
 				.trigger("newLine");
 		}
 	};
-	
-	APS.connect({user: user});
-	return;
 	
 	/*
 	 * Subscribe to channel
@@ -87,7 +83,7 @@ $(document).ready(function(){
 		}
 		
 		//Add current pubid data
-		data.pubid = APE.PubSub.user.pubid;
+		data.pubid = APS.user.pubid;
 		
 		//Send message
 		Pub("music", data.message);

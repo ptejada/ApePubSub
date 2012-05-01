@@ -62,6 +62,12 @@ APE.prototype.onMessage = function(data){
 				this.trigger('newChannel', pipe);
 				
 			break;
+			case "PUBDATA":
+				var user = this.pipes[args.from.pubid];
+				pipe = this.pipes[args.pipe.pubid];
+				
+				pipe.trigger(args.type, [args.content, user, pipe]);
+			break;
 			case 'JOIN':
 				var user = this.pipes[args.user.pubid];
 				pipe = this.pipes[args.pipe.pubid];

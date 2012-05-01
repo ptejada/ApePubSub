@@ -1,5 +1,25 @@
 var Sub = APS.sub.bind(APS);
 
+var Pub = function(channel, data){
+	var pipe = getChan(channel);
+	
+	if(pipe){
+		pipe.send("Pub", {data: data});
+	}else{
+		APS.log("NO Channel " + channel);
+	}
+};
+
+var getChan = function(channel){
+	if(channel in APS.channels){
+		return APS.channels[channel];
+	}
+	
+	return false;
+}
+
+var onClient = APS.on.bind(APS);
+
 var onChan = function(channel, Events, fn){	
 	if(channel in this.channels){
 		this.channels[channel].on(Events, fn);

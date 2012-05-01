@@ -38,7 +38,7 @@ APE.prototype.trigger = function(ev, args){
 		if(this.events[ev].hasOwnProperty(i)) this.events[ev][i].apply(this, args);
 	}
 	
-	APE.log("{{{ " + ev + " }}}");
+	APS.log("{{{ " + ev + " }}} on ", this);
 }
 
 APE.prototype.on = function(ev, fn){

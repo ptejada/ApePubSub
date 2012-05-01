@@ -7,6 +7,7 @@ APE.prototype.log = function($obj){
 	window.console.log.apply(console, args);
 };
 
+
 APE.prototype.info = function($obj){
 	if(!this.options.debug) return;
 	
