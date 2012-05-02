@@ -1,11 +1,31 @@
 var userlist = new $H;
 
+Ape.addEvent("init", function(){
+	Ape.log(this.toSource())
+})
+
+function extraHeaders(){
+	this.client.write("HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: "+this.host+"\r\n");
+}
+
+Ape.registerHookCmd("check", extraHeaders);
+Ape.registerHookCmd("send", extraHeaders);
+Ape.registerHookCmd("quit", extraHeaders);
+Ape.registerHookCmd("join", extraHeaders);
+Ape.registerHookCmd("left", extraHeaders);
+Ape.registerHookCmd("session", extraHeaders);
+
 Ape.registerHookCmd("connect", function(params, cmd){
+	//Ape.log(Ape.toString());
+	
+	//cmd.client.write("HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n");
+	//Ape.log(cmd.toSource());
+
 	if(!$defined(params)) return 1;
 	
 	if($defined(params.user)){
 		
-		if(params.user.name.length > 16 || params.user.name.test('[^_a-zA-Z0-9]', 'i')) return ["006", "BAD_NICK"];
+		if (params.user.name.length > 16 || params.user.name.test('[^_a-zA-Z0-9]', 'i')) return ["006", "BAD_NICK"];
 		
 		for(var index in params.user){
 			cmd.user.setProperty(index, params.user[index]);
@@ -17,7 +37,9 @@ Ape.registerHookCmd("connect", function(params, cmd){
 	return 1;
 });
 
-//Global server wide users list events
+//Ape.registerHookCmd("")
+
+//Global server wide users list
 Ape.addEvent('adduser', function(user) {
 	if(typeof user.getProperty('name') != "undefined"){
 		userlist.set(user.getProperty('name').toLowerCase(), true);
