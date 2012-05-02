@@ -80,24 +80,30 @@ APE.prototype.onMessage = function(data){
 				//Add user's own pipe to channels list
 				user.channels[pipe.pubid] = user;
 				
+				//Add user to channel list
+				pipe.addUser(user);
+				
 				pipe.trigger('join', [user, pipe]);
 			break;
 			case 'LEFT':
 				pipe = this.pipes[args.pipe.pubid];
-				var u = this.pipes[args.user.pubid];
-				delete u.channels[pipe.pubid];
-				for(var i in u.channels){
-					if(u.channels.hasOwnProperty(i)) delete this.pipes[args.user.pubid];
+				var user = this.pipes[args.user.pubid];
+				
+				delete user.channels[pipe.pubid];
+				
+				for(var i in user.channels){
+					if(user.channels.hasOwnProperty(i)) delete this.pipes[user.pubid];
 					break;
 				}
-				pipe.trigger('left', [u, pipe]);
+				
+				pipe.trigger('left', [user, pipe]);
 			break;
 			case 'IDENT':
 				this.user = new APE.user(args.user, this);
 				this.user.sessid = this.session_id;
 				this.pipes[this.user.pubid] = this.user;
 				
-				this.poll();
+				this.poll(); //This call is under observation
 			break;
 			case 'ERR' :
 				if(this.transport.id == 0 && cmd == 'ERR' &&(args.code > 100 || args.code == "001")) this.check();
@@ -108,7 +114,5 @@ APE.prototype.onMessage = function(data){
 		if(this.transport.id == 0 && cmd != 'ERR' && this.transport.state == 1){
 			this.check();
 		}
-
-		//this.trigger('message', [cmd, args, pipe]);
 	}
 }

@@ -46,15 +46,19 @@ APE.prototype.on = function(ev, fn){
 	
 	if(typeof ev == 'string' && typeof fn == 'function'){
 		Events[ev] = fn;
-	}else{
+	}else if(typeof ev == "object"){
 		Events = ev;
+	}else{
+		return this;
 	}
 	
 	for(var e in Events){
 		if(!this.events[e])
-			this.events[ev] = [];
+			this.events[e] = [];
 		this.events[e].push(fn);
 	}
+	
+	return this;
 }
 
 APE.prototype.poll = function(){
@@ -92,6 +96,8 @@ APE.prototype.send = function(cmd, args, pipe, callback){
 	} else {
 		this.on('ready', this.send.bind(this, cmd, args));
 	}
+	
+	return this;
 }
 
 APE.prototype.check = function(){
@@ -100,6 +106,7 @@ APE.prototype.check = function(){
 
 APE.prototype.connect = function(args){
 	this.send('CONNECT', args);
+	return this;
 }
 
 APE.prototype.sub = function(channel, Events, callback){
@@ -116,4 +123,6 @@ APE.prototype.sub = function(channel, Events, callback){
 	}
 	
 	if(this.state == 0) this.connect({user: user});
+	
+	return getChan(channel);
 }

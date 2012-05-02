@@ -45,5 +45,13 @@ var onChan = function(channel, Events, fn){
 		onChan(channel,xnew);
 	}	
 }
-
 onChan = onChan.bind(APS);
+
+var onClient = APS.on.bind(APS);
+
+//Unsubscribe from a channel
+var unSub = function(channel){
+	if(channel == "") return;
+	getChan(channel).leave();
+}
+

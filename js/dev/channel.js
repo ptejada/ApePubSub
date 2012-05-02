@@ -8,11 +8,21 @@ APE.channel = function(pipe, ape) {
 	this.users = {};
 	
 	this.addUser = function(u){
-		this.users[u.properties.pubid] = u;
+		this.users[u.pubid] = u;
 	}
 	
 	this.send = function(cmd, args){
 		this.ape.send(cmd, args, this);
+	}
+	
+	this.leave = function(){
+		this.trigger("unsub", [this.ape.user, this]);
+		
+		this.ape.send('LEFT', {"channel": this.name});
+		
+		APE.debug("Unsubscribed from ("+this.name+")");
+		
+		delete this.ape.channels[this.name];
 	}
 	
 	this.on = APE.prototype.on.bind(this);
