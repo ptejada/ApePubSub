@@ -1,11 +1,6 @@
-$(document).ready(function(){
-	
-	//Options
-	APE.PubSub.debug = true; //Log to browser's console AND uses decompressed APE files
-	APE.PubSub.session = false; //Toggles the use of session for APE
-	
+$(document).ready(function(){	
 	//Current user's properties
-	APE.PubSub.user = {
+	APE.client.user = {
 		name: "User_"+randomString(5), //Generates a random name
 		//id: 321,
 		//What ever you want to store in the user
@@ -15,7 +10,7 @@ $(document).ready(function(){
 	 * Add global events which will apply to all channels 
 	 * including existing and future ones
 	 */
-	onAllChan({
+	onClient({
 		/*
 		 * Function triggered when other users join the channel
 		 * 		+user
@@ -55,26 +50,26 @@ $(document).ready(function(){
 		 * 		+channel = multipipe object where the message came through
 		 */
 		message: function(message, from, channel){
-			APE.debug(channel);
 			//(jQuery)Append a Message to DIV container
-			var user = from.properties;
 			$("#feed-"+channel.name+" .feed-body")
-				.append("<div><b>"+user.name+":</b> "+message+"</div>")
+				.append("<div><b>"+from.name+":</b> "+message+"</div>")
 				.trigger("newLine");
 		},
 		
 		/*
-		 * This event is exclusive to onAllChan() and is only triggered once when a connection to the
+		 * This event is exclusive to onClient() and is only triggered once when a connection to the
 		 * server has been stablished
 		 */
-		connected: function(){
-			$("#username").text(APE.PubSub.user.name);
+		
+		ready: function(){
+			$("#username").text(APE.client.user.name);
 		}
+		
 	});
 	
 	
 	/*
-	 * Since all channels will have the same events and have already been added then above using onAllChan()
+	 * Since all channels will have the same events and have already been added then above using onClient()
 	 * we can make the simple call below to subscribe to all our channels
 	 */
 	Sub(["music","games","dance"]);
@@ -123,7 +118,7 @@ $(document).ready(function(){
 		}
 		
 		//Add current pubid data
-		data.pubid = APE.PubSub.user.pubid;
+		//data.pubid = APE.PubSub.user.pubid;
 		
 		//Send message
 		Pub(data.channel, data.message);

@@ -1,7 +1,8 @@
 /**
  * @author Pablo Tejada
- * Built on 2012-05-04 @ 03:15
+ * Built on 2012-05-05 @ 06:33
  */
+
 //Generate a random string
 function randomString(l){
 	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
@@ -62,7 +63,13 @@ function APE( server, events, options ){
 		}
 	}
 
-	this.transport = new APE.transport(server, cb, options);
+	this.connect = function(args){
+		server = server || APE.server;
+		if(this.state == 0)
+			this.transport = new APE.transport(server, cb, options);
+		this.send('CONNECT', args);
+		return this;
+	}
 	
 	return this;
 }
@@ -106,6 +113,7 @@ APE.prototype.on = function(ev, fn){
 	}
 	
 	for(var e in Events){
+		var fn = Events[e];
 		if(!this.events[e])
 			this.events[e] = [];
 		this.events[e].push(fn);
@@ -155,11 +163,6 @@ APE.prototype.send = function(cmd, args, pipe, callback){
 
 APE.prototype.check = function(){
 	this.send('CHECK');
-}
-
-APE.prototype.connect = function(args){
-	this.send('CONNECT', args);
-	return this;
 }
 
 APE.prototype.join = function(channel){
@@ -221,6 +224,9 @@ APE.prototype.onMessage = function(data){
 					user.channels[pipe.name] = pipe;
 					pipe.users[user.pubid] = user;
 					
+					//Add user's own pipe to channels list
+					user.channels[user.pubid] = user;
+
 					//No Need to trigger this event
 					//this.trigger('join', [user, pipe]);
 				}

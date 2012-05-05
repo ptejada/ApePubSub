@@ -1,4 +1,10 @@
 $(document).ready(function(){
+	/*
+	 * The APE server already set in ../config.js
+	 * Otherwise, 
+	 * 		APE.server = 'ape2.crusthq.com';
+	 */
+	
 	//Current user's properties
 	APE.client.user = {
 		name: "User_"+randomString(5), //Generates a random name
@@ -106,7 +112,7 @@ $(document).ready(function(){
 		var $this = $(this);
 		
 		$this.animate({scrollTop: $this.prop("scrollHeight") - $this.height()},{
-			queue: true			
+			queue: true
 		});
 	});
 })

@@ -42,6 +42,9 @@ APE.prototype.onMessage = function(data){
 					user.channels[pipe.name] = pipe;
 					pipe.users[user.pubid] = user;
 					
+					//Add user's own pipe to channels list
+					user.channels[user.pubid] = user;
+
 					//No Need to trigger this event
 					//this.trigger('join', [user, pipe]);
 				}

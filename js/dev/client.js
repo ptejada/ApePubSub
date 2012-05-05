@@ -71,6 +71,7 @@ APE.prototype.on = function(ev, fn){
 	}
 	
 	for(var e in Events){
+		var fn = Events[e];
 		if(!this.events[e])
 			this.events[e] = [];
 		this.events[e].push(fn);

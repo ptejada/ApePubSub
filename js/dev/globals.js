@@ -7,17 +7,29 @@ var Sub = function(channel, Events, callback){
 	
 	//Handle the events
 	if(typeof Events == "object"){
-		onChan(channel, Events);
+		if(typeof channel == "object"){
+			for(var chan in channel){
+				onChan(channel[chan], Events);
+			}
+		}else{
+			onChan(channel, Events);
+		}
 	}
 	
 	//Handle callback
 	if(typeof callback == "function"){
-		onChan(channel, "joined", callback);
+		if(typeof channel == "object"){
+			for(var chan in channel){
+				onChan(channel[chan], "joined", callback);
+			}
+		}else{
+			onChan(channel, "joined", callback);
+		}
 	}
 	
 	if(this.state == 0) this.connect({user: this.user});
 	
-	return getChan(channel);
+	return this;
 }
 Sub = Sub.bind(APE.client);
 

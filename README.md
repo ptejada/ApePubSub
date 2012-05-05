@@ -1,3 +1,5 @@
+**update**: this project went from been a wrapper to a full/standalone framework. There are some features pending for implementation, like sessions... based on @paraboul's the next generation [APE_JSF](https://github.com/paraboul/APE-Client-JavaScript/tree/31dd239394af8a574667c8228ed8c004d6866973) draft.
+
 What is it?
 =====================
 
@@ -65,8 +67,6 @@ Events List
 ## Client events
 * **ready**	==> Triggered when
 * **newChannel**	==> Triggered when a new `APE.Channel` object is created and inserted in the channels stack.
-* **reconnect**	==> Triggered when the client loses its connection/session with the server and tries to reconnect.
-* **reconnected**	==> Triggered when the client has reconnected to the APE server after losing its connection.
 
 Getting Started
 =====================
@@ -79,8 +79,8 @@ Once the module/script is installed you could dig in the demos. Im really bad ma
 
 TODOs
 =====================
-* Create additional demos to furhter illustrates the usage of the projet
-* Add events to handle the [006] BAD_NICK error
+* Reinplement sessions...
+* Create additional demos to furhter illustrates the usage of the project
 * Reconsider the use of global functions and their name conventions
 * Keep working on the files in [php/](https://github.com/ptejada/ApePubSub/tree/master/php/) to create a PHP link between the APE server and the client framework for tighter PHP applications intregrration ( Been consider for separate project)
 * Keep testing...
