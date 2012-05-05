@@ -21,7 +21,13 @@ function APE( server, events, options ){
 		}
 	}
 
-	this.transport = new APE.transport(server, cb, options);
+	this.connect = function(args){
+		server = server || APE.server;
+		if(this.state == 0)
+			this.transport = new APE.transport(server, cb, options);
+		this.send('CONNECT', args);
+		return this;
+	}
 	
 	return this;
 }
@@ -114,11 +120,6 @@ APE.prototype.send = function(cmd, args, pipe, callback){
 
 APE.prototype.check = function(){
 	this.send('CHECK');
-}
-
-APE.prototype.connect = function(args){
-	this.send('CONNECT', args);
-	return this;
 }
 
 APE.prototype.join = function(channel){

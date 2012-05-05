@@ -1,8 +1,6 @@
-//-------ApePubSub Starts--------//
-APE.server = "ape2.crusthq.com";
 APE.debug = true;
 
-APE.client = new APE(APE.server);
+APE.client = new APE();
 
 var Sub = function(channel, Events, callback){
 	this.join(channel);
