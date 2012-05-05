@@ -1,18 +1,3 @@
-//Debug Function for Browsers console
-APE.debug = function($obj){
-	if(!APS.options.debug) return;
-	
-	var pre = "[APE] ";
-	if(typeof $obj == "string"){
-		window.console.log(pre+$obj);
-	}else{
-		window.console.log(pre+"[Object]");
-		window.console.log($obj);
-	}
-};
-
-APE.log = APE.debug;
-
 //Generate a random string
 function randomString(l){
 	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";

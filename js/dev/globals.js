@@ -1,4 +1,27 @@
-var Sub = APS.sub.bind(APS);
+//-------ApePubSub Starts--------//
+APE.server = "ape2.crusthq.com";
+APE.debug = true;
+
+APE.client = new APE(APE.server);
+
+var Sub = function(channel, Events, callback){
+	this.join(channel);
+	
+	//Handle the events
+	if(typeof Events == "object"){
+		onChan(channel, Events);
+	}
+	
+	//Handle callback
+	if(typeof callback == "function"){
+		onChan(channel, "joined", callback);
+	}
+	
+	if(this.state == 0) this.connect({user: this.user});
+	
+	return getChan(channel);
+}
+Sub = Sub.bind(APE.client);
 
 var Pub = function(channel, data){
 	var pipe = getChan(channel);
@@ -6,21 +29,21 @@ var Pub = function(channel, data){
 	if(pipe){
 		pipe.send("Pub", {data: data});
 	}else{
-		APS.log("NO Channel " + channel);
+		APE.log("NO Channel " + channel);
 	}
 };
 
 var getChan = function(channel){
-	if(channel in APS.channels){
-		return APS.channels[channel];
+	if(channel in this.channels){
+		return this.channels[channel];
 	}
 	
 	return false;
 }
+getChan = getChan.bind(APE.client);
 
-var onClient = APS.on.bind(APS);
 
-var onChan = function(channel, Events, fn){	
+var onChan = function(channel, Events, fn){
 	if(channel in this.channels){
 		this.channels[channel].on(Events, fn);
 		return true;
@@ -31,13 +54,13 @@ var onChan = function(channel, Events, fn){
 		if(typeof this.events._queue[channel] != "object")
 			this.events._queue[channel] = [];
 		
-		this.events._queue[channel].push(Events);
+		//this.events._queue[channel].push(Events);
 		for(var $event in Events){
 			var fn = Events[$event];
 			
 			this.events._queue[channel].push([$event, fn]);
 			
-			APE.debug("Adding ["+channel+"] event '"+$event+"' to queue");
+			APE.log("Adding ["+channel+"] event '"+$event+"' to queue");
 		}
 	}else{
 		var xnew = Object();
@@ -45,9 +68,9 @@ var onChan = function(channel, Events, fn){
 		onChan(channel,xnew);
 	}	
 }
-onChan = onChan.bind(APS);
+onChan = onChan.bind(APE.client);
 
-var onClient = APS.on.bind(APS);
+var onClient = APE.client.on.bind(APE.client);
 
 //Unsubscribe from a channel
 var unSub = function(channel){

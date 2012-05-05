@@ -1,6 +1,6 @@
 $(document).ready(function(){
 	//Current user's properties
-	window.user = {
+	APE.client.user = {
 		name: "User_"+randomString(5), //Generates a random name
 		//id: 321,
 		//What ever you want to store in the user
@@ -83,7 +83,7 @@ $(document).ready(function(){
 		}
 		
 		//Add current pubid data
-		data.pubid = APS.user.pubid;
+		//data.pubid = APS.user.pubid;
 		
 		//Send message
 		Pub("music", data.message);

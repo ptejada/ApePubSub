@@ -13,7 +13,7 @@ APE.prototype.onMessage = function(data){
 		pipe = null;
 		clearTimeout(this.poller);
 		
-		this.log('>>>> ', cmd , " <<<< ", args);
+		APE.log('>>>> ', cmd , " <<<< ", args);
 
 		switch(cmd){
 			case 'LOGIN':
@@ -38,8 +38,8 @@ APE.prototype.onMessage = function(data){
 						user = new APE.user(u[i], this);
 						this.pipes[user.pubid] = user;
 					}
-
-					user.channels[pipe.pubid] = pipe;
+					
+					user.channels[pipe.name] = pipe;
 					pipe.users[user.pubid] = user;
 					
 					//No Need to trigger this event
@@ -106,9 +106,18 @@ APE.prototype.onMessage = function(data){
 				this.poll(); //This call is under observation
 			break;
 			case 'ERR' :
-				if(this.transport.id == 0 && cmd == 'ERR' &&(args.code > 100 || args.code == "001")) this.check();
-				else if(cmd == 'ERR' && args.code < 100) clearTimeout(this.poller);
+				if(this.transport.id == 0 && cmd == 'ERR' &&(args.code > 100 || args.code == "001")){
+					this.check();
+				}else if(cmd == 'ERR' && args.code < 100){
+					clearTimeout(this.poller);
+					this.trigger("dead", args)
+				}
+				this.trigger("error",args);
+				this.trigger("error"+args.code,args);
 			break;
+			default:
+				//trigger custom commands
+				this.trigger(cmd, [args, raw])
 		}
 
 		if(this.transport.id == 0 && cmd != 'ERR' && this.transport.state == 1){
