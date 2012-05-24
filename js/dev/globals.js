@@ -37,7 +37,9 @@ var Pub = function(channel, data){
 	var pipe = getChan(channel);
 	
 	if(pipe){
-		pipe.send("Pub", {data: data});
+		var args = {data: data};
+		pipe.send("Pub", args);
+		pipe.trigger("pub",args);
 	}else{
 		APE.log("NO Channel " + channel);
 	}

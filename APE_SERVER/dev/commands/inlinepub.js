@@ -3,7 +3,7 @@ Ape.registerCmd("inlinepub", false, function(params, info) {
 	//Global password
 	if (params.password == password) {
 		
-		if ($defined(params.to) && $defined(params.raw) && $defined(params.data)){
+		if(params.to && params.raw && params.data){
 			
 			if(params.toType == "multi"){
 				var to = Ape.getChannelByPubid(params.to);
@@ -12,11 +12,11 @@ Ape.registerCmd("inlinepub", false, function(params, info) {
 				Ape.log("User to User");
 			}
 			
-			if (!$defined(to.pipe)) return ["401", "UNKNOWN_CHANNEL"];
+			if (!to.pipe) return ["401", "UNKNOWN_CHANNEL"];
 			
 			//User Source From
 			var user = Ape.getUserByPubid(params.from);
-			if (!$defined(user.pipe) || !user.pipe) return ["401", "UNKNOWN_USER"];
+			if (!user.pipe || !user.pipe) return ["401", "UNKNOWN_USER"];
 			
 			//Send Data to channel
 			to.pipe.sendRaw(params.raw, params.data, {"from": user.pipe});	

@@ -18,8 +18,7 @@ APE.prototype.onMessage = function(data){
 		switch(cmd){
 			case 'LOGIN':
 				this.state = 1;
-				this.user.sessid = args.sessid;
-				this.session_id = args.sessid;
+				this.user.sessid = this.session.id = args.sessid;
 				this.trigger('ready');
 				this.poll();
 			break;
@@ -103,10 +102,17 @@ APE.prototype.onMessage = function(data){
 			break;
 			case 'IDENT':
 				this.user = new APE.user(args.user, this);
-				this.user.sessid = this.session_id;
+				this.user.sessid = this.session.id;
 				this.pipes[this.user.pubid] = this.user;
 				
-				this.poll(); //This call is under observation
+				this.session.save();
+				
+				//this.poll(); //This call is under observation
+			break;
+			case 'NOSESSION':
+				this.session.destroy();
+				this.session.connect();
+				
 			break;
 			case 'ERR' :
 				if(this.transport.id == 0 && cmd == 'ERR' &&(args.code > 100 || args.code == "001")){

@@ -1,8 +1,12 @@
 function APE( server, events, options ){
 	this.options = {
 		'poll': 25000,
-		debug: true
+		debug: true,
+		session: true,
+		connectionArgs: {},
+		server: server
 	}
+	this.identifier = "APS";
 	this.version = 'draft-v2';
 	this.state = 0;
 	this.events = {_queue: {}};
@@ -13,6 +17,10 @@ function APE( server, events, options ){
 	
 	//Add Events
 	this.on(events);
+	this.on("error004", function(){
+		this.session.destroy();
+		this.session.connect();
+	})
 
 	var cb = {
 		'onmessage': this.onMessage.bind(this),
@@ -22,13 +30,28 @@ function APE( server, events, options ){
 	}
 
 	this.connect = function(args){
+		this.options.connectionArgs = args || this.options.connectionArgs;
+		
 		server = server || APE.server;
 		if(this.state == 0)
 			this.transport = new APE.transport(server, cb, options);
-		this.send('CONNECT', args);
+		
+		//alert("connnecting...")
+		
+		//Handle sessions
+		if(this.options.session == true){
+			this.session.connect = this.connect.bind(this,args);
+			if(this.session.restore() == true) return this;
+		}
+		
+		this.session.save();
+		
+		this.send('CONNECT', this.options.connectionArgs);
+		
 		return this;
 	}
 	
+	this.session.client = this;
 	return this;
 }
 
@@ -93,7 +116,8 @@ APE.prototype.getPipe = function(user){
 }
 
 APE.prototype.send = function(cmd, args, pipe, callback){
-	if(this.state == 1 || cmd == 'CONNECT'){
+	var specialCmd = {CONNECT: 0, RECONNECT:0, SESSION:0};
+	if(this.state == 1 || cmd in specialCmd){
 
 		var tmp = {
 			'cmd': cmd,
@@ -102,16 +126,17 @@ APE.prototype.send = function(cmd, args, pipe, callback){
 
 		if(args) tmp.params = args;
 		if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid; 
-		if(this.user.sessid) tmp.sessid = this.user.sessid;
+		if(this.session.id) tmp.sessid = this.session.id;
 
 		APE.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
 
-		this.transport.send(JSON.stringify([tmp]));
-		if(cmd != 'CONNECT'){
+		this.transport.send(JSON.stringify([tmp]), callback);
+		if(!(cmd in specialCmd)){
 			clearTimeout(this.poller);
 			this.poll();
 		}
 		this.chl++;
+		this.session.saveChl();
 	} else {
 		this.on('ready', this.send.bind(this, cmd, args));
 	}

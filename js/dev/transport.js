@@ -43,15 +43,19 @@ APE.transport = function(server, callback, options){
 		APE.transport.prototype.send = APE.transport.prototype.postMessage;
 	}
 }
-APE.transport.prototype.postMessage = function(str){
+APE.transport.prototype.postMessage = function(str, callback){
 	if(this.state > 0){
 		this.frame.contentWindow.postMessage(str, '*');
 		this.state = 2;
 	} else this.stack.push(str);
+	
+	this.callback.once = callback || function(){};
 }
 APE.transport.prototype.frameMessage = function(ev){
 	this.state = 1;
 	this.callback.onmessage(ev.data);
+	this.callback.once(ev.data);
+	this.callback.once = function(){};
 }
 APE.transport.prototype.onLoad = function(){
 	if(this.id == 6) this.state = 2;

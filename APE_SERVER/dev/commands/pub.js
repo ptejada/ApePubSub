@@ -1,18 +1,18 @@
 //Pub Command
-Ape.registerCmd("PUB", false, function(params, info) {
-	if($defined(params.pipe) && $defined(params.data)) {
+Ape.registerCmd("PUB", true, function(params, info) {
+	if(params.pipe && params.data){
 	
 		var chan = Ape.getChannelByPubid(params.pipe);
 		//Ape.log(chan.pipe.toSource());
-		if (!$defined(chan.pipe)) return ["401", "UNKNOWN_CHANNEL"];
+		if(!chan.pipe) return ["401", "UNKNOWN_CHANNEL"];
 		
 		var user = info.user;
 		//Ape.log(user.toSource());
-		if (!$defined(user.pipe) || !user.pipe) return ["401", "UNKNOWN_USER"];
+		if(!user.pipe) return ["401", "UNKNOWN_USER"];
 		
 		var raw = {};
 		raw.content = params.data;
-		raw.type = typeof(params.data) == "string" ? "message" : "data";
+		raw.type = params.data == "string" ? "message" : "data";
 		
 		//Send Data to channel
 		chan.pipe.sendRaw("PUBDATA", raw, {from: user.pipe});

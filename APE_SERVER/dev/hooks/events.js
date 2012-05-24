@@ -1,15 +1,19 @@
-var userlist = new $H;
+var userlist = {}
 
 //Global server wide users list
 Ape.addEvent('adduser', function(user) {
-	if(typeof user.getProperty('name') != "undefined"){
-		userlist.set(user.getProperty('name').toLowerCase(), true);
+	var name = user.getProperty('name');
+	if(!name){
+		name = name.toLowerCase();
+		userlist[name] = user;
 	}
 });
 
 Ape.addEvent('deluser', function(user) {
-	if(typeof user.getProperty('name') != "undefined"){
-		userlist.erase(user.getProperty('name').toLowerCase());
+	var name = user.getProperty('name');
+	if(!name){
+		name = name.toLowerCase();
+		delete userlist[name];
 	}
 });
 
