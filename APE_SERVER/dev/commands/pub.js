@@ -12,7 +12,7 @@ Ape.registerCmd("PUB", true, function(params, info) {
 		
 		var raw = {};
 		raw.content = params.data;
-		raw.type = params.data == "string" ? "message" : "data";
+		raw.type = typeof params.data == "string" ? "message" : "data";
 		
 		//Send Data to channel
 		chan.pipe.sendRaw("PUBDATA", raw, {from: user.pipe});

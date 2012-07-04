@@ -1,6 +1,8 @@
 Ape.registerHookCmd("connect", function(params, cmd){
-	//Ape.log(cmd.toSource());
-
+	//IMPORTANT! create propCache and channels property
+	cmd.user.propCache = {};
+	cmd.user.channels = {};
+	
 	if(!params) return 1;
 	
 	if(params.user){
@@ -8,7 +10,7 @@ Ape.registerHookCmd("connect", function(params, cmd){
 		if (params.user.name.length > 16 || /[^_a-zA-Z0-9]/i.test(params.user.name)) return ["006", "BAD_NICK"];
 		
 		for(var index in params.user){
-			cmd.user.setProperty(index, params.user[index]);
+			cmd.user.prop(index, params.user[index]);
 		}
 	}
 	
