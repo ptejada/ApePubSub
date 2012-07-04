@@ -66,7 +66,7 @@ APE.prototype.session = {
 		client.chl++;
 		//client.check();
 		//client.poll();
-		client.send('RECONNECT', {sid: this.id})
+		client.send('RESTORE', {sid: this.id})
 		return true;
 	},
 	

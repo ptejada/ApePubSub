@@ -1,5 +1,5 @@
 //Pub Command
-Ape.registerCmd("RECONNECT", true, function(params, info) {
+Ape.registerCmd("RESTORE", true, function(params, info) {
 	var user = info.user;
 	
 	if(user && user.pipe){

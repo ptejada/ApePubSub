@@ -114,7 +114,7 @@ APE.prototype.getPipe = function(user){
 }
 
 APE.prototype.send = function(cmd, args, pipe, callback){
-	var specialCmd = {CONNECT: 0, RECONNECT:0, SESSION:0};
+	var specialCmd = {CONNECT: 0, RESTORE:0, SESSION:0};
 	if(this.state == 1 || cmd in specialCmd){
 
 		var tmp = {
