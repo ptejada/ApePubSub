@@ -30,6 +30,7 @@ function APE( server, events, options ){
 	}
 
 	this.connect = function(args){
+		var client = this;
 		this.options.connectionArgs = args || this.options.connectionArgs;
 		
 		server = server || APE.server;
@@ -40,13 +41,10 @@ function APE( server, events, options ){
 		
 		//Handle sessions
 		if(this.options.session == true){
-			this.session.connect = this.connect.bind(this,args);
 			if(this.session.restore() == true) return this;
 		}
 		
-		this.session.save();
-		
-		this.send('CONNECT', this.options.connectionArgs);
+		this.send('CONNECT', args);
 		
 		return this;
 	}
@@ -129,8 +127,21 @@ APE.prototype.send = function(cmd, args, pipe, callback){
 		if(this.session.id) tmp.sessid = this.session.id;
 
 		APE.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
-
-		this.transport.send(JSON.stringify([tmp]), callback);
+		
+		if(typeof callback != "function")	callback = function(){};
+		
+		APE.log(tmp);
+		var data = [];
+		try { 
+			data = JSON.stringify([tmp]);
+		}catch(e){
+			APE.log(e);
+			APE.log(data);
+		}
+		
+		//alert(data);
+		
+		this.transport.send(data);
 		if(!(cmd in specialCmd)){
 			clearTimeout(this.poller);
 			this.poll();

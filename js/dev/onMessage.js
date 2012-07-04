@@ -3,7 +3,7 @@ APE.prototype.onMessage = function(data){
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
-		this.check();
+		//this.check();
 	}
 	
 	var cmd, args, pipe;
@@ -63,6 +63,8 @@ APE.prototype.onMessage = function(data){
 				pipe.trigger('joined',this.user, pipe);
 				this.trigger('newChannel', pipe);
 				
+				this.session.save();
+				
 			break;
 			case "PUBDATA":
 				var user = this.pipes[args.from.pubid];
@@ -105,7 +107,7 @@ APE.prototype.onMessage = function(data){
 				this.user.sessid = this.session.id;
 				this.pipes[this.user.pubid] = this.user;
 				
-				this.session.save();
+				//this.session.save();
 				
 				//this.poll(); //This call is under observation
 			break;

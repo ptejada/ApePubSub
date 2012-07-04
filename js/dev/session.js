@@ -6,25 +6,27 @@ APE.prototype.session = {
 	data: {},
 	
 	save: function(){
+		if(!this.client.options.session) return;
+		
 		var pubid = this.client.user.pubid;
 		var client = this.client;
 		
 		var session = {
-			user: client.user,
 			channels: Object.keys(client.channels),
-			id: this.id
+			id: this.id,
+			pubid: pubid
 		}
 		
-		APE.log("Session Array", session)
-
 		this.cookie.change(this.id);
 		this.saveChl()
 		
-		client.send("saveSESSION", session);
+		//client.send("saveSESSION", session);
 	},
 	
 	saveChl: function(){
-		this.chl.change(this.client.chl+1);
+		if(!this.client.options.session) return;
+
+		this.chl.change(this.client.chl);
 	},
 	
 	destroy: function(){
@@ -62,8 +64,17 @@ APE.prototype.session = {
 		}
 		
 		client.chl++;
+		//client.check();
+		//client.poll();
 		client.send('RECONNECT', {sid: this.id})
 		return true;
+	},
+	
+	connect: function(){
+		var client = this.client;
+		var args = client.options.connectionArgs
+		
+		client.send('CONNECT', args);
 	}
 	
 }
