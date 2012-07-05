@@ -17,10 +17,6 @@ function APE( server, events, options ){
 	
 	//Add Events
 	this.on(events);
-	this.on("error004", function(){
-		this.session.destroy();
-		this.session.connect();
-	})
 
 	var cb = {
 		'onmessage': this.onMessage.bind(this),
@@ -160,6 +156,8 @@ APE.prototype.check = function(){
 }
 
 APE.prototype.join = function(channel){
+	//alert(typeof this.channels[channel]);
+	if(typeof this.channels[channel] == "object") return;
 	this.send('JOIN', {'channels': channel});
 }
 

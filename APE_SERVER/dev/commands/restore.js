@@ -77,6 +77,11 @@ function restoreUser(user,sid){
 		}
 	}
 	
+	res.push({
+		name: "RESTORED",
+		data: {done: 1}
+	})
+	
 	Ape.log(res.toSource());
 	
 	for(var i in res){

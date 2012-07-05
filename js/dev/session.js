@@ -64,8 +64,8 @@ APE.prototype.session = {
 		}
 		
 		client.chl++;
-		//client.check();
-		//client.poll();
+		//Restoring session state == 2
+		client.state = 2;
 		client.send('RESTORE', {sid: this.id})
 		return true;
 	},
@@ -74,6 +74,7 @@ APE.prototype.session = {
 		var client = this.client;
 		var args = client.options.connectionArgs
 		
+		this.destroy();
 		client.send('CONNECT', args);
 	}
 	

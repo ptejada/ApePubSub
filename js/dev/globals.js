@@ -3,7 +3,8 @@ APE.debug = true;
 APE.client = new APE();
 
 var Sub = function(channel, Events, callback){
-	this.join(channel);
+	//this.join(channel);	
+	this.on("ready", this.join.bind(this, channel));
 	
 	//Handle the events
 	if(typeof Events == "object"){

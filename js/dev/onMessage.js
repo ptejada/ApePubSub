@@ -17,12 +17,29 @@ APE.prototype.onMessage = function(data){
 
 		switch(cmd){
 			case 'LOGIN':
-				this.state = 1;
+				this.state = this.state == 0 ? 1 : this.state;
 				this.user.sessid = this.session.id = args.sessid;
-				this.trigger('ready');
 				this.poll();
+				this.session.save();
+			break;
+			case 'IDENT':
+				this.user = new APE.user(args.user, this);
+				this.user.sessid = this.session.id;
+				this.pipes[this.user.pubid] = this.user;
+				
+				//alert(this.state);
+				if(this.state == 1)
+					this.trigger('ready');
+				
+				//this.poll(); //This call is under observation
+			break;
+			case 'RESTORED':
+				//Session restored completed
+				this.state = 1;
+				this.trigger('ready');
 			break;
 			case 'CHANNEL':
+				//APE.log(pipe, args);
 				pipe = new APE.channel(args.pipe, this);
 				this.pipes[pipe.pubid] = pipe;
 				this.channels[pipe.name] = pipe;
@@ -63,8 +80,6 @@ APE.prototype.onMessage = function(data){
 				pipe.trigger('joined',this.user, pipe);
 				this.trigger('newChannel', pipe);
 				
-				this.session.save();
-				
 			break;
 			case "PUBDATA":
 				var user = this.pipes[args.from.pubid];
@@ -102,26 +117,25 @@ APE.prototype.onMessage = function(data){
 				
 				pipe.trigger('left', [user, pipe]);
 			break;
-			case 'IDENT':
-				this.user = new APE.user(args.user, this);
-				this.user.sessid = this.session.id;
-				this.pipes[this.user.pubid] = this.user;
-				
-				//this.session.save();
-				
-				//this.poll(); //This call is under observation
-			break;
 			case 'NOSESSION':
-				this.session.destroy();
 				this.session.connect();
 				
 			break;
 			case 'ERR' :
-				if(this.transport.id == 0 && cmd == 'ERR' &&(args.code > 100 || args.code == "001")){
-					this.check();
-				}else if(cmd == 'ERR' && args.code < 100){
-					clearTimeout(this.poller);
-					this.trigger("dead", args)
+				switch(args.code){
+					case "001":
+					case "002":
+					case "003":
+						clearTimeout(this.poller);
+						this.trigger("dead", args);
+						break;
+					case "004":
+					case "250":
+						this.state = 0;
+						this.session.connect();
+						break;
+					default:
+						this.check();
 				}
 				this.trigger("error",args);
 				this.trigger("error"+args.code,args);
@@ -129,10 +143,11 @@ APE.prototype.onMessage = function(data){
 			default:
 				//trigger custom commands
 				this.trigger(cmd, [args, raw])
+				this.check();
 		}
-
-		if(this.transport.id == 0 && cmd != 'ERR' && this.transport.state == 1){
+		if(this.transport.id == 0 && cmd != 'ERR' && cmd != "LOGIN" && cmd != "IDENT" && this.transport.state == 1){
 			this.check();
 		}
+		
 	}
 }
