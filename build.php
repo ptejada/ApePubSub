@@ -8,7 +8,7 @@
 	 
 	$path = "js/dev/";
 	$sufix = ".js";
-	$files = array("utilities","client", "onMessage", "transport", "user", "channel");
+	$files = array("utilities","client", "onMessage", "transport", "user", "channel", "session");
 	
 	function build($list, $output){
 		global $path, $sufix;
@@ -29,32 +29,23 @@
 		return $res;
 	}
 	
-	$min = JSMin::minify(build($files, "js/ApePubSub-core.js"));
-	file_put_contents("js/ApePubSub-core.min.js", $min);
+	$min = JSMin::minify(build($files, "js/ApePubSub.js"));
+	file_put_contents("js/ApePubSub.min.js", $min);
 	
+	/*
+	 * Global API
+	 */
+	/*
 	$files[] = "globals";
 	
 	$min = JSMin::minify(build($files, "js/ApePubSub.js"));
 	file_put_contents("js/ApePubSub.min.js", $min);
-	
-	$path = "APE_SERVER/dev/";
-	$files = array(
-		"commands/frame",
-		"commands/pub",
-		"commands/inlinepub",
-		"hooks/connect",
-		"hooks/events"
-	);
-	
-	build($files, "APE_SERVER/scripts/apsModule.js")
+	*/
 ?>
 <center>
 	<h1>Build Succeed!</h1>
 	<ul>
 		<li>js/ApePubSub.js</li>
 		<li>js/ApePubSub.min.js</li>
-		<li>js/ApePubSub-core.js</li>
-		<li>js/ApePubSub-core.min.js</li>
-		<li>APE_SERVER/scripts/apsModule.js</li>
 	</ul>
 </center>
