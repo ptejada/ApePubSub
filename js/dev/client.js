@@ -1,4 +1,4 @@
-function APE( server, events, options ){
+function APS( server, events, options ){
 	this.options = {
 		'poll': 25000,
 		debug: true,
@@ -29,9 +29,9 @@ function APE( server, events, options ){
 		var client = this;
 		this.options.connectionArgs = args || this.options.connectionArgs;
 		
-		server = server || APE.server;
+		server = server || APS.server;
 		if(this.state == 0)
-			this.transport = new APE.transport(server, cb, options);
+			this.transport = new APS.transport(server, cb, options);
 		
 		//alert("connnecting...")
 		
@@ -49,7 +49,7 @@ function APE( server, events, options ){
 	return this;
 }
 
-APE.prototype.trigger = function(ev, args){
+APS.prototype.trigger = function(ev, args){
 	ev = ev.toLowerCase();
 	if(!(args instanceof Array)) args = [args];
 	
@@ -76,7 +76,7 @@ APE.prototype.trigger = function(ev, args){
 	}
 }
 
-APE.prototype.on = function(ev, fn){
+APS.prototype.on = function(ev, fn){
 	var Events = [];
 	
 	if(typeof ev == 'string' && typeof fn == 'function'){
@@ -97,11 +97,11 @@ APE.prototype.on = function(ev, fn){
 	return this;
 }
 
-APE.prototype.poll = function(){
+APS.prototype.poll = function(){
 	this.poller = setTimeout((function(){ this.check() }).bind(this), this.options.poll);
 }
 
-APE.prototype.getPipe = function(user){
+APS.prototype.getPipe = function(user){
 	if(typeof user == 'string'){
 		return this.pipes[user];
 	} else {
@@ -109,7 +109,7 @@ APE.prototype.getPipe = function(user){
 	}
 }
 
-APE.prototype.send = function(cmd, args, pipe, callback){
+APS.prototype.send = function(cmd, args, pipe, callback){
 	var specialCmd = {CONNECT: 0, RESTORE:0, SESSION:0};
 	if(this.state == 1 || cmd in specialCmd){
 
@@ -151,11 +151,11 @@ APE.prototype.send = function(cmd, args, pipe, callback){
 	return this;
 }
 
-APE.prototype.check = function(){
+APS.prototype.check = function(){
 	this.send('CHECK');
 }
 
-APE.prototype.sub = function(channel, Events, callback){
+APS.prototype.sub = function(channel, Events, callback){
 	//Handle the events
 	if(typeof Events == "object"){
 		if(typeof channel == "object"){
@@ -190,7 +190,7 @@ APE.prototype.sub = function(channel, Events, callback){
 	return this;
 }
 
-APE.prototype.pub = function(channel, data){
+APS.prototype.pub = function(channel, data){
 	var pipe = this.getChannel(channel);
 	
 	if(pipe){
@@ -202,7 +202,7 @@ APE.prototype.pub = function(channel, data){
 	}
 };
 
-APE.prototype.getChannel = function(channel){
+APS.prototype.getChannel = function(channel){
 	if(channel in this.channels){
 		return this.channels[channel];
 	}
@@ -210,7 +210,7 @@ APE.prototype.getChannel = function(channel){
 	return false;
 }
 
-APE.prototype.onChannel = function(channel, Events, fn){
+APS.prototype.onChannel = function(channel, Events, fn){
 	if(channel in this.channels){
 		this.channels[channel].on(Events, fn);
 		return true;
@@ -236,23 +236,23 @@ APE.prototype.onChannel = function(channel, Events, fn){
 	}
 }
 
-APE.prototype.unSub = function(channel){
+APS.prototype.unSub = function(channel){
 	if(channel == "") return;
 	this.getChannel(channel).leave();
 }
 
 //Debug Function for Browsers console
 if(navigator.appName != "Microsoft Internet Explorer"){
-	APE.prototype.log = function($obj){
+	APS.prototype.log = function($obj){
 		if(!this.debug) return;
 		
 		var args =  Array.prototype.slice.call(arguments);
-		args.unshift("[APE]");
+		args.unshift("[APS]");
 		
 		window.console.log.apply(console, args);
 	};
 	
 }else{
-	APE.prototype.log = function(){}	
+	APS.prototype.log = function(){}	
 }
 

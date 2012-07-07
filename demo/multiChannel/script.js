@@ -1,6 +1,6 @@
 $(document).ready(function(){
-	//Create a new APE client
-	var client = new APE("ape2.crusthq.com");
+	//Create a new APS client
+	var client = new APS("ape2.crusthq.com");
 	
 	//Enable debug output to browser console
 	client.debug = true;
@@ -120,7 +120,7 @@ $(document).ready(function(){
 		}
 		
 		//Add current pubid data
-		//data.pubid = APE.PubSub.user.pubid;
+		//data.pubid = APS.PubSub.user.pubid;
 		
 		//Send message
 		client.pub(data.channel, data.message);

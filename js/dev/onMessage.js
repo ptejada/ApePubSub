@@ -1,4 +1,4 @@
-APE.prototype.onMessage = function(data){
+APS.prototype.onMessage = function(data){
 	//var data = data;
 	try { 
 		data = JSON.parse(data)
@@ -23,7 +23,7 @@ APE.prototype.onMessage = function(data){
 				this.session.save();
 			break;
 			case 'IDENT':
-				this.user = new APE.user(args.user, this);
+				this.user = new APS.user(args.user, this);
 				this.user.sessid = this.session.id;
 				this.pipes[this.user.pubid] = this.user;
 				
@@ -40,7 +40,7 @@ APE.prototype.onMessage = function(data){
 			break;
 			case 'CHANNEL':
 				//this.log(pipe, args);
-				pipe = new APE.channel(args.pipe, this);
+				pipe = new APS.channel(args.pipe, this);
 				this.pipes[pipe.pubid] = pipe;
 				this.channels[pipe.name] = pipe;
 				
@@ -51,7 +51,7 @@ APE.prototype.onMessage = function(data){
 				for(var i = 0; i < u.length; i++){
 					user = this.pipes[u[i].pubid]
 					if(!user){
-						user = new APE.user(u[i], this);
+						user = new APS.user(u[i], this);
 						this.pipes[user.pubid] = user;
 					}
 					
@@ -92,7 +92,7 @@ APE.prototype.onMessage = function(data){
 				pipe = this.pipes[args.pipe.pubid];
 
 				if(!user){
-					user = new APE.user(args.user, this);
+					user = new APS.user(args.user, this);
 					this.pipes[user.pubid] = user;
 				}
 				

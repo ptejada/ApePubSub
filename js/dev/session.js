@@ -1,4 +1,4 @@
-APE.prototype.session = {
+APS.prototype.session = {
 	id: "",
 	chl: {},
 	client: {},
@@ -49,8 +49,8 @@ APE.prototype.session = {
 		var client = this.client;
 		
 		//alert("restoring")
-		this.chl = new APE.cookie(client.identifier + "_chl");
-		this.cookie = new APE.cookie(client.identifier + "_session");
+		this.chl = new APS.cookie(client.identifier + "_chl");
+		this.cookie = new APS.cookie(client.identifier + "_session");
 		
 		
 		client.chl = this.chl.value || 0;
@@ -80,7 +80,7 @@ APE.prototype.session = {
 	
 }
 
-APE.cookie = function(name,value,days){
+APS.cookie = function(name,value,days){
 	this.change = function(value,days){
 		var name = this.name;
 		if(days){

@@ -1,11 +1,11 @@
 $(document).ready(function(){
 	/*
-	 * The APE server already set in ../config.js
+	 * The APS server already set in ../config.js
 	 * Otherwise, 
-	 * 		APE.server = 'ape2.crusthq.com';
+	 * 		APS.server = 'ape2.crusthq.com';
 	 */
 	
-	var client = new APE("ape2.crusthq.com");
+	var client = new APS("ape2.crusthq.com");
 	
 	window.client = client;
 	

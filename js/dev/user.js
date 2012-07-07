@@ -1,5 +1,5 @@
-//var APEUser = function(pipe, ape) {
-APE.user = function(pipe, ape){
+//var APSUser = function(pipe, ape) {
+APS.user = function(pipe, ape){
 	for(var i in pipe.properties){
 		this[i] = pipe.properties[i]
 	}
@@ -9,6 +9,6 @@ APE.user = function(pipe, ape){
 	this.channels = {};
 }
 
-APE.user.prototype.send = function(cmd, args) {
+APS.user.prototype.send = function(cmd, args) {
 	this.ape.send(cmd, args, this);
 }
