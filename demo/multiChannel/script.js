@@ -1,6 +1,10 @@
-$(document).ready(function(){	
+$(document).ready(function(){
+	var client = new APE("ape2.crusthq.com");
+	
+	client.debug = true;
+	
 	//Current user's properties
-	APE.client.user = {
+	client.user = {
 		name: "User_"+randomString(5), //Generates a random name
 		//id: 321,
 		//What ever you want to store in the user
@@ -10,7 +14,7 @@ $(document).ready(function(){
 	 * Add global events which will apply to all channels 
 	 * including existing and future ones
 	 */
-	onClient({
+	client.on({
 		/*
 		 * Function triggered when other users join the channel
 		 * 		+user
@@ -62,7 +66,7 @@ $(document).ready(function(){
 		 */
 		
 		ready: function(){
-			$("#username").text(APE.client.user.name);
+			$("#username").text(client.user.name);
 		}
 		
 	});
@@ -72,7 +76,7 @@ $(document).ready(function(){
 	 * Since all channels will have the same events and have already been added then above using onClient()
 	 * we can make the simple call below to subscribe to all our channels
 	 */
-	Sub(["music","games","dance"]);
+	client.sub(["music","games","dance"]);
 	
 	/*
 	 * There are many ways to achive the same results, subscribe to multiple channels.
@@ -121,7 +125,7 @@ $(document).ready(function(){
 		//data.pubid = APE.PubSub.user.pubid;
 		
 		//Send message
-		Pub(data.channel, data.message);
+		client.pub(data.channel, data.message);
 		
 		//Clear input and focus
 		formInput.val("").focus();
