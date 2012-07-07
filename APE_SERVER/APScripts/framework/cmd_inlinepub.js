@@ -1,7 +1,7 @@
 //Pushpub Command
 Ape.registerCmd("inlinepub", false, function(params, info) {
-	//Global password
-	if (params.password == password) {
+	//Global inlinePass
+	if (params.password == inlinePass) {
 		
 		if(params.to && params.raw && params.data){
 			
