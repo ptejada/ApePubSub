@@ -13,7 +13,7 @@ APE.prototype.onMessage = function(data){
 		pipe = null;
 		clearTimeout(this.poller);
 		
-		APE.log('>>>> ', cmd , " <<<< ", args);
+		this.log('>>>> ', cmd , " <<<< ", args);
 
 		switch(cmd){
 			case 'LOGIN':
@@ -39,7 +39,7 @@ APE.prototype.onMessage = function(data){
 				this.trigger('ready');
 			break;
 			case 'CHANNEL':
-				//APE.log(pipe, args);
+				//this.log(pipe, args);
 				pipe = new APE.channel(args.pipe, this);
 				this.pipes[pipe.pubid] = pipe;
 				this.channels[pipe.name] = pipe;

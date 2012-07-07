@@ -58,7 +58,7 @@ APE.prototype.trigger = function(ev, args){
 		for(var i in this.ape.events[ev]){
 			if(this.ape.events[ev].hasOwnProperty(i)){ 
 				this.ape.events[ev][i].apply(this, args);
-				APE.log("{{{ " + ev + " }}} on client ", this.ape);
+				this.log("{{{ " + ev + " }}} on client ", this.ape);
 			}
 		}
 	}
@@ -68,9 +68,9 @@ APE.prototype.trigger = function(ev, args){
 		if(this.events[ev].hasOwnProperty(i)){
 			this.events[ev][i].apply(this, args);
 			if(!this.ape){
-				APE.log("{{{ " + ev + " }}} on client ", this);
+				this.log("{{{ " + ev + " }}} on client ", this);
 			}else{
-				APE.log("{{{ " + ev + " }}} on channel " + this.name, this);
+				this.log("{{{ " + ev + " }}} on channel " + this.name, this);
 			}
 		}
 	}
@@ -122,17 +122,17 @@ APE.prototype.send = function(cmd, args, pipe, callback){
 		if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid; 
 		if(this.session.id) tmp.sessid = this.session.id;
 
-		APE.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
+		this.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
 		
 		if(typeof callback != "function")	callback = function(){};
 		
-		APE.log(tmp);
+		this.log(tmp);
 		var data = [];
 		try { 
 			data = JSON.stringify([tmp]);
 		}catch(e){
-			APE.log(e);
-			APE.log(data);
+			this.log(e);
+			this.log(data);
 		}
 		
 		//alert(data);
@@ -155,14 +155,94 @@ APE.prototype.check = function(){
 	this.send('CHECK');
 }
 
-APE.prototype.join = function(channel){
-	//alert(typeof this.channels[channel]);
-	if(typeof this.channels[channel] == "object") return;
-	this.send('JOIN', {'channels': channel});
+APE.prototype.sub = function(channel, Events, callback){
+	//Handle the events
+	if(typeof Events == "object"){
+		if(typeof channel == "object"){
+			for(var chan in channel){
+				this.onChannel(channel[chan], Events);
+			}
+		}else{
+			this.onChannel(channel, Events);
+		}
+	}
+	
+	//Handle callback
+	if(typeof callback == "function"){
+		if(typeof channel == "object"){
+			for(var chan in channel){
+				this.onChannel(channel[chan], "joined", callback);
+			}
+		}else{
+			this.onChannel(channel, "joined", callback);
+		}
+	}
+	
+	//Join Channel
+	if(this.state == 0){
+		this.on("ready", this.sub.bind(this, channel));
+		this.connect({user: this.user});
+		
+	}else if(typeof this.channels[channel] != "object"){
+		this.send('JOIN', {'channels': channel});
+	}
+	
+	return this;
+}
+
+APE.prototype.pub = function(channel, data){
+	var pipe = this.getChannel(channel);
+	
+	if(pipe){
+		var args = {data: data};
+		pipe.send("Pub", args);
+		pipe.trigger("pub",args);
+	}else{
+		this.log("NO Channel " + channel);
+	}
+};
+
+APE.prototype.getChannel = function(channel){
+	if(channel in this.channels){
+		return this.channels[channel];
+	}
+	
+	return false;
+}
+
+APE.prototype.onChannel = function(channel, Events, fn){
+	if(channel in this.channels){
+		this.channels[channel].on(Events, fn);
+		return true;
+	}
+	
+	if(typeof Events == "object"){
+		//add events to queue
+		if(typeof this.events._queue[channel] != "object")
+			this.events._queue[channel] = [];
+		
+		//this.events._queue[channel].push(Events);
+		for(var $event in Events){
+			var fn = Events[$event];
+			
+			this.events._queue[channel].push([$event, fn]);
+			
+			this.log("Adding ["+channel+"] event '"+$event+"' to queue");
+		}
+	}else{
+		var xnew = Object();
+		xnew[Events] = fn;
+		this.onChannel(channel,xnew);
+	}
+}
+
+APE.prototype.unSub = function(channel){
+	if(channel == "") return;
+	this.getChannel(channel).leave();
 }
 
 //Debug Function for Browsers console
-APE.log = function($obj){
+APE.prototype.log = function($obj){
 	if(!this.debug) return;
 	
 	var args =  Array.prototype.slice.call(arguments);

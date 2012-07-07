@@ -26,5 +26,7 @@ APE.channel = function(pipe, ape) {
 	}
 	
 	this.on = APE.prototype.on.bind(this);
+	this.pup = APE.prototype.pub.bind(ape, this.name);
 	this.trigger = APE.prototype.trigger.bind(this);
+	this.log = APE.prototype.log.bind(this, "[CHANNEL]", "["+this.name+"]");
 }

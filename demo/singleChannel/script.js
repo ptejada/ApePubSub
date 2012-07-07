@@ -5,8 +5,14 @@ $(document).ready(function(){
 	 * 		APE.server = 'ape2.crusthq.com';
 	 */
 	
+	var client = new APE("ape2.crusthq.com");
+	
+	window.client = client;
+	
+	client.debug = true;
 	//Current user's properties
-	APE.client.user = {
+	
+	client.user = {
 		name: "User_"+randomString(5), //Generates a random name
 		//id: 321,
 		//What ever you want to store in the user
@@ -63,7 +69,7 @@ $(document).ready(function(){
 	 * Subscribe to channel
 	 */
 	
-	Sub("music", Events, function(user, channel){
+	client.sub("music", Events, function(user, channel){
 		$("#username").text(user.name);
 	});
 	
@@ -92,7 +98,7 @@ $(document).ready(function(){
 		//data.pubid = APS.user.pubid;
 		
 		//Send message
-		Pub("music", data.message);
+		client.pub("music", data.message);
 		
 		//Clear input and focus
 		formInput.val("").focus();
