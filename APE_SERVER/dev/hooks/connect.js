@@ -1,6 +1,5 @@
 Ape.registerHookCmd("connect", function(params, cmd){
-	//IMPORTANT! create propCache and channels property
-	cmd.user.propCache = {};
+	//IMPORTANT! create channels property
 	cmd.user.channels = {};
 	
 	if(!params) return 1;

@@ -9,9 +9,6 @@ Ape.registerCmd("RESTORE", true, function(params, info) {
 		return 1;
 	}
 
-	//this.sendResponse("NOSESSION", "failed");
-	//info.sendResponse("RECONNECT", {value: "failed"});
-	//return JSON.stringify({name: "NOSESSION", data: {value: "failed"}});
 	return {name: "NOSESSION", data: {value: "failed"}};
 
 });
@@ -29,25 +26,14 @@ function restoreUser(user,sid){
 	
 	res.push({
 		name: "IDENT",
-		data: {
-			user: {
-				casttype: 		"uni",
-				properties: 	user.prop(),
-				pubid: 			user.prop("pubid")
-			}
-		}
+		data: {user: user.pipe.toObject()}
 	});
 	
 	function buildUsers(users){
 		var output = [];
 		for( var id in users){
 			var user = users[id];
-			output.push({
-				casttype: 		"uni",
-				level: 			user.prop("level"),
-				properties: 	user.prop(),
-				pubid: 			id
-			});
+			output.push(user.pipe.toObject());
 		}
 		
 		return output;
@@ -63,11 +49,7 @@ function restoreUser(user,sid){
 				res.push({
 					name: "CHANNEL",
 					data: {
-						pipe: {
-							casttype: "multi",
-							properties: chan.prop(),
-							pubid: chan.prop("pubid")
-						},
+						pipe: chan.pipe.toObject(),
 						users: buildUsers(chan.users)
 					}
 				})
