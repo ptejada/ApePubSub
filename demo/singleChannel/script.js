@@ -13,7 +13,7 @@ $(document).ready(function(){
 	//Current user's properties
 	
 	client.user = {
-		name: "User_"+randomString(5), //Generates a random name
+		name: "User_"+randomString(5) //Generates a random name
 		//id: 321,
 		//What ever you want to store in the user
 	}	

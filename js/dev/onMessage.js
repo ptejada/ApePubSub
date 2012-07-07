@@ -3,7 +3,7 @@ APE.prototype.onMessage = function(data){
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
-		//this.check();
+		return this.check();
 	}
 	
 	var cmd, args, pipe;
@@ -142,7 +142,7 @@ APE.prototype.onMessage = function(data){
 			break;
 			default:
 				//trigger custom commands
-				this.trigger(cmd, [args, raw])
+				this.trigger(cmd, [args])
 				this.check();
 		}
 		if(this.transport.id == 0 && cmd != 'ERR' && cmd != "LOGIN" && cmd != "IDENT" && this.transport.state == 1){

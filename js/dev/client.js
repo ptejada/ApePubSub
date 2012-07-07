@@ -242,11 +242,17 @@ APE.prototype.unSub = function(channel){
 }
 
 //Debug Function for Browsers console
-APE.prototype.log = function($obj){
-	if(!this.debug) return;
+if(navigator.appName != "Microsoft Internet Explorer"){
+	APE.prototype.log = function($obj){
+		if(!this.debug) return;
+		
+		var args =  Array.prototype.slice.call(arguments);
+		args.unshift("[APE]");
+		
+		window.console.log.apply(console, args);
+	};
 	
-	var args =  Array.prototype.slice.call(arguments);
-	args.unshift("[APE]");
-	
-	window.console.log.apply(console, args);
-};
+}else{
+	APE.prototype.log = function(){}	
+}
+
