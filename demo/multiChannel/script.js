@@ -1,6 +1,8 @@
 $(document).ready(function(){
+	//Create a new APE client
 	var client = new APE("ape2.crusthq.com");
 	
+	//Enable debug output to browser console
 	client.debug = true;
 	
 	//Current user's properties
@@ -49,9 +51,9 @@ $(document).ready(function(){
 		
 		/*
 		 * Function triggered when a text message is recieved on this channel
-		 * 		+msg = (string) message
-		 * 		+from = sender(user) properties like name, id, pubid ... etc
-		 * 		+channel = multipipe object where the message came through
+		 * 		+message = (string) message
+		 * 		+from = sender(user) properties like name, pubid ... etc
+		 * 		+channel = a channel object where the message came through
 		 */
 		message: function(message, from, channel){
 			//(jQuery)Append a Message to DIV container
@@ -61,8 +63,8 @@ $(document).ready(function(){
 		},
 		
 		/*
-		 * This event is exclusive to onClient() and is only triggered once when a connection to the
-		 * server has been stablished
+		 * This event is exclusive to the client and is only triggered once when a connection to the
+		 * server has been stablished or Restored from session
 		 */
 		
 		ready: function(){
@@ -73,7 +75,7 @@ $(document).ready(function(){
 	
 	
 	/*
-	 * Since all channels will have the same events and have already been added then above using onClient()
+	 * Since all channels will have the same events and have already been added then above using client.on()
 	 * we can make the simple call below to subscribe to all our channels
 	 */
 	client.sub(["music","games","dance"]);
@@ -81,33 +83,29 @@ $(document).ready(function(){
 	/*
 	 * There are many ways to achive the same results, subscribe to multiple channels.
 	 * For example if you would rather have every channel with their own events you could 
-	 * wrap all your Sub() calls in an APE_ready()
+	 * wrap all your sub() calls in a sub() callback
 	
-			APE_ready(function(){
-				Sub("music", musicEvents, callback);
+			client.sub("music", musicEvents, function(){
 				Sub("games", gamesEvents, callback);
 				Sub("dance", danceEvents, callback);
 			});
 	
-	 * The reason we should call parallel Sub() requests inside an APE_ready() is to avoid
-	 * the framework from been reinitialzed on every request. Is also save to Subsribe to a
-	 * channel from any callback or event triggered after the server is connected, for example:
-	
-			Sub("music", musicEvents, function(){
-				Sub("games", gamesEvents, callback);
-				Sub("dance", danceEvents, callback);
-			});
-	
+	 * The reason we should call parallel client.sub() requests inside a callback is to avoid
+	 * the framework from been reinitialzed on every sub() request.
 	 */
 	
 	/*
-	 * To publish to a channel use the Pub() function
-	 * Pub(channel_name, message_or_object);
+	 * To publish to a channel use the pub() function
+	 *		client.pub(channel_name, message_or_object);
 	 * 
+	 * You may also call the pub() function directly from channel object
+	 * 		client.getChannel(channel_name).pub(message_or_object)
+	 */
+	
+	/*
 	 * All the code below is mostly gathering the form data to publish 
 	 * and adding some basic effects to the chat box 
 	 */
-	
 	$(".feed-send").on("submit", function(e){
 		e.preventDefault();
 		
