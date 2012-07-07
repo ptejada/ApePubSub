@@ -1,14 +1,14 @@
-//var APSUser = function(pipe, ape) {
-APS.user = function(pipe, ape){
+//var APSUser = function(pipe, client) {
+APS.user = function(pipe, client){
 	for(var i in pipe.properties){
 		this[i] = pipe.properties[i]
 	}
 	
 	this.pubid = pipe.pubid;
-	this.ape = ape;
+	this.client = client;
 	this.channels = {};
 }
 
 APS.user.prototype.send = function(cmd, args) {
-	this.ape.send(cmd, args, this);
+	this.client.send(cmd, args, this);
 }

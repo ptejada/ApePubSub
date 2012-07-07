@@ -54,11 +54,11 @@ APS.prototype.trigger = function(ev, args){
 	if(!(args instanceof Array)) args = [args];
 	
 	//GLobal
-	if("ape" in this){
-		for(var i in this.ape.events[ev]){
-			if(this.ape.events[ev].hasOwnProperty(i)){ 
-				this.ape.events[ev][i].apply(this, args);
-				this.log("{{{ " + ev + " }}} on client ", this.ape);
+	if("client" in this){
+		for(var i in this.client.events[ev]){
+			if(this.client.events[ev].hasOwnProperty(i)){ 
+				this.client.events[ev][i].apply(this, args);
+				this.log("{{{ " + ev + " }}} on client ", this.client);
 			}
 		}
 	}
@@ -67,7 +67,7 @@ APS.prototype.trigger = function(ev, args){
 	for(var i in this.events[ev]){
 		if(this.events[ev].hasOwnProperty(i)){
 			this.events[ev][i].apply(this, args);
-			if(!this.ape){
+			if(!this.client){
 				this.log("{{{ " + ev + " }}} on client ", this);
 			}else{
 				this.log("{{{ " + ev + " }}} on channel " + this.name, this);

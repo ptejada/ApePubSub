@@ -1,10 +1,10 @@
-//var APSChannel = function(pipe, ape) {
-APS.channel = function(pipe, ape) {
+//var APSChannel = function(pipe, client) {
+APS.channel = function(pipe, client) {
 	this.events = {};
 	this.properties = pipe.properties;
 	this.name = pipe.properties.name;
 	this.pubid = pipe.pubid;
-	this.ape = ape;
+	this.client = client;
 	this.users = {};
 	
 	this.addUser = function(u){
@@ -12,21 +12,21 @@ APS.channel = function(pipe, ape) {
 	}
 	
 	this.send = function(cmd, args){
-		this.ape.send(cmd, args, this);
+		this.client.send(cmd, args, this);
 	}
 	
 	this.leave = function(){
-		this.trigger("unsub", [this.ape.user, this]);
+		this.trigger("unsub", [this.client.user, this]);
 		
-		this.ape.send('LEFT', {"channel": this.name});
+		this.client.send('LEFT', {"channel": this.name});
 		
 		APS.debug("Unsubscribed from ("+this.name+")");
 		
-		delete this.ape.channels[this.name];
+		delete this.client.channels[this.name];
 	}
 	
 	this.on = APS.prototype.on.bind(this);
-	this.pup = APS.prototype.pub.bind(ape, this.name);
+	this.pup = APS.prototype.pub.bind(client, this.name);
 	this.trigger = APS.prototype.trigger.bind(this);
 	this.log = APS.prototype.log.bind(this, "[CHANNEL]", "["+this.name+"]");
 }
