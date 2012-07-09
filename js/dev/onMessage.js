@@ -3,7 +3,8 @@ APS.prototype.onMessage = function(data){
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
-		return this.check();
+		this.trigger("dead", e);
+		return clearTimeout(this.poller);
 	}
 	
 	var cmd, args, pipe;
