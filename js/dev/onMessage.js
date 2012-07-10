@@ -3,7 +3,7 @@ APS.prototype.onMessage = function(data){
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
-		this.trigger("dead", e);
+		this.trigger("dead", [e]);
 		return clearTimeout(this.poller);
 	}
 	
@@ -78,8 +78,8 @@ APS.prototype.onMessage = function(data){
 					}
 				}
 				
-				pipe.trigger('joined',this.user, pipe);
-				this.trigger('newChannel', pipe);
+				pipe.trigger('joined',[this.user, pipe]);
+				this.trigger('newChannel', [pipe]);
 				
 			break;
 			case "PUBDATA":
@@ -143,7 +143,7 @@ APS.prototype.onMessage = function(data){
 			break;
 			default:
 				//trigger custom commands
-				this.trigger(cmd, [args])
+				this.trigger(cmd, args)
 				this.check();
 		}
 		if(this.transport.id == 0 && cmd != 'ERR' && cmd != "LOGIN" && cmd != "IDENT" && this.transport.state == 1){
