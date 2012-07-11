@@ -67,8 +67,9 @@ APS.prototype.onMessage = function(data){
 				}
 				
 				//Add events from queue
-				if(pipe.name in this.events._queue){
-					var queue = this.events._queue[pipe.name];
+				var chanName = pipe.name.toLowerCase();
+				if(typeof this.eQueue[chanName] == "object"){
+					var queue = this.eQueue[chanName];
 					var ev, fn;
 					for(var i in queue){
 						ev = queue[i][0];

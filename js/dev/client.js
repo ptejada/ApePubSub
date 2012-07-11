@@ -9,11 +9,12 @@ function APS( server, events, options ){
 	this.identifier = "APS";
 	this.version = 'draft-v2';
 	this.state = 0;
-	this.events = {_queue: {}};
+	this.events = {};
 	this.chl = 0;
 	this.user = {};
 	this.pipes = {};
 	this.channels = {};
+	this.eQueue = {};
 	
 	//Add Events
 	this.on(events);
@@ -70,7 +71,7 @@ APS.prototype.trigger = function(ev, args){
 			if(!this.client){
 				this.log("{{{ " + ev + " }}} on client ", this);
 			}else{
-				this.log("{{{ " + ev + " }}} on channel " + this.name, this);
+				this.log("{{{ " + ev + " }}} ", this);
 			}
 		}
 	}
@@ -95,10 +96,6 @@ APS.prototype.on = function(ev, fn){
 	}
 	
 	return this;
-}
-
-APS.prototype.poll = function(){
-	this.poller = setTimeout((function(){ this.check() }).bind(this), this.options.poll);
 }
 
 APS.prototype.getPipe = function(user){
@@ -151,8 +148,14 @@ APS.prototype.send = function(cmd, args, pipe, callback){
 	return this;
 }
 
+APS.prototype.poll = function(){
+	if(this.transport.id == 0)
+		this.poller = setTimeout((function(){ this.check() }).bind(this), this.options.poll);
+}
+
 APS.prototype.check = function(){
-	this.send('CHECK');
+	if(this.transport.id == 0)
+		this.send('CHECK');
 }
 
 APS.prototype.sub = function(channel, Events, callback){
@@ -203,6 +206,7 @@ APS.prototype.pub = function(channel, data){
 };
 
 APS.prototype.getChannel = function(channel){
+	channel = channel.toLowerCase();
 	if(channel in this.channels){
 		return this.channels[channel];
 	}
@@ -211,6 +215,8 @@ APS.prototype.getChannel = function(channel){
 }
 
 APS.prototype.onChannel = function(channel, Events, fn){
+	channel = channel.toLowerCase();
+	
 	if(channel in this.channels){
 		this.channels[channel].on(Events, fn);
 		return true;
@@ -218,14 +224,14 @@ APS.prototype.onChannel = function(channel, Events, fn){
 	
 	if(typeof Events == "object"){
 		//add events to queue
-		if(typeof this.events._queue[channel] != "object")
-			this.events._queue[channel] = [];
+		if(typeof this.eQueue[channel] != "object")
+			this.eQueue[channel] = [];
 		
-		//this.events._queue[channel].push(Events);
+		//this.eQueue[channel].push(Events);
 		for(var $event in Events){
 			var fn = Events[$event];
 			
-			this.events._queue[channel].push([$event, fn]);
+			this.eQueue[channel].push([$event, fn]);
 			
 			this.log("Adding ["+channel+"] event '"+$event+"' to queue");
 		}
