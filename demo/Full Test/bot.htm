@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Full Test | Demo</title>
+		<meta http-equiv="cache-control" content="no-cache" />
+		<link rel="stylesheet" href="../style.css" type="text/css" />
+		
+		<script type="text/javaScript" src="../../js/dev/utilities.js"></script>
+		<script type="text/javaScript" src="../../js/dev/client.js"></script>
+		<script type="text/javaScript" src="../../js/dev/onMessage.js"></script>
+		<script type="text/javaScript" src="../../js/dev/transport.js"></script>
+		<script type="text/javaScript" src="../../js/dev/channel.js"></script>
+		<script type="text/javaScript" src="../../js/dev/user.js"></script>
+		<script type="text/javaScript" src="../../js/dev/session.js"></script>
+		<script>
+		function load(){
+			var parent = window.parent;
+			var client = new APS(parent.client.options.server);
+			
+			
+			client.user.bot = "yes";
+			client.identifier = "BOT";
+			
+			client.log(parent.client.options.server);
+			
+			client.sub(parent.chanName);
+		}
+		</script>
+	</head>
+ 
+	<body onload="load()">
+		<h1>Sending Payload...</h1>
+	</body>
+</html>
