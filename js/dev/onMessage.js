@@ -89,6 +89,12 @@ APS.prototype.onMessage = function(data){
 				
 				pipe.trigger(args.type, [args.content, user, pipe]);
 			break;
+			case "EVENT":
+				var user = this.pipes[args.from.pubid];
+				pipe = this.pipes[args.pipe.pubid];
+				
+				pipe.trigger(args.event, [args.data, user, pipe]);
+			break;
 			case 'JOIN':
 				var user = this.pipes[args.user.pubid];
 				pipe = this.pipes[args.pipe.pubid];

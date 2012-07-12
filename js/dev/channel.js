@@ -15,6 +15,13 @@ APS.channel = function(pipe, client) {
 		this.client.send(cmd, args, this);
 	}
 	
+	this.sendEvent = function(Event, args){
+		this.send("Event", {
+			event: Event,
+			data: args
+		});
+	}
+	
 	this.leave = function(){
 		this.trigger("unsub", [this.client.user, this]);
 		
