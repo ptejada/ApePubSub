@@ -8,7 +8,7 @@ function start(server){
 	window.chanName = "test_" + randomString(2);
 	window.client = new APS(server);
 	
-	client.options.session = false;
+	client.option.session = false;
 	client.debug = true;
 	
 	var Events = {

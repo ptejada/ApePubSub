@@ -6,7 +6,7 @@ APS.prototype.session = {
 	data: {},
 	
 	save: function(){
-		if(!this.client.options.session) return;
+		if(!this.client.option.session) return;
 		
 		var pubid = this.client.user.pubid;
 		var client = this.client;
@@ -24,7 +24,7 @@ APS.prototype.session = {
 	},
 	
 	saveChl: function(){
-		if(!this.client.options.session) return;
+		if(!this.client.option.session) return;
 
 		this.chl.change(this.client.chl);
 	},
@@ -72,7 +72,7 @@ APS.prototype.session = {
 	
 	connect: function(){
 		var client = this.client;
-		var args = client.options.connectionArgs
+		var args = client.option.connectionArgs
 		
 		this.destroy();
 		client.sendCmd('CONNECT', args);

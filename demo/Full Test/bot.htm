@@ -15,16 +15,16 @@
 		<script>
 		function load(){
 			var parent = window.parent;
-			var client = new APS(parent.client.options.server);
+			var client = new APS(parent.client.option.server);
 			
 			
 			client.user.bot = "yes";
 			client.identifier = "BOT";
-			client.options.session = false;
+			client.option.session = false;
 			//client.debug = true;
 			
 			
-			client.log(parent.client.options.server);
+			client.log(parent.client.option.server);
 			
 			client.sub(parent.chanName, false, function(user, channel){
 				//Simple string

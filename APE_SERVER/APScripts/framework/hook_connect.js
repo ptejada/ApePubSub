@@ -14,7 +14,7 @@ Ape.registerHookCmd("connect", function(params, cmd){
 	}
 	
 	//parse options
-	if(params.options){
+	if(params.option){
 		
 	}
 	

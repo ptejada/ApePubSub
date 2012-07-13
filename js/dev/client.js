@@ -1,5 +1,5 @@
 function APS( server, events, options ){
-	this.options = {
+	this.option = {
 		'poll': 25000,
 		debug: true,
 		session: true,
@@ -28,7 +28,7 @@ function APS( server, events, options ){
 
 	this.connect = function(args){
 		var client = this;
-		this.options.connectionArgs = args || this.options.connectionArgs;
+		this.option.connectionArgs = args || this.option.connectionArgs;
 		
 		server = server || APS.server;
 		if(this.state == 0)
@@ -37,7 +37,7 @@ function APS( server, events, options ){
 		//alert("connnecting...")
 		
 		//Handle sessions
-		if(this.options.session == true){
+		if(this.option.session == true){
 			if(this.session.restore() == true) return this;
 		}
 		
@@ -157,7 +157,7 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 
 APS.prototype.poll = function(){
 	if(this.transport.id == 0)
-		this.poller = setTimeout((function(){ this.check() }).bind(this), this.options.poll);
+		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
 }
 
 APS.prototype.check = function(){

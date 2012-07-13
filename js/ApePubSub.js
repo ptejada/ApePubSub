@@ -41,7 +41,7 @@ if(!Function.prototype.bind){
 }
 
 function APS( server, events, options ){
-	this.options = {
+	this.option = {
 		'poll': 25000,
 		debug: true,
 		session: true,
@@ -71,7 +71,7 @@ function APS( server, events, options ){
 		//Create Session object
 		this.session = new APS.session(this);
 		//Copy arguments
-		this.options.connectionArgs = args || this.options.connectionArgs;
+		this.option.connectionArgs = args || this.option.connectionArgs;
 		
 		server = server || APS.server;
 		if(this.state == 0)
@@ -80,7 +80,7 @@ function APS( server, events, options ){
 		//alert("connnecting...")
 		
 		//Handle sessions
-		if(this.options.session == true){
+		if(this.option.session == true){
 			if(this.session.restore() == true) return this;
 		}
 		
@@ -138,7 +138,7 @@ function APS( server, events, options ){
 	}
 	
 	this.poll = function(){
-		this.poller = setTimeout((function(){ this.check() }).bind(this), this.options.poll);
+		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
 	}
 	
 	this.getPipe = function(user){
@@ -591,7 +591,7 @@ APS.session = function(client){
 	this.data = {};
 	
 	this.save = function(){
-		if(!this.client.options.session) return;
+		if(!this.client.option.session) return;
 		
 		var pubid = this.client.user.pubid;
 		var client = this.client;
@@ -609,7 +609,7 @@ APS.session = function(client){
 	}
 	
 	this.saveChl = function(){
-		if(!this.client.options.session) return;
+		if(!this.client.option.session) return;
 
 		this.chl.change(this.client.chl);
 	}
@@ -657,7 +657,7 @@ APS.session = function(client){
 	
 	this.connect = function(){
 		var client = this.client;
-		var args = client.options.connectionArgs
+		var args = client.option.connectionArgs
 		
 		this.destroy();
 		client.send('CONNECT', args);
