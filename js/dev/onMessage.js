@@ -19,16 +19,27 @@ APS.prototype.onMessage = function(data){
 		switch(cmd){
 			case 'LOGIN':
 				this.state = this.state == 0 ? 1 : this.state;
-				this.user.sessid = this.session.id = args.sessid;
+				this.session.id = args.sessid;
 				this.poll();
 				this.session.save();
 			break;
 			case 'IDENT':
-				this.user = new APS.user(args.user, this);
-				this.user.sessid = this.session.id;
-				this.pipes[this.user.pubid] = this.user;
+				var user = new APS.user(args.user, this);
+				this.pipes[user.pubid] = user;
 				
-				//alert(this.state);
+				user.events = {};
+				user.client = this;
+				user.on = this.on.bind(user);
+				user.trigger = this.trigger.bind(this);
+				user.pub = this.pub.bind(this, this.name);
+				
+				this.send = function(Event, data){
+					client.sendCmd("Event", {
+						event: Event,
+						data: data
+					}, this.pubid);
+				}
+				
 				if(this.state == 1)
 					this.trigger('ready');
 				
@@ -82,12 +93,6 @@ APS.prototype.onMessage = function(data){
 				pipe.trigger('joined',[this.user, pipe]);
 				this.trigger('newChannel', [pipe]);
 				
-			break;
-			case "PUBDATA":
-				var user = this.pipes[args.from.pubid];
-				pipe = this.pipes[args.pipe.pubid];
-				
-				pipe.trigger(args.type, [args.content, user, pipe]);
 			break;
 			case "EVENT":
 				var user = this.pipes[args.from.pubid];
@@ -150,8 +155,8 @@ APS.prototype.onMessage = function(data){
 			break;
 			default:
 				//trigger custom commands
-				this.trigger(cmd, args)
-				this.check();
+				this.trigger(cmd, args);
+				//this.check();
 		}
 		if(this.transport.id == 0 && cmd != 'ERR' && cmd != "LOGIN" && cmd != "IDENT" && this.transport.state == 1){
 			this.check();

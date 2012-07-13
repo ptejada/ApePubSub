@@ -5,10 +5,13 @@ APS.user = function(pipe, client){
 	}
 	
 	this.pubid = pipe.pubid;
-	this.client = client;
+	//this.client = client;
 	this.channels = {};
-}
-
-APS.user.prototype.send = function(cmd, args) {
-	this.client.send(cmd, args, this);
+	
+	this.send = function(Event, data){
+		client.sendCmd("Event", {
+			event: Event,
+			data: data
+		}, this.pubid);
+	}
 }

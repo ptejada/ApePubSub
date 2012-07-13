@@ -11,25 +11,21 @@ APS.channel = function(pipe, client) {
 		this.users[u.pubid] = u;
 	}
 	
-	this.send = function(cmd, args){
-		this.client.send(cmd, args, this);
-	}
-	
-	this.sendEvent = function(Event, args){
-		this.send("Event", {
+	this.send = function(Event, data){
+		client.sendCmd("Event", {
 			event: Event,
-			data: args
-		});
+			data: data
+		}, this.pubid);
 	}
 	
 	this.leave = function(){
-		this.trigger("unsub", [this.client.user, this]);
+		this.trigger("unsub", [client.user, this]);
 		
-		this.client.send('LEFT', {"channel": this.name});
+		client.sendCmd('LEFT', {"channel": this.name});
 		
-		APS.debug("Unsubscribed from ("+this.name+")");
+		this.log("Unsubscribed from ("+this.name+")");
 		
-		delete this.client.channels[this.name];
+		delete client.channels[this.name];
 	}
 	
 	this.on = APS.prototype.on.bind(this);

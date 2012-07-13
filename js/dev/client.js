@@ -41,7 +41,7 @@ function APS( server, events, options ){
 			if(this.session.restore() == true) return this;
 		}
 		
-		this.send('CONNECT', args);
+		this.sendCmd('CONNECT', args);
 		
 		return this;
 	}
@@ -102,11 +102,18 @@ APS.prototype.getPipe = function(user){
 	if(typeof user == 'string'){
 		return this.pipes[user];
 	} else {
-		return this.pipes[user.getPubid()];
+		return this.pipes[user.pubid];
 	}
 }
 
-APS.prototype.send = function(cmd, args, pipe, callback){
+APS.prototype.send =function(pipe, $event, data){
+	this.sendCmd("Event", {
+		event: Event,
+		data: data
+	}, pipe);
+}
+
+APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 	var specialCmd = {CONNECT: 0, RESTORE:0, SESSION:0};
 	if(this.state == 1 || cmd in specialCmd){
 
@@ -116,7 +123,7 @@ APS.prototype.send = function(cmd, args, pipe, callback){
 		}
 
 		if(args) tmp.params = args;
-		if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid; 
+		if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid;
 		if(this.session.id) tmp.sessid = this.session.id;
 
 		this.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
@@ -142,7 +149,7 @@ APS.prototype.send = function(cmd, args, pipe, callback){
 		this.chl++;
 		this.session.saveChl();
 	} else {
-		this.on('ready', this.send.bind(this, cmd, args));
+		this.on('ready', this.sendCmd.bind(this, cmd, args));
 	}
 	
 	return this;
@@ -155,7 +162,7 @@ APS.prototype.poll = function(){
 
 APS.prototype.check = function(){
 	if(this.transport.id == 0)
-		this.send('CHECK');
+		this.sendCmd('CHECK');
 }
 
 APS.prototype.sub = function(channel, Events, callback){
@@ -187,7 +194,7 @@ APS.prototype.sub = function(channel, Events, callback){
 		this.connect({user: this.user});
 		
 	}else if(typeof this.channels[channel] != "object"){
-		this.send('JOIN', {'channels': channel});
+		this.sendCmd('JOIN', {'channels': channel});
 	}
 	
 	return this;
@@ -197,9 +204,10 @@ APS.prototype.pub = function(channel, data){
 	var pipe = this.getChannel(channel);
 	
 	if(pipe){
+		var $event = typeof data == "string" ? "message" : "data";
 		var args = {data: data};
-		pipe.send("Pub", args);
-		pipe.trigger("pub",args);
+		pipe.send($event, data);
+		//pipe.trigger("pub",args);
 	}else{
 		this.log("NO Channel " + channel);
 	}

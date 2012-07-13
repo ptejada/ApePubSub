@@ -20,7 +20,7 @@ APS.prototype.session = {
 		this.cookie.change(this.id);
 		this.saveChl()
 		
-		//client.send("saveSESSION", session);
+		//client.sendCmd("saveSESSION", session);
 	},
 	
 	saveChl: function(){
@@ -66,7 +66,7 @@ APS.prototype.session = {
 		client.chl++;
 		//Restoring session state == 2
 		client.state = 2;
-		client.send('RESTORE', {sid: this.id})
+		client.sendCmd('RESTORE', {sid: this.id})
 		return true;
 	},
 	
@@ -75,7 +75,7 @@ APS.prototype.session = {
 		var args = client.options.connectionArgs
 		
 		this.destroy();
-		client.send('CONNECT', args);
+		client.sendCmd('CONNECT', args);
 	}
 	
 }

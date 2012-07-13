@@ -1,6 +1,5 @@
 //custom events commands
 Ape.registerCmd("event", true, function(params, info) {
-	Ape.log(params);
 	
 	var pipe = Ape.getPipe(params.pipe);
 	
