@@ -1,6 +1,6 @@
 /**
  * @author Pablo Tejada
- * Built on 2012-07-07 @ 04:05
+ * Built on 2012-07-10 @ 02:27
  */
 
 //Generate a random string
@@ -56,9 +56,6 @@ function APS( server, events, options ){
 	this.user = {};
 	this.pipes = {};
 	this.channels = {};
-	
-	//Add Events
-	this.on(events);
 
 	var cb = {
 		'onmessage': this.onMessage.bind(this),
@@ -68,12 +65,17 @@ function APS( server, events, options ){
 	}
 
 	this.connect = function(args){
+		//if(this.state != 0) return this;
+		
 		var client = this;
+		//Create Session object
+		this.session = new APS.session(this);
+		//Copy arguments
 		this.options.connectionArgs = args || this.options.connectionArgs;
 		
 		server = server || APS.server;
 		if(this.state == 0)
-			this.transport = new APS.transport(server, cb, options);
+			this.transport = new APS.transport(server, cb, options, this);
 		
 		//alert("connnecting...")
 		
@@ -86,241 +88,247 @@ function APS( server, events, options ){
 		
 		return this;
 	}
-	
-	this.session.client = this;
-	return this;
-}
 
-APS.prototype.trigger = function(ev, args){
-	ev = ev.toLowerCase();
-	if(!(args instanceof Array)) args = [args];
-	
-	//GLobal
-	if("ape" in this){
-		for(var i in this.ape.events[ev]){
-			if(this.ape.events[ev].hasOwnProperty(i)){ 
-				this.ape.events[ev][i].apply(this, args);
-				this.log("{{{ " + ev + " }}} on client ", this.ape);
+	this.trigger = function(ev, args){
+		ev = ev.toLowerCase();
+		if(!(args instanceof Array)) args = [args];
+		
+		//GLobal
+		if("client" in this){
+			for(var i in this.client.events[ev]){
+				if(this.client.events[ev].hasOwnProperty(i)){ 
+					this.client.events[ev][i].apply(this, args);
+					this.log("{{{ " + ev + " }}} on client ", this.client);
+				}
+			}
+		}
+		
+		//Local
+		for(var i in this.events[ev]){
+			if(this.events[ev].hasOwnProperty(i)){
+				this.events[ev][i].apply(this, args);
+				if(!this.client){
+					this.log("{{{ " + ev + " }}} on client ", this);
+				}else{
+					this.log("{{{ " + ev + " }}} on channel " + this.name, this);
+				}
 			}
 		}
 	}
 	
-	//Local
-	for(var i in this.events[ev]){
-		if(this.events[ev].hasOwnProperty(i)){
-			this.events[ev][i].apply(this, args);
-			if(!this.ape){
-				this.log("{{{ " + ev + " }}} on client ", this);
-			}else{
-				this.log("{{{ " + ev + " }}} on channel " + this.name, this);
-			}
+	this.on = function(ev, fn){
+		var Events = [];
+		
+		if(typeof ev == 'string' && typeof fn == 'function'){
+			Events[ev] = fn;
+		}else if(typeof ev == "object"){
+			Events = ev;
+		}else{
+			return this;
 		}
-	}
-}
-
-APS.prototype.on = function(ev, fn){
-	var Events = [];
-	
-	if(typeof ev == 'string' && typeof fn == 'function'){
-		Events[ev] = fn;
-	}else if(typeof ev == "object"){
-		Events = ev;
-	}else{
+		
+		for(var e in Events){
+			var fn = Events[e];
+			if(!this.events[e])
+				this.events[e] = [];
+			this.events[e].push(fn);
+		}
+		
 		return this;
 	}
 	
-	for(var e in Events){
-		var fn = Events[e];
-		if(!this.events[e])
-			this.events[e] = [];
-		this.events[e].push(fn);
+	this.poll = function(){
+		this.poller = setTimeout((function(){ this.check() }).bind(this), this.options.poll);
 	}
 	
-	return this;
-}
-
-APS.prototype.poll = function(){
-	this.poller = setTimeout((function(){ this.check() }).bind(this), this.options.poll);
-}
-
-APS.prototype.getPipe = function(user){
-	if(typeof user == 'string'){
-		return this.pipes[user];
-	} else {
-		return this.pipes[user.getPubid()];
-	}
-}
-
-APS.prototype.send = function(cmd, args, pipe, callback){
-	var specialCmd = {CONNECT: 0, RESTORE:0, SESSION:0};
-	if(this.state == 1 || cmd in specialCmd){
-
-		var tmp = {
-			'cmd': cmd,
-			'chl': this.chl
+	this.getPipe = function(user){
+		if(typeof user == 'string'){
+			return this.pipes[user];
+		} else {
+			return this.pipes[user.getPubid()];
 		}
-
-		if(args) tmp.params = args;
-		if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid; 
-		if(this.session.id) tmp.sessid = this.session.id;
-
-		this.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
-		
-		if(typeof callback != "function")	callback = function(){};
-		
-		this.log(tmp);
-		var data = [];
-		try { 
-			data = JSON.stringify([tmp]);
-		}catch(e){
-			this.log(e);
-			this.log(data);
-		}
-		
-		//alert(data);
-		
-		this.transport.send(data);
-		if(!(cmd in specialCmd)){
-			clearTimeout(this.poller);
-			this.poll();
-		}
-		this.chl++;
-		this.session.saveChl();
-	} else {
-		this.on('ready', this.send.bind(this, cmd, args));
 	}
 	
-	return this;
-}
-
-APS.prototype.check = function(){
-	this.send('CHECK');
-}
-
-APS.prototype.sub = function(channel, Events, callback){
-	//Handle the events
-	if(typeof Events == "object"){
-		if(typeof channel == "object"){
-			for(var chan in channel){
-				this.onChannel(channel[chan], Events);
+	this.send = function(cmd, args, pipe, callback){
+		var specialCmd = {CONNECT: 0, RESTORE:0, SESSION:0};
+		if(this.state == 1 || cmd in specialCmd){
+	
+			var tmp = {
+				'cmd': cmd,
+				'chl': this.chl
 			}
-		}else{
-			this.onChannel(channel, Events);
-		}
-	}
 	
-	//Handle callback
-	if(typeof callback == "function"){
-		if(typeof channel == "object"){
-			for(var chan in channel){
-				this.onChannel(channel[chan], "joined", callback);
+			if(args) tmp.params = args;
+			if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid; 
+			if(this.session.id) tmp.sessid = this.session.id;
+	
+			this.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
+			
+			if(typeof callback != "function")	callback = function(){};
+			
+			this.log(tmp);
+			var data = [];
+			try { 
+				data = JSON.stringify([tmp]);
+			}catch(e){
+				this.log(e);
+				this.log(data);
 			}
+			
+			//alert(data);
+			
+			this.transport.send(data);
+			if(!(cmd in specialCmd)){
+				clearTimeout(this.poller);
+				this.poll();
+			}
+			this.chl++;
+			this.session.saveChl();
+		} else {
+			//this.on('ready', this.send.bind(this, cmd, args));
+		}
+		
+		return this;
+	}
+	
+	this.check = function(){
+		this.send('CHECK');
+	}
+	
+	this.sub = function(channel, Events, callback){
+		//Handle the events
+		if(typeof Events == "object"){
+			if(typeof channel == "object"){
+				for(var chan in channel){
+					this.onChannel(channel[chan], Events);
+				}
+			}else{
+				this.onChannel(channel, Events);
+			}
+		}
+		
+		//Handle callback
+		if(typeof callback == "function"){
+			if(typeof channel == "object"){
+				for(var chan in channel){
+					this.onChannel(channel[chan], "joined", callback);
+				}
+			}else{
+				this.onChannel(channel, "joined", callback);
+			}
+		}
+		
+		//Join Channel
+		if(this.state == 0){
+			var client = this;
+			this.on("ready", function(){
+				if(typeof client.channels[channel] != "object"){
+					this.send('JOIN', {'channels': channel});
+				}
+			});
+			this.connect({user: this.user});
+			
+		}else if(typeof this.channels[channel] != "object"){
+			this.send('JOIN', {'channels': channel});
+		}
+		
+		return this;
+	}
+	
+	this.pub = function(channel, data){
+		var pipe = this.getChannel(channel);
+		
+		if(pipe){
+			var args = {data: data};
+			pipe.send("Pub", args);
+			pipe.trigger("pub",args);
 		}else{
-			this.onChannel(channel, "joined", callback);
+			this.log("NO Channel " + channel);
 		}
-	}
-	
-	//Join Channel
-	if(this.state == 0){
-		this.on("ready", this.sub.bind(this, channel));
-		this.connect({user: this.user});
-		
-	}else if(typeof this.channels[channel] != "object"){
-		this.send('JOIN', {'channels': channel});
-	}
-	
-	return this;
-}
-
-APS.prototype.pub = function(channel, data){
-	var pipe = this.getChannel(channel);
-	
-	if(pipe){
-		var args = {data: data};
-		pipe.send("Pub", args);
-		pipe.trigger("pub",args);
-	}else{
-		this.log("NO Channel " + channel);
-	}
-};
-
-APS.prototype.getChannel = function(channel){
-	if(channel in this.channels){
-		return this.channels[channel];
-	}
-	
-	return false;
-}
-
-APS.prototype.onChannel = function(channel, Events, fn){
-	if(channel in this.channels){
-		this.channels[channel].on(Events, fn);
-		return true;
-	}
-	
-	if(typeof Events == "object"){
-		//add events to queue
-		if(typeof this.events._queue[channel] != "object")
-			this.events._queue[channel] = [];
-		
-		//this.events._queue[channel].push(Events);
-		for(var $event in Events){
-			var fn = Events[$event];
-			
-			this.events._queue[channel].push([$event, fn]);
-			
-			this.log("Adding ["+channel+"] event '"+$event+"' to queue");
-		}
-	}else{
-		var xnew = Object();
-		xnew[Events] = fn;
-		this.onChannel(channel,xnew);
-	}
-}
-
-APS.prototype.unSub = function(channel){
-	if(channel == "") return;
-	this.getChannel(channel).leave();
-}
-
-//Debug Function for Browsers console
-if(navigator.appName != "Microsoft Internet Explorer"){
-	APS.prototype.log = function($obj){
-		if(!this.debug) return;
-		
-		var args =  Array.prototype.slice.call(arguments);
-		args.unshift("[APS]");
-		
-		window.console.log.apply(console, args);
 	};
 	
-}else{
-	APS.prototype.log = function(){}	
+	this.getChannel = function(channel){
+		if(channel in this.channels){
+			return this.channels[channel];
+		}
+		
+		return false;
+	}
+	
+	this.onChannel = function(channel, Events, fn){
+		if(channel in this.channels){
+			this.channels[channel].on(Events, fn);
+			return true;
+		}
+		
+		if(typeof Events == "object"){
+			//add events to queue
+			if(typeof this.events._queue[channel] != "object")
+				this.events._queue[channel] = [];
+			
+			//this.events._queue[channel].push(Events);
+			for(var $event in Events){
+				var fn = Events[$event];
+				
+				this.events._queue[channel].push([$event, fn]);
+				
+				this.log("Adding ["+channel+"] event '"+$event+"' to queue");
+			}
+		}else{
+			var xnew = Object();
+			xnew[Events] = fn;
+			this.onChannel(channel,xnew);
+		}
+	}
+	
+	this.unSub = function(channel){
+		if(channel == "") return;
+		this.getChannel(channel).leave();
+	}
+	
+	//Debug Function for Browsers console
+	if(navigator.appName != "Microsoft Internet Explorer"){
+		this.log = function($obj){
+			if(!this.debug) return;
+			
+			var args =  Array.prototype.slice.call(arguments);
+			args.unshift("["+this.identifier+"]");
+			
+			window.console.log.apply(console, args);
+		};
+		
+	}else{
+		this.log = function(){}
+	}
+	
+	//Add Events
+	this.on(events);
+	
+	return this;
 }
-
-
 
 APS.prototype.onMessage = function(data){
 	//var data = data;
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
-		return this.check();
+		this.trigger("dead", [e]);
+		return clearTimeout(this.poller);
 	}
 	
-	var cmd, args, pipe;
+	
 	for(var i in data){
-		cmd = data[i].raw;
-		args = data[i].data;
-		pipe = null;
+		var cmd = data[i].raw;
+		var args = data[i].data;
+		var pipe = null;
 		clearTimeout(this.poller);
 		
 		this.log('>>>> ', cmd , " <<<< ", args);
-
+		
 		switch(cmd){
 			case 'LOGIN':
 				this.state = this.state == 0 ? 1 : this.state;
-				this.user.sessid = this.session.id = args.sessid;
+				this.session.id = args.sessid;
 				this.poll();
 				this.session.save();
 			break;
@@ -379,8 +387,8 @@ APS.prototype.onMessage = function(data){
 					}
 				}
 				
-				pipe.trigger('joined',this.user, pipe);
-				this.trigger('newChannel', pipe);
+				pipe.trigger('joined',[this.user, pipe]);
+				this.trigger('newChannel', [pipe]);
 				
 			break;
 			case "PUBDATA":
@@ -444,7 +452,7 @@ APS.prototype.onMessage = function(data){
 			break;
 			default:
 				//trigger custom commands
-				this.trigger(cmd, [args])
+				this.trigger(cmd, args)
 				this.check();
 		}
 		if(this.transport.id == 0 && cmd != 'ERR' && cmd != "LOGIN" && cmd != "IDENT" && this.transport.state == 1){
@@ -456,20 +464,44 @@ APS.prototype.onMessage = function(data){
 
 
 //var APSTransport = function(server, callback, options){
-APS.transport = function(server, callback, options){
+APS.transport = function(server, callback, options, client){
 	this.state = 0;//0 = Not initialized, 1 = Initialized and ready to exchange data, 2 = Request is running
 	this.stack = [];
 	this.callback = callback;
-
+	
+	//client.state = 3;
+	
+	this.postMessage = function(str, callback){
+		if(this.state > 0){
+			this.frame.contentWindow.postMessage(str, '*');
+			this.state = 2;
+		} else this.stack.push(str);
+		
+		this.callback.once = callback || function(){};
+	}
+	this.frameMessage = function(ev){
+		this.state = 1;
+		this.callback.onmessage(ev.data);
+		this.callback.once(ev.data);
+		this.callback.once = function(){};
+	}
+	this.onLoad = function(){
+		if(this.id == 6) this.state = 2;
+		else this.state = 1;
+	
+		for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
+		this.stack = [];
+	}
+	
 	if('WebSocket' in window && APS.wb == true){
 		this.id = 6;
 		var ws = new WebSocket('ws://' + server + '/6/');
-		APS.transport.prototype.send = function(str){
+		this.send = function(str){
 			if(this.state > 0) ws.send(str);
 			else this.stack.push(str);
 		}.bind(this);
 
-		ws.onopen = APS.transport.prototype.onLoad.bind(this);
+		ws.onopen = this.onLoad.bind(this);
 
 		ws.onmessage = function(ev){
 			callback.onmessage(ev.data);
@@ -497,54 +529,33 @@ APS.transport = function(server, callback, options){
 		}
 
 
-		APS.transport.prototype.send = APS.transport.prototype.postMessage;
+		this.send = this.postMessage;
 	}
 }
-APS.transport.prototype.postMessage = function(str, callback){
-	if(this.state > 0){
-		this.frame.contentWindow.postMessage(str, '*');
-		this.state = 2;
-	} else this.stack.push(str);
-	
-	this.callback.once = callback || function(){};
-}
-APS.transport.prototype.frameMessage = function(ev){
-	this.state = 1;
-	this.callback.onmessage(ev.data);
-	this.callback.once(ev.data);
-	this.callback.once = function(){};
-}
-APS.transport.prototype.onLoad = function(){
-	if(this.id == 6) this.state = 2;
-	else this.state = 1;
 
-	for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
-	this.stack = [];
-}
-
-//var APSUser = function(pipe, ape) {
-APS.user = function(pipe, ape){
+//var APSUser = function(pipe, client) {
+APS.user = function(pipe, client){
 	for(var i in pipe.properties){
 		this[i] = pipe.properties[i]
 	}
 	
 	this.pubid = pipe.pubid;
-	this.ape = ape;
+	this.client = client;
 	this.channels = {};
 }
 
 APS.user.prototype.send = function(cmd, args) {
-	this.ape.send(cmd, args, this);
+	this.client.send(cmd, args, this);
 }
 
 
-//var APSChannel = function(pipe, ape) {
-APS.channel = function(pipe, ape) {
+//var APSChannel = function(pipe, client) {
+APS.channel = function(pipe, client) {
 	this.events = {};
 	this.properties = pipe.properties;
 	this.name = pipe.properties.name;
 	this.pubid = pipe.pubid;
-	this.ape = ape;
+	this.client = client;
 	this.users = {};
 	
 	this.addUser = function(u){
@@ -552,34 +563,34 @@ APS.channel = function(pipe, ape) {
 	}
 	
 	this.send = function(cmd, args){
-		this.ape.send(cmd, args, this);
+		this.client.send(cmd, args, this);
 	}
 	
 	this.leave = function(){
-		this.trigger("unsub", [this.ape.user, this]);
+		this.trigger("unsub", [this.client.user, this]);
 		
-		this.ape.send('LEFT', {"channel": this.name});
+		this.client.send('LEFT', {"channel": this.name});
 		
 		APS.debug("Unsubscribed from ("+this.name+")");
 		
-		delete this.ape.channels[this.name];
+		delete this.client.channels[this.name];
 	}
 	
-	this.on = APS.prototype.on.bind(this);
-	this.pup = APS.prototype.pub.bind(ape, this.name);
-	this.trigger = APS.prototype.trigger.bind(this);
-	this.log = APS.prototype.log.bind(this, "[CHANNEL]", "["+this.name+"]");
+	this.on = client.on.bind(this);
+	this.pup = client.pub.bind(client, this.name);
+	this.trigger = client.trigger.bind(this);
+	this.log = client.log.bind(this, "[CHANNEL]", "["+this.name+"]");
 }
 
 
-APS.prototype.session = {
-	id: "",
-	chl: {},
-	client: {},
-	cookie: {},
-	data: {},
+APS.session = function(client){
+	this.id = "";
+	this.chl = {};
+	this.client = client;
+	this.cookie = {};
+	this.data = {};
 	
-	save: function(){
+	this.save = function(){
 		if(!this.client.options.session) return;
 		
 		var pubid = this.client.user.pubid;
@@ -595,31 +606,31 @@ APS.prototype.session = {
 		this.saveChl()
 		
 		//client.send("saveSESSION", session);
-	},
+	}
 	
-	saveChl: function(){
+	this.saveChl = function(){
 		if(!this.client.options.session) return;
 
 		this.chl.change(this.client.chl);
-	},
+	}
 	
-	destroy: function(){
+	this.destroy = function(){
 		this.cookie.destroy();
 		this.chl.destroy();
 		this.client.chl = 0;
 		this.id = null;
 		this.properties = {};
-	},
+	}
 	
-	get: function(index){
+	this.get = function(index){
 		return this.data[index];
-	},
+	}
 	
-	set: function(index, val){
+	this.set = function(index, val){
 		this.data[index] = val;
-	},
+	}
 	
-	restore: function(){
+	this.restore = function(){
 		var client = this.client;
 		
 		//alert("restoring")
@@ -642,9 +653,9 @@ APS.prototype.session = {
 		client.state = 2;
 		client.send('RESTORE', {sid: this.id})
 		return true;
-	},
+	}
 	
-	connect: function(){
+	this.connect = function(){
 		var client = this.client;
 		var args = client.options.connectionArgs
 		

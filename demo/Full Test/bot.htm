@@ -20,10 +20,37 @@
 			
 			client.user.bot = "yes";
 			client.identifier = "BOT";
+			client.options.session = false;
+			//client.debug = true;
+			
 			
 			client.log(parent.client.options.server);
 			
-			client.sub(parent.chanName);
+			client.sub(parent.chanName, false, function(user, channel){
+				//Simple string
+				channel.pub("Hello World");
+				//Complex string
+				channel.pub("Th!s i$ a Ve&ryC0pLeX $trying !@#$%^&* ()_+=- `~?>< \{][?]},.");
+				
+				//Simple Object
+				channel.pub({type: "simple", obj: "yes"});
+				//Complex Object
+				channel.pub({
+					set: "ye$", 
+					type: "complex", 
+					cat: {
+						green: "yes", 
+						blue: "no", 
+						grey: {
+							white: "yes", 
+							black: "yes"
+						}
+					}
+				});
+				
+				//Send custom event
+				channel.sendEvent("payload", {inprogress: "yes"});
+			});
 		}
 		</script>
 	</head>

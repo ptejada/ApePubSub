@@ -47,3 +47,21 @@
 .feed-send input {
 	font-size: 1.5em;
 }
+
+#console {
+	width: 500px;
+	padding: 10px;
+	background: #222;
+	color: #eee;
+	border: solid 3px #aaa;
+	font-size: 1.2em;
+	font-family: Courier New, Courier;
+}
+
+#console b {
+	font-weight: bold;
+}
+
+#console > div {
+	padding: 5px 0px;
+}
