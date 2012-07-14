@@ -49,13 +49,14 @@
 }
 
 #console {
-	width: 500px;
+	width: 600px;
 	padding: 10px;
 	background: #222;
 	color: #eee;
 	border: solid 3px #aaa;
 	font-size: 1.2em;
 	font-family: Courier New, Courier;
+	min-height: 500px;
 }
 
 #console b {
@@ -64,4 +65,22 @@
 
 #console > div {
 	padding: 5px 0px;
+}
+
+#console form {
+	display: inline-block;
+	background: none;
+	width: 550px;
+}
+#console form input:focus {
+	outline: none;
+}
+#console form input {
+	display: inline-block;
+	background: none;
+	border: none;
+	color: #eee;
+	font-size: 1em;
+	font-family: Courier New, Courier;
+	width: 400px;
 }
