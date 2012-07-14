@@ -52,6 +52,7 @@ function APS( server, events, options ){
 
 APS.prototype.trigger = function(ev, args){
 	ev = ev.toLowerCase();
+	this.log(ev, this);
 	if(!(args instanceof Array)) args = [args];
 	
 	//GLobal
@@ -108,7 +109,7 @@ APS.prototype.getPipe = function(user){
 
 APS.prototype.send =function(pipe, $event, data){
 	this.sendCmd("Event", {
-		event: Event,
+		event: $event,
 		data: data
 	}, pipe);
 }
@@ -202,6 +203,7 @@ APS.prototype.sub = function(channel, Events, callback){
 
 APS.prototype.pub = function(channel, data){
 	var pipe = this.getChannel(channel);
+	if(!pipe && channel.length == 32) pipe = this.getPipe(channel);
 	
 	if(pipe){
 		var $event = typeof data == "string" ? "message" : "data";
@@ -257,16 +259,16 @@ APS.prototype.unSub = function(channel){
 
 //Debug Function for Browsers console
 if(navigator.appName != "Microsoft Internet Explorer"){
-	APS.prototype.log = function($obj){
+	APS.prototype.log = function(){
 		if(!this.debug) return;
 		
 		var args =  Array.prototype.slice.call(arguments);
-		args.unshift("[APS]");
+		args.unshift("["+this.identifier+"]");
 		
 		window.console.log.apply(console, args);
 	};
 	
 }else{
-	APS.prototype.log = function(){}	
+	APS.prototype.log = function(){}
 }
 

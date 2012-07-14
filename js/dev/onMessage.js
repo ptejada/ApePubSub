@@ -8,6 +8,8 @@ APS.prototype.onMessage = function(data){
 	}
 	
 	var cmd, args, pipe;
+	var check = true;
+	
 	for(var i in data){
 		cmd = data[i].raw;
 		args = data[i].data;
@@ -18,27 +20,26 @@ APS.prototype.onMessage = function(data){
 
 		switch(cmd){
 			case 'LOGIN':
+				check = false;
+				
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
 				this.poll();
 				this.session.save();
 			break;
 			case 'IDENT':
+				check = false;
+				
 				var user = new APS.user(args.user, this);
 				this.pipes[user.pubid] = user;
 				
 				user.events = {};
 				user.client = this;
 				user.on = this.on.bind(user);
-				user.trigger = this.trigger.bind(this);
-				user.pub = this.pub.bind(this, this.name);
+				user.trigger = this.trigger.bind(user);
+				user.log = APS.prototype.log.bind(this, "[user]");
 				
-				this.send = function(Event, data){
-					client.sendCmd("Event", {
-						event: Event,
-						data: data
-					}, this.pubid);
-				}
+				this.user = user;
 				
 				if(this.state == 1)
 					this.trigger('ready');
@@ -98,6 +99,12 @@ APS.prototype.onMessage = function(data){
 				var user = this.pipes[args.from.pubid];
 				pipe = this.pipes[args.pipe.pubid];
 				
+				if(pipe instanceof APS.user)
+					pipe = this.user;
+				
+				this.log(pipe.pubid);
+				this.log(pipe);
+				
 				pipe.trigger(args.event, [args.data, user, pipe]);
 			break;
 			case 'JOIN':
@@ -135,6 +142,7 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case 'ERR' :
+				check = false;
 				switch(args.code){
 					case "001":
 					case "002":
@@ -158,9 +166,8 @@ APS.prototype.onMessage = function(data){
 				this.trigger(cmd, args);
 				//this.check();
 		}
-		if(this.transport.id == 0 && cmd != 'ERR' && cmd != "LOGIN" && cmd != "IDENT" && this.transport.state == 1){
-			this.check();
-		}
-		
+	}
+	if(this.transport.id == 0 && check && this.transport.state == 1){
+		this.check();
 	}
 }

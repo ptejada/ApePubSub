@@ -30,6 +30,8 @@ APS.prototype.session = {
 	},
 	
 	destroy: function(){
+		if(!this.client.option.session) return;
+		
 		this.cookie.destroy();
 		this.chl.destroy();
 		this.client.chl = 0;

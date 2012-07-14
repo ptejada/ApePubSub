@@ -8,10 +8,15 @@ APS.user = function(pipe, client){
 	//this.client = client;
 	this.channels = {};
 	
+	this.pub = APS.prototype.pub.bind(client, this.pubid);
+	this.send = APS.prototype.send.bind(client, this.pubid);
+	
+	/*
 	this.send = function(Event, data){
 		client.sendCmd("Event", {
 			event: Event,
 			data: data
 		}, this.pubid);
 	}
+	*/
 }
