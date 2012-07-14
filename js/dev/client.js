@@ -52,7 +52,7 @@ function APS( server, events, options ){
 
 APS.prototype.trigger = function(ev, args){
 	ev = ev.toLowerCase();
-	this.log(ev, this);
+	
 	if(!(args instanceof Array)) args = [args];
 	
 	//GLobal
@@ -107,15 +107,15 @@ APS.prototype.getPipe = function(user){
 	}
 }
 
-APS.prototype.send =function(pipe, $event, data){
+APS.prototype.send =function(pipe, $event, data, callback){
 	this.sendCmd("Event", {
 		event: $event,
 		data: data
-	}, pipe);
+	}, pipe, callback);
 }
 
 APS.prototype.sendCmd = function(cmd, args, pipe, callback){
-	var specialCmd = {CONNECT: 0, RESTORE:0, SESSION:0};
+	var specialCmd = {CONNECT: 0, RESTORE:0};
 	if(this.state == 1 || cmd in specialCmd){
 
 		var tmp = {
@@ -131,7 +131,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		
 		if(typeof callback != "function")	callback = function(){};
 		
-		this.log(tmp);
 		var data = [];
 		try { 
 			data = JSON.stringify([tmp]);
@@ -140,9 +139,7 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 			this.log(data);
 		}
 		
-		//alert(data);
-		
-		this.transport.send(data);
+		this.transport.send(data, callback);
 		if(!(cmd in specialCmd)){
 			clearTimeout(this.poller);
 			this.poll();
@@ -201,14 +198,14 @@ APS.prototype.sub = function(channel, Events, callback){
 	return this;
 }
 
-APS.prototype.pub = function(channel, data){
+APS.prototype.pub = function(channel, data, callback){
 	var pipe = this.getChannel(channel);
 	if(!pipe && channel.length == 32) pipe = this.getPipe(channel);
 	
 	if(pipe){
 		var $event = typeof data == "string" ? "message" : "data";
 		var args = {data: data};
-		pipe.send($event, data);
+		pipe.send($event, data, callback);
 		//pipe.trigger("pub",args);
 	}else{
 		this.log("NO Channel " + channel);

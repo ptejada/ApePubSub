@@ -102,9 +102,6 @@ APS.prototype.onMessage = function(data){
 				if(pipe instanceof APS.user)
 					pipe = this.user;
 				
-				this.log(pipe.pubid);
-				this.log(pipe);
-				
 				pipe.trigger(args.event, [args.data, user, pipe]);
 			break;
 			case 'JOIN':
