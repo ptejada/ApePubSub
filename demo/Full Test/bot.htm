@@ -17,11 +17,12 @@
 			var parent = window.parent;
 			var client = new APS(parent.client.option.server);
 			
+			parent.bot = client;
 			
 			client.user.bot = "yes";
 			client.identifier = "BOT";
 			client.option.session = false;
-			//client.debug = true;
+			client.debug = true;
 			
 			
 			client.log(parent.client.option.server);
@@ -49,7 +50,17 @@
 				});
 				
 				//Send custom event
-				channel.sendEvent("payload", {inprogress: "yes"});
+				channel.send("payload", {inprogress: "yes"});
+				
+				//Check user to user communication
+				user.on("message", function(message, from){
+					if(message == "Hi!")
+						from.pub(message);
+				})
+				
+				this.on("kick", function(msg, from, channel){
+					channel.leave();
+				})
 			});
 		}
 		</script>
