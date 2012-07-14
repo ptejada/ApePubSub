@@ -269,6 +269,13 @@ if(navigator.appName != "Microsoft Internet Explorer"){
 	};
 	
 }else{
-	APS.prototype.log = function(){}
+	APS.prototype.log = function(){
+		if(!this.debug) return;
+		
+		var args =  Array.prototype.slice.call(arguments);
+		args.unshift("["+this.identifier+"]");
+
+		window.console.log(args.join().replace(",",""));
+	}
 }
 
