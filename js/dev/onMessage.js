@@ -47,6 +47,7 @@ APS.prototype.onMessage = function(data){
 				//this.poll(); //This call is under observation
 			break;
 			case 'RESTORED':
+				check = true;
 				//Session restored completed
 				this.state = 1;
 				this.trigger('ready');
