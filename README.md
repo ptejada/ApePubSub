@@ -1,16 +1,22 @@
+**------------Outdated - Pending edit---------**
+
 What is it?
 =====================
 
-ApePubSub is an alternative lightweight plain JavaScript framework to the official [APE_JSF](https://github.com/APE-Project/APE_JSF) for the [APE Server](https://github.com/APE-Project/APE_Server). Great for beginners, good for those small/simpler projects.
+ApePubSub is an alternative event driven Pub/Sub framework to the official [APE_JSF](https://github.com/APE-Project/APE_JSF) for the [APE Server](https://github.com/APE-Project/APE_Server). It is written in plain javascript and is great for beginners, good for those small/simpler projects.
 
-The client framework is based on @paraboul's next generation [APE_JSF](https://github.com/paraboul/APE-Client-JavaScript/tree/31dd239394af8a574667c8228ed8c004d6866973) draft and the server framework is a compilation of custom commads, hooks and rewrites from the official [framework](https://github.com/APE-Project/APE_Server/scripts/), the actual server binary does not requires modification.
+The client framework is based on @paraboul's next generation [APE_JSF](https://github.com/paraboul/APE-Client-JavaScript/tree/31dd239394af8a574667c8228ed8c004d6866973) draft and the server framework is a compilation of custom commads, hooks and rewrites from the official [framework](https://github.com/APE-Project/APE_Server/scripts/), the actual server binary do not requires modification.
 
 Features
 =====================
 
-The framework provides a fail proof session system which can easily be toggle on and off at any time, even after initialization 
+The framework provides a fail proof session system which can easily be toggle on and off at any time, even after initialization. You can also publish and send events directly to users.
 
-Develper mode, toggle debug mode by setting `APS.debug` to **true** or **false**. When **true** the wrapper will log information to the browser's console. When **false** no information will be written to the browser\`s console. To keep this feature with your application you are encorage to use `APS.log()` instead of `console.log()`. Outgoing commands will show like this `<<<<<<COMMAND>>>>>` in the browser\`s console and incoming raw like `>>>>>>>RAW<<<<<<<`. Triggered events could be seen as `{{{ EVENT }}}`.
+
+Modular built so you could globaly add methods and properties to common objects such as user, channel and the client object via prototype. The objects for prototyping are as follows: `APS.user`, `APS.channel`, `APS` for the client.
+
+A robust log() function its built-in the object for debugging. For example if you call log() from a channel like `channel.log("Error here!");` you would see the following output in your browser's console `[APS][channel.name] Error here!`. Other useful debuging info in the browser console are outgoing commands and incoming events. The outgoing commands are noted as `<<<< NAME >>>>` and incoming data/event are noted as `>>>> NAME <<<<` where `NAME` is the actual command or event. Also event triggered/fired are log into the console. For example a *join* event trigered on a channel *music* will show up like this on the browser console `[APS][channel][music] {{{ join }}}`. All this output can turned off at anytime `client.option.debug = false`
+
 
 Global API reference
 =========================

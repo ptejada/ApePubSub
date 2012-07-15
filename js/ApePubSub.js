@@ -1,6 +1,6 @@
 /**
  * @author Pablo Tejada
- * Built on 2012-07-10 @ 02:27
+ * Built on 2012-07-15 @ 02:42
  */
 
 //Generate a random string
@@ -51,11 +51,15 @@ function APS( server, events, options ){
 	this.identifier = "APS";
 	this.version = 'draft-v2';
 	this.state = 0;
-	this.events = {_queue: {}};
+	this.events = {};
 	this.chl = 0;
 	this.user = {};
 	this.pipes = {};
 	this.channels = {};
+	this.eQueue = {};
+	
+	//Add Events
+	this.on(events);
 
 	var cb = {
 		'onmessage': this.onMessage.bind(this),
@@ -65,17 +69,12 @@ function APS( server, events, options ){
 	}
 
 	this.connect = function(args){
-		//if(this.state != 0) return this;
-		
 		var client = this;
-		//Create Session object
-		this.session = new APS.session(this);
-		//Copy arguments
 		this.option.connectionArgs = args || this.option.connectionArgs;
 		
 		server = server || APS.server;
 		if(this.state == 0)
-			this.transport = new APS.transport(server, cb, options, this);
+			this.transport = new APS.transport(server, cb, options);
 		
 		//alert("connnecting...")
 		
@@ -84,228 +83,242 @@ function APS( server, events, options ){
 			if(this.session.restore() == true) return this;
 		}
 		
-		this.send('CONNECT', args);
+		this.sendCmd('CONNECT', args);
 		
 		return this;
 	}
+	
+	this.session.client = this;
+	return this;
+}
 
-	this.trigger = function(ev, args){
-		ev = ev.toLowerCase();
-		if(!(args instanceof Array)) args = [args];
-		
-		//GLobal
-		if("client" in this){
-			for(var i in this.client.events[ev]){
-				if(this.client.events[ev].hasOwnProperty(i)){ 
-					this.client.events[ev][i].apply(this, args);
-					this.log("{{{ " + ev + " }}} on client ", this.client);
-				}
-			}
-		}
-		
-		//Local
-		for(var i in this.events[ev]){
-			if(this.events[ev].hasOwnProperty(i)){
-				this.events[ev][i].apply(this, args);
-				if(!this.client){
-					this.log("{{{ " + ev + " }}} on client ", this);
-				}else{
-					this.log("{{{ " + ev + " }}} on channel " + this.name, this);
-				}
+APS.prototype.trigger = function(ev, args){
+	ev = ev.toLowerCase();
+	
+	if(!(args instanceof Array)) args = [args];
+	
+	//GLobal
+	if("client" in this){
+		for(var i in this.client.events[ev]){
+			if(this.client.events[ev].hasOwnProperty(i)){ 
+				this.client.events[ev][i].apply(this, args);
+				this.log("{{{ " + ev + " }}} on client ", this.client);
 			}
 		}
 	}
 	
-	this.on = function(ev, fn){
-		var Events = [];
-		
-		if(typeof ev == 'string' && typeof fn == 'function'){
-			Events[ev] = fn;
-		}else if(typeof ev == "object"){
-			Events = ev;
-		}else{
-			return this;
-		}
-		
-		for(var e in Events){
-			var fn = Events[e];
-			if(!this.events[e])
-				this.events[e] = [];
-			this.events[e].push(fn);
-		}
-		
-		return this;
-	}
-	
-	this.poll = function(){
-		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
-	}
-	
-	this.getPipe = function(user){
-		if(typeof user == 'string'){
-			return this.pipes[user];
-		} else {
-			return this.pipes[user.getPubid()];
-		}
-	}
-	
-	this.send = function(cmd, args, pipe, callback){
-		var specialCmd = {CONNECT: 0, RESTORE:0, SESSION:0};
-		if(this.state == 1 || cmd in specialCmd){
-	
-			var tmp = {
-				'cmd': cmd,
-				'chl': this.chl
-			}
-	
-			if(args) tmp.params = args;
-			if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid; 
-			if(this.session.id) tmp.sessid = this.session.id;
-	
-			this.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
-			
-			if(typeof callback != "function")	callback = function(){};
-			
-			this.log(tmp);
-			var data = [];
-			try { 
-				data = JSON.stringify([tmp]);
-			}catch(e){
-				this.log(e);
-				this.log(data);
-			}
-			
-			//alert(data);
-			
-			this.transport.send(data);
-			if(!(cmd in specialCmd)){
-				clearTimeout(this.poller);
-				this.poll();
-			}
-			this.chl++;
-			this.session.saveChl();
-		} else {
-			//this.on('ready', this.send.bind(this, cmd, args));
-		}
-		
-		return this;
-	}
-	
-	this.check = function(){
-		this.send('CHECK');
-	}
-	
-	this.sub = function(channel, Events, callback){
-		//Handle the events
-		if(typeof Events == "object"){
-			if(typeof channel == "object"){
-				for(var chan in channel){
-					this.onChannel(channel[chan], Events);
-				}
+	//Local
+	for(var i in this.events[ev]){
+		if(this.events[ev].hasOwnProperty(i)){
+			this.events[ev][i].apply(this, args);
+			if(!this.client){
+				this.log("{{{ " + ev + " }}} on client ", this);
 			}else{
-				this.onChannel(channel, Events);
+				this.log("{{{ " + ev + " }}} ", this);
 			}
 		}
-		
-		//Handle callback
-		if(typeof callback == "function"){
-			if(typeof channel == "object"){
-				for(var chan in channel){
-					this.onChannel(channel[chan], "joined", callback);
-				}
-			}else{
-				this.onChannel(channel, "joined", callback);
-			}
-		}
-		
-		//Join Channel
-		if(this.state == 0){
-			var client = this;
-			this.on("ready", function(){
-				if(typeof client.channels[channel] != "object"){
-					this.send('JOIN', {'channels': channel});
-				}
-			});
-			this.connect({user: this.user});
-			
-		}else if(typeof this.channels[channel] != "object"){
-			this.send('JOIN', {'channels': channel});
-		}
-		
-		return this;
 	}
+}
+
+APS.prototype.on = function(ev, fn){
+	var Events = [];
 	
-	this.pub = function(channel, data){
-		var pipe = this.getChannel(channel);
-		
-		if(pipe){
-			var args = {data: data};
-			pipe.send("Pub", args);
-			pipe.trigger("pub",args);
-		}else{
-			this.log("NO Channel " + channel);
-		}
-	};
-	
-	this.getChannel = function(channel){
-		if(channel in this.channels){
-			return this.channels[channel];
-		}
-		
-		return false;
-	}
-	
-	this.onChannel = function(channel, Events, fn){
-		if(channel in this.channels){
-			this.channels[channel].on(Events, fn);
-			return true;
-		}
-		
-		if(typeof Events == "object"){
-			//add events to queue
-			if(typeof this.events._queue[channel] != "object")
-				this.events._queue[channel] = [];
-			
-			//this.events._queue[channel].push(Events);
-			for(var $event in Events){
-				var fn = Events[$event];
-				
-				this.events._queue[channel].push([$event, fn]);
-				
-				this.log("Adding ["+channel+"] event '"+$event+"' to queue");
-			}
-		}else{
-			var xnew = Object();
-			xnew[Events] = fn;
-			this.onChannel(channel,xnew);
-		}
-	}
-	
-	this.unSub = function(channel){
-		if(channel == "") return;
-		this.getChannel(channel).leave();
-	}
-	
-	//Debug Function for Browsers console
-	if(navigator.appName != "Microsoft Internet Explorer"){
-		this.log = function($obj){
-			if(!this.debug) return;
-			
-			var args =  Array.prototype.slice.call(arguments);
-			args.unshift("["+this.identifier+"]");
-			
-			window.console.log.apply(console, args);
-		};
-		
+	if(typeof ev == 'string' && typeof fn == 'function'){
+		Events[ev] = fn;
+	}else if(typeof ev == "object"){
+		Events = ev;
 	}else{
-		this.log = function(){}
+		return this;
 	}
 	
-	//Add Events
-	this.on(events);
+	for(var e in Events){
+		var fn = Events[e];
+		if(!this.events[e])
+			this.events[e] = [];
+		this.events[e].push(fn);
+	}
 	
 	return this;
 }
+
+APS.prototype.getPipe = function(user){
+	if(typeof user == 'string'){
+		return this.pipes[user];
+	} else {
+		return this.pipes[user.pubid];
+	}
+}
+
+APS.prototype.send =function(pipe, $event, data, callback){
+	this.sendCmd("Event", {
+		event: $event,
+		data: data
+	}, pipe, callback);
+}
+
+APS.prototype.sendCmd = function(cmd, args, pipe, callback){
+	var specialCmd = {CONNECT: 0, RESTORE:0};
+	if(this.state == 1 || cmd in specialCmd){
+
+		var tmp = {
+			'cmd': cmd,
+			'chl': this.chl
+		}
+
+		if(args) tmp.params = args;
+		if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid;
+		if(this.session.id) tmp.sessid = this.session.id;
+
+		this.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
+		
+		if(typeof callback != "function")	callback = function(){};
+		
+		var data = [];
+		try { 
+			data = JSON.stringify([tmp]);
+		}catch(e){
+			this.log(e);
+			this.log(data);
+		}
+		
+		this.transport.send(data, callback);
+		if(!(cmd in specialCmd)){
+			clearTimeout(this.poller);
+			this.poll();
+		}
+		this.chl++;
+		this.session.saveChl();
+	} else {
+		this.on('ready', this.sendCmd.bind(this, cmd, args));
+	}
+	
+	return this;
+}
+
+APS.prototype.poll = function(){
+	if(this.transport.id == 0)
+		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
+}
+
+APS.prototype.check = function(){
+	if(this.transport.id == 0)
+		this.sendCmd('CHECK');
+}
+
+APS.prototype.sub = function(channel, Events, callback){
+	//Handle the events
+	if(typeof Events == "object"){
+		if(typeof channel == "object"){
+			for(var chan in channel){
+				this.onChannel(channel[chan], Events);
+			}
+		}else{
+			this.onChannel(channel, Events);
+		}
+	}
+	
+	//Handle callback
+	if(typeof callback == "function"){
+		if(typeof channel == "object"){
+			for(var chan in channel){
+				this.onChannel(channel[chan], "joined", callback);
+			}
+		}else{
+			this.onChannel(channel, "joined", callback);
+		}
+	}
+	
+	//Join Channel
+	if(this.state == 0){
+		this.on("ready", this.sub.bind(this, channel));
+		this.connect({user: this.user});
+		
+	}else if(typeof this.channels[channel] != "object"){
+		this.sendCmd('JOIN', {'channels': channel});
+	}
+	
+	return this;
+}
+
+APS.prototype.pub = function(channel, data, callback){
+	var pipe = this.getChannel(channel);
+	if(!pipe && channel.length == 32) pipe = this.getPipe(channel);
+	
+	if(pipe){
+		var $event = typeof data == "string" ? "message" : "data";
+		var args = {data: data};
+		pipe.send($event, data, callback);
+		//pipe.trigger("pub",args);
+	}else{
+		this.log("NO Channel " + channel);
+	}
+};
+
+APS.prototype.getChannel = function(channel){
+	channel = channel.toLowerCase();
+	if(channel in this.channels){
+		return this.channels[channel];
+	}
+	
+	return false;
+}
+
+APS.prototype.onChannel = function(channel, Events, fn){
+	channel = channel.toLowerCase();
+	
+	if(channel in this.channels){
+		this.channels[channel].on(Events, fn);
+		return true;
+	}
+	
+	if(typeof Events == "object"){
+		//add events to queue
+		if(typeof this.eQueue[channel] != "object")
+			this.eQueue[channel] = [];
+		
+		//this.eQueue[channel].push(Events);
+		for(var $event in Events){
+			var fn = Events[$event];
+			
+			this.eQueue[channel].push([$event, fn]);
+			
+			this.log("Adding ["+channel+"] event '"+$event+"' to queue");
+		}
+	}else{
+		var xnew = Object();
+		xnew[Events] = fn;
+		this.onChannel(channel,xnew);
+	}
+}
+
+APS.prototype.unSub = function(channel){
+	if(channel == "") return;
+	this.getChannel(channel).leave();
+}
+
+//Debug Function for Browsers console
+if(navigator.appName != "Microsoft Internet Explorer"){
+	APS.prototype.log = function(){
+		if(!this.debug) return;
+		
+		var args =  Array.prototype.slice.call(arguments);
+		args.unshift("["+this.identifier+"]");
+		
+		window.console.log.apply(console, args);
+	};
+	
+}else{
+	APS.prototype.log = function(){
+		if(!this.debug) return;
+		
+		var args =  Array.prototype.slice.call(arguments);
+		args.unshift("["+this.identifier+"]");
+
+		window.console.log(args.join().replace(",",""));
+	}
+}
+
+
 
 APS.prototype.onMessage = function(data){
 	//var data = data;
@@ -316,34 +329,47 @@ APS.prototype.onMessage = function(data){
 		return clearTimeout(this.poller);
 	}
 	
+	var cmd, args, pipe;
+	var check = true;
 	
 	for(var i in data){
-		var cmd = data[i].raw;
-		var args = data[i].data;
-		var pipe = null;
+		cmd = data[i].raw;
+		args = data[i].data;
+		pipe = null;
 		clearTimeout(this.poller);
 		
 		this.log('>>>> ', cmd , " <<<< ", args);
-		
+
 		switch(cmd){
 			case 'LOGIN':
+				check = false;
+				
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
 				this.poll();
 				this.session.save();
 			break;
 			case 'IDENT':
-				this.user = new APS.user(args.user, this);
-				this.user.sessid = this.session.id;
-				this.pipes[this.user.pubid] = this.user;
+				check = false;
 				
-				//alert(this.state);
+				var user = new APS.user(args.user, this);
+				this.pipes[user.pubid] = user;
+				
+				user.events = {};
+				user.client = this;
+				user.on = this.on.bind(user);
+				user.trigger = this.trigger.bind(user);
+				user.log = APS.prototype.log.bind(this, "[user]");
+				
+				this.user = user;
+				
 				if(this.state == 1)
 					this.trigger('ready');
 				
 				//this.poll(); //This call is under observation
 			break;
 			case 'RESTORED':
+				check = true;
 				//Session restored completed
 				this.state = 1;
 				this.trigger('ready');
@@ -376,8 +402,9 @@ APS.prototype.onMessage = function(data){
 				}
 				
 				//Add events from queue
-				if(pipe.name in this.events._queue){
-					var queue = this.events._queue[pipe.name];
+				var chanName = pipe.name.toLowerCase();
+				if(typeof this.eQueue[chanName] == "object"){
+					var queue = this.eQueue[chanName];
 					var ev, fn;
 					for(var i in queue){
 						ev = queue[i][0];
@@ -391,11 +418,14 @@ APS.prototype.onMessage = function(data){
 				this.trigger('newChannel', [pipe]);
 				
 			break;
-			case "PUBDATA":
+			case "EVENT":
 				var user = this.pipes[args.from.pubid];
 				pipe = this.pipes[args.pipe.pubid];
 				
-				pipe.trigger(args.type, [args.content, user, pipe]);
+				if(pipe instanceof APS.user)
+					pipe = this.user;
+				
+				pipe.trigger(args.event, [args.data, user, pipe]);
 			break;
 			case 'JOIN':
 				var user = this.pipes[args.user.pubid];
@@ -432,6 +462,7 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case 'ERR' :
+				check = false;
 				switch(args.code){
 					case "001":
 					case "002":
@@ -452,46 +483,23 @@ APS.prototype.onMessage = function(data){
 			break;
 			default:
 				//trigger custom commands
-				this.trigger(cmd, args)
-				this.check();
+				this.trigger(cmd, args);
+				//this.check();
 		}
-		if(this.transport.id == 0 && cmd != 'ERR' && cmd != "LOGIN" && cmd != "IDENT" && this.transport.state == 1){
-			this.check();
-		}
-		
+	}
+	if(this.transport.id == 0 && check && this.transport.state == 1){
+		this.check();
 	}
 }
 
 
 //var APSTransport = function(server, callback, options){
-APS.transport = function(server, callback, options, client){
+APS.transport = function(server, callback, options){
 	this.state = 0;//0 = Not initialized, 1 = Initialized and ready to exchange data, 2 = Request is running
 	this.stack = [];
 	this.callback = callback;
 	
-	//client.state = 3;
-	
-	this.postMessage = function(str, callback){
-		if(this.state > 0){
-			this.frame.contentWindow.postMessage(str, '*');
-			this.state = 2;
-		} else this.stack.push(str);
-		
-		this.callback.once = callback || function(){};
-	}
-	this.frameMessage = function(ev){
-		this.state = 1;
-		this.callback.onmessage(ev.data);
-		this.callback.once(ev.data);
-		this.callback.once = function(){};
-	}
-	this.onLoad = function(){
-		if(this.id == 6) this.state = 2;
-		else this.state = 1;
-	
-		for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
-		this.stack = [];
-	}
+	//WS, SSE, long polling,
 	
 	if('WebSocket' in window && APS.wb == true){
 		this.id = 6;
@@ -501,36 +509,70 @@ APS.transport = function(server, callback, options, client){
 			else this.stack.push(str);
 		}.bind(this);
 
-		ws.onopen = this.onLoad.bind(this);
+		ws.onopen = this.onLoad;
 
 		ws.onmessage = function(ev){
 			callback.onmessage(ev.data);
 		}
-	}else{
-		this.id = 0;
-		var frame = document.createElement('iframe');
-		this.frame = frame;
-
-		with(frame.style){ 
-			position = 'absolute';
-			left = top = '-10px';
-			width = height = '1px';
-		}
-
-		frame.setAttribute('src', 'http://' + server + '/?[{"cmd":"frame","params": {"origin":"'+window.location.protocol+'//'+window.location.host+'"}}]');
 		
-		document.body.appendChild(frame);
-
-		if('addEventListener' in window){
-			window.addEventListener('message', this.frameMessage.bind(this), 0);
-			frame.addEventListener('load', this.onLoad.bind(this), 0); 
-		} else {
-			window.attachEvent('onmessage', this.frameMessage.bind(this));
-		}
-
-
-		this.send = this.postMessage;
+		return;
 	}
+	
+	this.id = 0;
+	var frame = document.createElement('iframe');
+	this.frame = frame;
+
+	with(frame.style){ 
+		position = 'absolute';
+		left = top = '-10px';
+		width = height = '1px';
+	}
+
+	frame.setAttribute('src', 'http://' + server + '/?[{"cmd":"frame","params": {"origin":"'+window.location.protocol+'//'+window.location.host+'"}}]');
+	
+	document.body.appendChild(frame);
+
+	
+	if('addEventListener' in window){
+		window.addEventListener('message', this.frameMessage.bind(this), 0);
+		frame.addEventListener('load', this.onLoad.bind(this), 0);
+	} else {
+		window.attachEvent('onmessage', this.frameMessage.bind(this));
+	}
+	
+	var t = this;
+	this.send = function(str, callback){
+		if(this.state > 0){
+			this.frame.contentWindow.postMessage(str, '*');
+			this.state = 2;
+		} else this.stack.push(str);
+		
+		if(typeof callback == "function") callback();
+		//this.callback.once = callback || function(){};
+	}
+}
+
+APS.transport.prototype.postMessage = function(str, callback){
+	if(this.state > 0){
+		this.frame.contentWindow.postMessage(str, '*');
+		this.state = 2;
+	} else this.stack.push(str);
+	
+	if(typeof callback == "function") callback();
+	//this.callback.once = callback || function(){};
+}
+APS.transport.prototype.frameMessage = function(ev){
+	this.state = 1;
+	this.callback.onmessage(ev.data);
+	//this.callback.once(ev.data);
+	//this.callback.once = function(){};
+}
+APS.transport.prototype.onLoad = function(){
+	if(this.id == 6) this.state = 2;
+	else this.state = 1;
+
+	for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
+	this.stack = [];
 }
 
 //var APSUser = function(pipe, client) {
@@ -540,14 +582,21 @@ APS.user = function(pipe, client){
 	}
 	
 	this.pubid = pipe.pubid;
-	this.client = client;
+	//this.client = client;
 	this.channels = {};
+	
+	this.pub = APS.prototype.pub.bind(client, this.pubid);
+	this.send = APS.prototype.send.bind(client, this.pubid);
+	
+	/*
+	this.send = function(Event, data){
+		client.sendCmd("Event", {
+			event: Event,
+			data: data
+		}, this.pubid);
+	}
+	*/
 }
-
-APS.user.prototype.send = function(cmd, args) {
-	this.client.send(cmd, args, this);
-}
-
 
 //var APSChannel = function(pipe, client) {
 APS.channel = function(pipe, client) {
@@ -562,35 +611,43 @@ APS.channel = function(pipe, client) {
 		this.users[u.pubid] = u;
 	}
 	
-	this.send = function(cmd, args){
-		this.client.send(cmd, args, this);
+	/*
+	this.send = function(Event, data){
+		client.sendCmd("Event", {
+			event: Event,
+			data: data
+		}, this.pubid);
 	}
+	*/
 	
 	this.leave = function(){
-		this.trigger("unsub", [this.client.user, this]);
+		this.trigger("unsub", [client.user, this]);
 		
-		this.client.send('LEFT', {"channel": this.name});
+		client.sendCmd('LEFT', {"channel": this.name});
 		
-		APS.debug("Unsubscribed from ("+this.name+")");
+		this.log("Unsubscribed from ("+this.name+")");
 		
-		delete this.client.channels[this.name];
+		delete client.channels[this.name];
 	}
 	
-	this.on = client.on.bind(this);
-	this.pup = client.pub.bind(client, this.name);
-	this.trigger = client.trigger.bind(this);
-	this.log = client.log.bind(this, "[CHANNEL]", "["+this.name+"]");
+	this.send = APS.prototype.send.bind(client, this.pubid);
+	
+	this.on = APS.prototype.on.bind(this);
+	this.pub = APS.prototype.pub.bind(client, this.name);
+	this.trigger = APS.prototype.trigger.bind(this);
+	this.log = APS.prototype.log.bind(client, "[channel]", "["+this.name+"]");
+	//this.log = APS.prototype.log.bind(client);
 }
 
 
-APS.session = function(client){
-	this.id = "";
-	this.chl = {};
-	this.client = client;
-	this.cookie = {};
-	this.data = {};
+APS.prototype.session = {
+	id: "",
+	chl: {},
+	client: {},
+	cookie: {},
+	data: {},
 	
-	this.save = function(){
+	save: function(){
 		if(!this.client.option.session) return;
 		
 		var pubid = this.client.user.pubid;
@@ -605,32 +662,34 @@ APS.session = function(client){
 		this.cookie.change(this.id);
 		this.saveChl()
 		
-		//client.send("saveSESSION", session);
-	}
+		//client.sendCmd("saveSESSION", session);
+	},
 	
-	this.saveChl = function(){
+	saveChl: function(){
 		if(!this.client.option.session) return;
 
 		this.chl.change(this.client.chl);
-	}
+	},
 	
-	this.destroy = function(){
+	destroy: function(){
+		if(!this.client.option.session) return;
+		
 		this.cookie.destroy();
 		this.chl.destroy();
 		this.client.chl = 0;
 		this.id = null;
 		this.properties = {};
-	}
+	},
 	
-	this.get = function(index){
+	get: function(index){
 		return this.data[index];
-	}
+	},
 	
-	this.set = function(index, val){
+	set: function(index, val){
 		this.data[index] = val;
-	}
+	},
 	
-	this.restore = function(){
+	restore: function(){
 		var client = this.client;
 		
 		//alert("restoring")
@@ -651,16 +710,16 @@ APS.session = function(client){
 		client.chl++;
 		//Restoring session state == 2
 		client.state = 2;
-		client.send('RESTORE', {sid: this.id})
+		client.sendCmd('RESTORE', {sid: this.id})
 		return true;
-	}
+	},
 	
-	this.connect = function(){
+	connect: function(){
 		var client = this.client;
 		var args = client.option.connectionArgs
 		
 		this.destroy();
-		client.send('CONNECT', args);
+		client.sendCmd('CONNECT', args);
 	}
 	
 }
