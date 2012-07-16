@@ -9,7 +9,7 @@ $(document).ready(function(){
 	
 	window.client = client;
 	
-	client.debug = true;
+	client.option.debug = true;
 	//Current user's properties
 	
 	client.user = {

@@ -3,7 +3,7 @@ $(document).ready(function(){
 	var client = new APS("ape2.crusthq.com");
 	
 	//Enable debug output to browser console
-	client.debug = true;
+	client.option.debug =true;
 	
 	//Current user's properties
 	client.user = {

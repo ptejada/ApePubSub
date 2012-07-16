@@ -1,7 +1,7 @@
 function APS( server, events, options ){
 	this.option = {
 		'poll': 25000,
-		debug: true,
+		debug: false,
 		session: true,
 		connectionArgs: {},
 		server: server
@@ -257,7 +257,7 @@ APS.prototype.unSub = function(channel){
 //Debug Function for Browsers console
 if(navigator.appName != "Microsoft Internet Explorer"){
 	APS.prototype.log = function(){
-		if(!this.debug) return;
+		if(!this.option.debug) return;
 		
 		var args =  Array.prototype.slice.call(arguments);
 		args.unshift("["+this.identifier+"]");
@@ -267,7 +267,7 @@ if(navigator.appName != "Microsoft Internet Explorer"){
 	
 }else{
 	APS.prototype.log = function(){
-		if(!this.debug) return;
+		if(!this.option.debug) return;
 		
 		var args =  Array.prototype.slice.call(arguments);
 		args.unshift("["+this.identifier+"]");

@@ -27,7 +27,7 @@ function start(server){
 			addLine("Can't connect to APE Server <a target='_blank' href='http://"+server+"'>"+server+"</a>");
 			addLine("Make sure the APS framework is installed and server is running");
 		}
-	},2000);	
+	},5000);	
 	
 	window.chanName = "test_" + randomString(4).toLowerCase();
 	window.client = new APS(server);
