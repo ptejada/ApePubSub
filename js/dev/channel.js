@@ -32,9 +32,9 @@ APS.channel = function(pipe, client) {
 	
 	this.send = APS.prototype.send.bind(client, this.pubid);
 	
-	this.on = APS.prototype.on.bind(this);
-	this.pub = APS.prototype.pub.bind(client, this.name);
-	this.trigger = APS.prototype.trigger.bind(this);
-	this.log = APS.prototype.log.bind(client, "[channel]", "["+this.name+"]");
-	//this.log = APS.prototype.log.bind(client);
+	this.on = client.on.bind(this);
+	this.pub = client.pub.bind(client, this.name);
+	this.trigger = client.trigger.bind(this);
+	this.log = client.log.bind(client, "[channel]", "["+this.name+"]");
+	//this.log = client.log.bind(client);
 }

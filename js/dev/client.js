@@ -21,7 +21,22 @@ function APS( server, events, options ){
 	//Add Events
 	this.on(events);
 	
-	this.log = function(){};
+	//IE9 crap - log function fix
+	if(navigator.appName == "Microsoft Internet Explorer"){
+		if(typeof window.console == "undefined"){
+			this.log = function(){};
+		}else{
+			this.log = function(){
+				if(this.option.debug == false) return;
+				
+				var args =  Array.prototype.slice.call(arguments);
+				args.unshift("["+this.identifier+"]");
+		
+				window.console.log(args.join().replace(",",""));
+			}
+			
+		}
+	}
 	
 	var cb = {
 		'onmessage': this.onMessage.bind(this),
@@ -259,11 +274,6 @@ APS.prototype.unSub = function(channel){
 }
 
 //Debug Function for Browsers console
-/*
-APS.prototype.log = function(){
-	
-}
-*/
 if(navigator.appName != "Microsoft Internet Explorer"){
 	APS.prototype.log = function(){
 		if(!this.option.debug) return;
@@ -274,19 +284,4 @@ if(navigator.appName != "Microsoft Internet Explorer"){
 		window.console.log.apply(console, args);
 	};
 	
-}else{
-	if(typeof window.console == "undefined"){
-		//APS.prototype.log(function(q,w,e,r,t,y){});
-	}else{
-		/*
-		APS.prototype.log = function(){
-			if(this.option.debug == false) return;
-			
-			var args =  Array.prototype.slice.call(arguments);
-			args.unshift("["+this.identifier+"]");
-	
-			window.console.log(args.join().replace(",",""));
-		}
-		*/
-	}
 }
