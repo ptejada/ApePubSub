@@ -4,10 +4,12 @@ function APS( server, events, options ){
 		debug: false,
 		session: true,
 		connectionArgs: {},
-		server: server
+		server: server,
+		//transport: ["wb", "lp"]
+		transport: "lp"
 	}
 	this.identifier = "APS";
-	this.version = 'draft-v2';
+	this.version = '0.8b2';
 	this.state = 0;
 	this.events = {};
 	this.chl = 0;
@@ -18,12 +20,12 @@ function APS( server, events, options ){
 	
 	//Add Events
 	this.on(events);
-
+	
+	this.log = function(){};
+	
 	var cb = {
 		'onmessage': this.onMessage.bind(this),
-		'onerror': function(err){
-			console.log("ERROR >> ",err);
-		}
+		'onerror': this.log.bind(this, "T_ERR")
 	}
 
 	this.connect = function(args){
@@ -32,7 +34,7 @@ function APS( server, events, options ){
 		
 		server = server || APS.server;
 		if(this.state == 0)
-			this.transport = new APS.transport(server, cb, options);
+			this.transport = new APS.transport(server, cb, this);
 		
 		//alert("connnecting...")
 		
@@ -141,7 +143,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		
 		this.transport.send(data, callback);
 		if(!(cmd in specialCmd)){
-			clearTimeout(this.poller);
 			this.poll();
 		}
 		this.chl++;
@@ -154,12 +155,15 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 }
 
 APS.prototype.poll = function(){
-	if(this.transport.id == 0)
+	if(this.transport.id == 0){
+		clearTimeout(this.poller);
+		this.log("POLLING!");
 		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
+	}
 }
 
-APS.prototype.check = function(){
-	if(this.transport.id == 0)
+APS.prototype.check = function(force){
+	if(this.transport.id == 0 || !!force)
 		this.sendCmd('CHECK');
 }
 
@@ -255,6 +259,11 @@ APS.prototype.unSub = function(channel){
 }
 
 //Debug Function for Browsers console
+/*
+APS.prototype.log = function(){
+	
+}
+*/
 if(navigator.appName != "Microsoft Internet Explorer"){
 	APS.prototype.log = function(){
 		if(!this.option.debug) return;
@@ -266,13 +275,18 @@ if(navigator.appName != "Microsoft Internet Explorer"){
 	};
 	
 }else{
-	APS.prototype.log = function(){
-		if(!this.option.debug) return;
-		
-		var args =  Array.prototype.slice.call(arguments);
-		args.unshift("["+this.identifier+"]");
-
-		window.console.log(args.join().replace(",",""));
+	if(typeof window.console == "undefined"){
+		//APS.prototype.log(function(q,w,e,r,t,y){});
+	}else{
+		/*
+		APS.prototype.log = function(){
+			if(this.option.debug == false) return;
+			
+			var args =  Array.prototype.slice.call(arguments);
+			args.unshift("["+this.identifier+"]");
+	
+			window.console.log(args.join().replace(",",""));
+		}
+		*/
 	}
 }
-

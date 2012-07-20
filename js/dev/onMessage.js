@@ -10,11 +10,13 @@ APS.prototype.onMessage = function(data){
 	var cmd, args, pipe;
 	var check = true;
 	
+	//Clear the timeout;
+	clearTimeout(this.poller);
+	
 	for(var i in data){
 		cmd = data[i].raw;
 		args = data[i].data;
 		pipe = null;
-		clearTimeout(this.poller);
 		
 		this.log('>>>> ', cmd , " <<<< ", args);
 
@@ -24,7 +26,7 @@ APS.prototype.onMessage = function(data){
 				
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
-				this.poll();
+				//this.poll();
 				this.session.save();
 			break;
 			case 'IDENT':
@@ -165,7 +167,9 @@ APS.prototype.onMessage = function(data){
 				//this.check();
 		}
 	}
-	if(this.transport.id == 0 && check && this.transport.state == 1){
+	
+	if(this.check && this.transport.id == 0 && this.transport.state == 1){
+		this.log("Checking!");
 		this.check();
 	}
 }
