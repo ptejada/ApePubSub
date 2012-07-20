@@ -12,14 +12,17 @@ Features
 
 The framework provides a fail proof session system which can easily be toggle on and off at any time, even after initialization. You can also publish and send events directly to users.
 
-
 Modular built so you could globaly add methods and properties to common objects such as user, channel and the client object via prototype. The objects for prototyping are as follows: `APS.user`, `APS.channel`, `APS` for the client.
 
-A robust log() function its built-in the object for debugging. For example if you call log() from a channel like `channel.log("Error here!");` you would see the following output in your browser's console `[APS][channel.name] Error here!`. Other useful debuging info in the browser console are outgoing commands and incoming events. The outgoing commands are noted as `<<<< NAME >>>>` and incoming data/event are noted as `>>>> NAME <<<<` where `NAME` is the actual command or event. Also event triggered/fired are log into the console. For example a *join* event trigered on a channel *music* will show up like this on the browser console `[APS][channel][music] {{{ join }}}`. All this output can turned off at anytime `client.option.debug = false`
+A robust log() function is built-in the objects for debugging. For example if you call log() from a channel like `channel.log("Error here!");` you will see the following output in your browser's console `[APS][channel.name] Error here!`. Other useful debuging info in the browser console are outgoing commands and incoming events. The outgoing commands are noted as `<<<< NAME >>>>` and incoming data/event are noted as `>>>> NAME <<<<` where `NAME` is the actual command or event. Also event triggered/fired are log into the console. For example a *join* event trigered on a channel *music* will show up like this on the browser console `[APS][channel][music] {{{ join }}}`. All this output can be turned off at anytime `client.option.debug = false`
 
 
-Global API reference
+Overview
 =========================
+
+The whole client framework API is based on three simple objects: *user*, *channel* and the *client* itself. The *client* holds the *channels* and the *channels* the *users* the rest are just reference to either one of this type of objects.
+
+The `on()` function is available in the *client* and *channel* objects to add event handlers. An event handler is simply the
 
 **Sub()** => function which joins a channel and starts the connection to the server if it has not been started. You could also add **events** to the channel with this method and a callback for when the channel has been joined.
 ```

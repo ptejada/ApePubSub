@@ -5,7 +5,7 @@ $(document).ready(function(){
 	 * 		APS.server = 'ape2.crusthq.com';
 	 */
 	
-	var client = new APS("ape2.crusthq.com");
+	var client = new APS("ape2.crusthq.com:53630");
 	
 	window.client = client;
 	

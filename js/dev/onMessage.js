@@ -39,7 +39,7 @@ APS.prototype.onMessage = function(data){
 				user.client = this;
 				user.on = this.on.bind(user);
 				user.trigger = this.trigger.bind(user);
-				user.log = APS.prototype.log.bind(this, "[user]");
+				user.log = this.log.bind(this, "[user]");
 				
 				this.user = user;
 				
