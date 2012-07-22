@@ -4,32 +4,6 @@ APS.transport = function(server, callback, client){
 	this.stack = [];
 	this.callback = callback;
 	
-	//WS, SSE, long polling,
-	/*
-	this.postMessage = function(str, callback){
-		if(this.state > 0){
-			this.frame.contentWindow.postMessage(str, '*');
-			this.state = 2;
-		} else this.stack.push(str);
-		
-		if(typeof callback == "function") callback();
-		//this.callback.once = callback || function(){};
-	}
-	this.frameMessage = function(ev){
-		this.state = 1;
-		this.callback.onmessage(ev.data);
-		//this.callback.once(ev.data);
-		//this.callback.once = function(){};
-	}
-	this.onLoad = function(){
-		if(this.id == 6) this.state = 2;
-		else this.state = 1;
-	
-		for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
-		this.stack = [];
-	}
-	*/
-	
 	//Fire transport
 	var trans = client.option.transport;
 	var args = Array.prototype.slice.call(arguments);
@@ -80,6 +54,8 @@ APS.transport.wb = function(server, callback, client){
 APS.transport.lp = function(server, callback, client){
 	this.id = 0;
 	var frame = document.createElement('iframe');
+	var protocol = !!client.option.secure ? "https" : "http";
+	var origin = window.location.protocol+'//'+window.location.host;
 	
 	this.frame = frame;
 
@@ -89,20 +65,14 @@ APS.transport.lp = function(server, callback, client){
 		width = height = '1px';
 	}
 
-	frame.setAttribute('src', 'http://' + server + '/?[{"cmd":"frame","params": {"origin":"'+window.location.protocol+'//'+window.location.host+'"}}]');
+	frame.setAttribute('src', protocol + "://" + server + '/?[{"cmd":"frame","params": {"origin":"'+origin+'"}}]');
 	
 	document.body.appendChild(frame);
 	
-	function postMessage(str, callback){
-		if(this.state > 0){
-			this.frame.contentWindow.postMessage(str, '*');
-			this.state = 2;
-		} else this.stack.push(str);
+	function recieveMessage(ev){
+		if(ev.origin != protocol + "://" + server) return;
+		if(ev.source !== frame.contentWindow) return;
 		
-		if(typeof callback == "function") callback();
-		//this.callback.once = callback || function(){};
-	}
-	function frameMessage(ev){
 		this.state = 1;
 		this.callback.onmessage(ev.data);
 		//this.callback.once(ev.data);
@@ -116,16 +86,15 @@ APS.transport.lp = function(server, callback, client){
 	}
 	
 	if('addEventListener' in window){
-		window.addEventListener('message', frameMessage.bind(this), 0);
+		window.addEventListener('message', recieveMessage.bind(this), 0);
 		frame.addEventListener('load', onLoad.bind(this), 0);
 	} else {
-		window.attachEvent('onmessage', frameMessage.bind(this));
+		window.attachEvent('onmessage', recieveMessage.bind(this));
 	}
 	
-	var t = this;
 	this.send = function(str, callback){
 		if(this.state > 0){
-			this.frame.contentWindow.postMessage(str, '*');
+			this.frame.contentWindow.postMessage(str, protocol + "://" + server);
 			this.state = 2;
 		} else this.stack.push(str);
 		
