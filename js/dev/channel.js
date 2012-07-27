@@ -1,8 +1,13 @@
 //var APSChannel = function(pipe, client) {
 APS.channel = function(pipe, client) {
+	
+	for(var i in pipe.properties){
+		this[i] = pipe.properties[i]
+	}
+	
 	this.events = {};
-	this.properties = pipe.properties;
-	this.name = pipe.properties.name;
+	//this.properties = pipe.properties;
+	//this.name = pipe.properties.name;
 	this.pubid = pipe.pubid;
 	this.client = client;
 	this.users = {};
