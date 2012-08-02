@@ -1,11 +1,5 @@
 $(document).ready(function(){
-	/*
-	 * The APS server already set in ../config.js
-	 * Otherwise, 
-	 * 		APS.server = 'ape2.crusthq.com';
-	 */
-	
-	var client = new APS("ape2.crusthq.com:53630");
+	var client = new APS("ape.crusthq.com:45138");
 	
 	window.client = client;
 	

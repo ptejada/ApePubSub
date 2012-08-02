@@ -1,6 +1,6 @@
 $(document).ready(function(){
 	//Create a new APS client
-	var client = new APS("ape2.crusthq.com:53630");
+	var client = new APS("ape.crusthq.com:45138");
 	
 	//Enable debug output to browser console
 	client.option.debug =true;
