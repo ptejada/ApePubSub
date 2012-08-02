@@ -1,6 +1,6 @@
 /**
  * @author Pablo Tejada
- * Built on 2012-07-15 @ 02:42
+ * Built on 2012-08-02 @ 03:38
  */
 
 //Generate a random string
@@ -43,13 +43,16 @@ if(!Function.prototype.bind){
 function APS( server, events, options ){
 	this.option = {
 		'poll': 25000,
-		debug: true,
+		debug: false,
 		session: true,
 		connectionArgs: {},
-		server: server
+		server: server,
+		//transport: ["wb", "lp"],
+		transport: "lp",
+		secure: false
 	}
 	this.identifier = "APS";
-	this.version = 'draft-v2';
+	this.version = '0.8b2';
 	this.state = 0;
 	this.events = {};
 	this.chl = 0;
@@ -60,12 +63,27 @@ function APS( server, events, options ){
 	
 	//Add Events
 	this.on(events);
-
+	
+	//IE9 crap - log function fix
+	if(navigator.appName == "Microsoft Internet Explorer"){
+		if(typeof window.console == "undefined"){
+			this.log = function(){};
+		}else{
+			this.log = function(){
+				if(this.option.debug == false) return;
+				
+				var args =  Array.prototype.slice.call(arguments);
+				args.unshift("["+this.identifier+"]");
+		
+				window.console.log(args.join().replace(",",""));
+			}
+			
+		}
+	}
+	
 	var cb = {
 		'onmessage': this.onMessage.bind(this),
-		'onerror': function(err){
-			console.log("ERROR >> ",err);
-		}
+		'onerror': this.log.bind(this, "T_ERR")
 	}
 
 	this.connect = function(args){
@@ -74,7 +92,7 @@ function APS( server, events, options ){
 		
 		server = server || APS.server;
 		if(this.state == 0)
-			this.transport = new APS.transport(server, cb, options);
+			this.transport = new APS.transport(server, cb, this);
 		
 		//alert("connnecting...")
 		
@@ -183,7 +201,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		
 		this.transport.send(data, callback);
 		if(!(cmd in specialCmd)){
-			clearTimeout(this.poller);
 			this.poll();
 		}
 		this.chl++;
@@ -196,12 +213,15 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 }
 
 APS.prototype.poll = function(){
-	if(this.transport.id == 0)
+	if(this.transport.id == 0){
+		clearTimeout(this.poller);
+		this.log("POLLING!");
 		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
+	}
 }
 
-APS.prototype.check = function(){
-	if(this.transport.id == 0)
+APS.prototype.check = function(force){
+	if(this.transport.id == 0 || !!force)
 		this.sendCmd('CHECK');
 }
 
@@ -299,7 +319,7 @@ APS.prototype.unSub = function(channel){
 //Debug Function for Browsers console
 if(navigator.appName != "Microsoft Internet Explorer"){
 	APS.prototype.log = function(){
-		if(!this.debug) return;
+		if(!this.option.debug) return;
 		
 		var args =  Array.prototype.slice.call(arguments);
 		args.unshift("["+this.identifier+"]");
@@ -307,17 +327,7 @@ if(navigator.appName != "Microsoft Internet Explorer"){
 		window.console.log.apply(console, args);
 	};
 	
-}else{
-	APS.prototype.log = function(){
-		if(!this.debug) return;
-		
-		var args =  Array.prototype.slice.call(arguments);
-		args.unshift("["+this.identifier+"]");
-
-		window.console.log(args.join().replace(",",""));
-	}
 }
-
 
 
 APS.prototype.onMessage = function(data){
@@ -332,11 +342,13 @@ APS.prototype.onMessage = function(data){
 	var cmd, args, pipe;
 	var check = true;
 	
+	//Clear the timeout;
+	clearTimeout(this.poller);
+	
 	for(var i in data){
 		cmd = data[i].raw;
 		args = data[i].data;
 		pipe = null;
-		clearTimeout(this.poller);
 		
 		this.log('>>>> ', cmd , " <<<< ", args);
 
@@ -346,7 +358,7 @@ APS.prototype.onMessage = function(data){
 				
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
-				this.poll();
+				//this.poll();
 				this.session.save();
 			break;
 			case 'IDENT':
@@ -359,7 +371,7 @@ APS.prototype.onMessage = function(data){
 				user.client = this;
 				user.on = this.on.bind(user);
 				user.trigger = this.trigger.bind(user);
-				user.log = APS.prototype.log.bind(this, "[user]");
+				user.log = this.log.bind(this, "[user]");
 				
 				this.user = user;
 				
@@ -487,39 +499,73 @@ APS.prototype.onMessage = function(data){
 				//this.check();
 		}
 	}
-	if(this.transport.id == 0 && check && this.transport.state == 1){
+	
+	if(this.check && this.transport.id == 0 && this.transport.state == 1){
+		this.log("Checking!");
 		this.check();
 	}
 }
 
 
 //var APSTransport = function(server, callback, options){
-APS.transport = function(server, callback, options){
+APS.transport = function(server, callback, client){
 	this.state = 0;//0 = Not initialized, 1 = Initialized and ready to exchange data, 2 = Request is running
 	this.stack = [];
 	this.callback = callback;
 	
-	//WS, SSE, long polling,
-	
-	if('WebSocket' in window && APS.wb == true){
+	//Fire transport
+	var trans = client.option.transport;
+	var args = Array.prototype.slice.call(arguments);
+	if(typeof trans == "object"){
+		for(var t in trans){
+			var ret = APS.transport[trans[t]].apply(this, args);
+			if(ret != false) break;
+		}
+	}
+	if(typeof trans == "string"){
+		APS.transport[trans].apply(this, args);
+	}
+}
+
+APS.transport.wb = function(server, callback, client){
+	if('WebSocket' in window){
 		this.id = 6;
+		this.loop = setInterval(client.check.bind(client,true), 40000);
+		
 		var ws = new WebSocket('ws://' + server + '/6/');
 		this.send = function(str){
 			if(this.state > 0) ws.send(str);
 			else this.stack.push(str);
 		}.bind(this);
-
-		ws.onopen = this.onLoad;
+		
+		ws.onerror = function(e){
+			this.state = 0;
+			clearInterval(this.loop);
+			callback.onerror(e);
+		}.bind(this)
+		
+		ws.onopen = function(){
+			this.state = 2;
+		
+			for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
+			this.stack = [];
+		}.bind(this)
+;
 
 		ws.onmessage = function(ev){
 			callback.onmessage(ev.data);
 		}
-		
-		return;
+	}else{
+		return false;
 	}
-	
+}
+
+APS.transport.lp = function(server, callback, client){
 	this.id = 0;
 	var frame = document.createElement('iframe');
+	var protocol = !!client.option.secure ? "https" : "http";
+	var origin = window.location.protocol+'//'+window.location.host;
+	
 	this.frame = frame;
 
 	with(frame.style){ 
@@ -528,51 +574,42 @@ APS.transport = function(server, callback, options){
 		width = height = '1px';
 	}
 
-	frame.setAttribute('src', 'http://' + server + '/?[{"cmd":"frame","params": {"origin":"'+window.location.protocol+'//'+window.location.host+'"}}]');
+	frame.setAttribute('src', protocol + "://" + server + '/?[{"cmd":"frame","params": {"origin":"'+origin+'"}}]');
 	
 	document.body.appendChild(frame);
-
 	
-	if('addEventListener' in window){
-		window.addEventListener('message', this.frameMessage.bind(this), 0);
-		frame.addEventListener('load', this.onLoad.bind(this), 0);
-	} else {
-		window.attachEvent('onmessage', this.frameMessage.bind(this));
+	function recieveMessage(ev){
+		if(ev.origin != protocol + "://" + server) return;
+		if(ev.source !== frame.contentWindow) return;
+		
+		this.state = 1;
+		this.callback.onmessage(ev.data);
+		//this.callback.once(ev.data);
+		//this.callback.once = function(){};
+	}
+	function onLoad(){
+		this.state = 1;
+	
+		for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
+		this.stack = [];
 	}
 	
-	var t = this;
+	if('addEventListener' in window){
+		window.addEventListener('message', recieveMessage.bind(this), 0);
+		frame.addEventListener('load', onLoad.bind(this), 0);
+	} else {
+		window.attachEvent('onmessage', recieveMessage.bind(this));
+	}
+	
 	this.send = function(str, callback){
 		if(this.state > 0){
-			this.frame.contentWindow.postMessage(str, '*');
+			this.frame.contentWindow.postMessage(str, protocol + "://" + server);
 			this.state = 2;
 		} else this.stack.push(str);
 		
 		if(typeof callback == "function") callback();
 		//this.callback.once = callback || function(){};
 	}
-}
-
-APS.transport.prototype.postMessage = function(str, callback){
-	if(this.state > 0){
-		this.frame.contentWindow.postMessage(str, '*');
-		this.state = 2;
-	} else this.stack.push(str);
-	
-	if(typeof callback == "function") callback();
-	//this.callback.once = callback || function(){};
-}
-APS.transport.prototype.frameMessage = function(ev){
-	this.state = 1;
-	this.callback.onmessage(ev.data);
-	//this.callback.once(ev.data);
-	//this.callback.once = function(){};
-}
-APS.transport.prototype.onLoad = function(){
-	if(this.id == 6) this.state = 2;
-	else this.state = 1;
-
-	for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
-	this.stack = [];
 }
 
 //var APSUser = function(pipe, client) {
@@ -600,9 +637,14 @@ APS.user = function(pipe, client){
 
 //var APSChannel = function(pipe, client) {
 APS.channel = function(pipe, client) {
+	
+	for(var i in pipe.properties){
+		this[i] = pipe.properties[i]
+	}
+	
 	this.events = {};
-	this.properties = pipe.properties;
-	this.name = pipe.properties.name;
+	//this.properties = pipe.properties;
+	//this.name = pipe.properties.name;
 	this.pubid = pipe.pubid;
 	this.client = client;
 	this.users = {};
@@ -632,11 +674,11 @@ APS.channel = function(pipe, client) {
 	
 	this.send = APS.prototype.send.bind(client, this.pubid);
 	
-	this.on = APS.prototype.on.bind(this);
-	this.pub = APS.prototype.pub.bind(client, this.name);
-	this.trigger = APS.prototype.trigger.bind(this);
-	this.log = APS.prototype.log.bind(client, "[channel]", "["+this.name+"]");
-	//this.log = APS.prototype.log.bind(client);
+	this.on = client.on.bind(this);
+	this.pub = client.pub.bind(client, this.name);
+	this.trigger = client.trigger.bind(this);
+	this.log = client.log.bind(client, "[channel]", "["+this.name+"]");
+	//this.log = client.log.bind(client);
 }
 
 
