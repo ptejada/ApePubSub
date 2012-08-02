@@ -3,7 +3,8 @@
  */
 Ape.addEvent('adduser', function(user) {
 	var name = user.prop('name');
-	if(name){
+	
+	if(typeof name == "string"){
 		name = name.toLowerCase();
 		userlist[name] = user;
 	}
@@ -11,7 +12,8 @@ Ape.addEvent('adduser', function(user) {
 
 Ape.addEvent('deluser', function(user) {
 	var name = user.prop('name');
-	if(name){
+	
+	if(typeof name == "string"){
 		name = name.toLowerCase();
 		delete userlist[name];
 	}
@@ -45,6 +47,7 @@ Ape.addEvent("left", function(user, channel) {
 });
 
 Ape.addEvent("beforeJoin", function(user, channel) {
+	/*
 	Ape.log("========= TEST ==========");
 	Ape.log("========= User ==========");
 	Ape.log(user.prop("name"));
@@ -53,4 +56,5 @@ Ape.addEvent("beforeJoin", function(user, channel) {
 	Ape.log(channel.prop("name"));
 	Ape.log(channel.prop());
 	Ape.log("=======================");
+	*/
 });

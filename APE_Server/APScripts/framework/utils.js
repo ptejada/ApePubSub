@@ -3,6 +3,7 @@
  */
 var userlist = {};
 var inlinePass = Ape.config("inlinepub.conf", "password");
+
 /*
  * Enchance Ape.log function
  */
@@ -28,7 +29,7 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
 	}
 	
 	if(typeof index == 'string' && typeof value == 'undefined'){
-		return this.getProperty(index);
+		return this.getProperty(index) || false;
 	}
 	
 	return this.pipe.toObject().properties;
