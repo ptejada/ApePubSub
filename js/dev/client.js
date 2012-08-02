@@ -5,8 +5,8 @@ function APS( server, events, options ){
 		session: true,
 		connectionArgs: {},
 		server: server,
-		//transport: ["wb", "lp"],
-		transport: "lp",
+		transport: ["wb", "lp"],
+		//transport: "lp",
 		secure: false
 	}
 	this.identifier = "APS";
