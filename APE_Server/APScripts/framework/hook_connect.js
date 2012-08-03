@@ -5,11 +5,16 @@ Ape.registerHookCmd("connect", function(params, cmd){
 	if(!params) return 1;
 	
 	if(params.user){
-		if(typeof params.user.name == "string")
-			if(params.user.name.length > 16 || /[^_a-zA-Z0-9]/i.test(params.user.name)) return ["006", "BAD_NICK"];
+		var user = params.user;
+		if(typeof user.name == "string"){
+			//Check for valid name
+			if(user.name.length > 16 || /[^_a-zA-Z0-9]/i.test(user.name)) return ["006", "BAD_NAME"];
+			//Check if name is unique
+			if(typeof userlist[user.name.toLowerCase()] == "object") return ["007", "NAME_USED"];
+		}
 		
-		for(var index in params.user){
-			cmd.user.prop(index, params.user[index]);
+		for(var index in user){
+			cmd.user.prop(index, user[index]);
 		}
 	}
 	
