@@ -23,7 +23,12 @@ APS.transport.wb = function(server, callback, client){
 		this.id = 6;
 		this.loop = setInterval(client.check.bind(client,true), 40000);
 		
-		var ws = new WebSocket('ws://' + server + '/6/');
+		try{
+			var ws = new WebSocket('ws://' + server + '/6/');			
+		}catch(e){
+			return false
+		}
+		
 		this.send = function(str){
 			if(this.state > 0) ws.send(str);
 			else this.stack.push(str);

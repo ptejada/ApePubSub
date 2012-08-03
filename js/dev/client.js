@@ -173,7 +173,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 APS.prototype.poll = function(){
 	if(this.transport.id == 0){
 		clearTimeout(this.poller);
-		this.log("POLLING!");
 		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
 	}
 }

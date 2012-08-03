@@ -169,7 +169,6 @@ APS.prototype.onMessage = function(data){
 	}
 	
 	if(this.check && this.transport.id == 0 && this.transport.state == 1){
-		this.log("Checking!");
 		this.check();
 	}
 }
