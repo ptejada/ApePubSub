@@ -3,7 +3,7 @@ $(document).ready(function(){
 	
 	window.client = client;
 	
-	client.option.transport = "lp";
+	//client.option.transport = "lp";
 	
 	client.option.debug = true;
 	client.option.session = false;

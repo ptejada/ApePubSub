@@ -26,6 +26,7 @@ APS.transport.wb = function(server, callback, client){
 		try{
 			var ws = new WebSocket('ws://' + server + '/6/');			
 		}catch(e){
+			callback.onerror(e);
 			return false
 		}
 		
@@ -45,13 +46,13 @@ APS.transport.wb = function(server, callback, client){
 		
 			for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
 			this.stack = [];
-		}.bind(this)
-;
+		}.bind(this);
 
 		ws.onmessage = function(ev){
 			callback.onmessage(ev.data);
 		}
 	}else{
+		client.log("No Websocket support");
 		return false;
 	}
 }

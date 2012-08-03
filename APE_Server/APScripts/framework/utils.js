@@ -18,6 +18,7 @@ Ape.log = function(data){
 		default:
 			Apelog(data);
 	}
+	Apelog("\n\r");
 }
 
 /*
