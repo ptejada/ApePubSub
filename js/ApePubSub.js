@@ -1,6 +1,6 @@
 /**
  * @author Pablo Tejada
- * Built on 2012-08-02 @ 03:38
+ * Built on 2012-08-03 @ 03:36
  */
 
 //Generate a random string
@@ -47,8 +47,8 @@ function APS( server, events, options ){
 		session: true,
 		connectionArgs: {},
 		server: server,
-		//transport: ["wb", "lp"],
-		transport: "lp",
+		transport: ["wb", "lp"],
+		//transport: "lp",
 		secure: false
 	}
 	this.identifier = "APS";
@@ -215,7 +215,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 APS.prototype.poll = function(){
 	if(this.transport.id == 0){
 		clearTimeout(this.poller);
-		this.log("POLLING!");
 		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
 	}
 }
@@ -501,7 +500,6 @@ APS.prototype.onMessage = function(data){
 	}
 	
 	if(this.check && this.transport.id == 0 && this.transport.state == 1){
-		this.log("Checking!");
 		this.check();
 	}
 }
@@ -532,7 +530,12 @@ APS.transport.wb = function(server, callback, client){
 		this.id = 6;
 		this.loop = setInterval(client.check.bind(client,true), 40000);
 		
-		var ws = new WebSocket('ws://' + server + '/6/');
+		try{
+			var ws = new WebSocket('ws://' + server + '/6/');			
+		}catch(e){
+			return false
+		}
+		
 		this.send = function(str){
 			if(this.state > 0) ws.send(str);
 			else this.stack.push(str);
