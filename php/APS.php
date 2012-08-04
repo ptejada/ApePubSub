@@ -29,17 +29,17 @@
 				$protocol = "https://";
 			}
 			
-			if($this->connect && $this->user){				
+			if($this->connect && $this->user){
 				if(empty($this->data->params->user)){
 					$user = $this->user;
 				}else{
-					$user = array_merge((array)$this->data->params->user, $this->user);					
+					$user = array_merge((array)$this->data->params->user, $this->user);
 				}
 				
 				$this->data->params->user = $user;
 			}
 			
-			$this->cmd = json_encode(array($this->data));
+			$this->cmd = rawurlencode(json_encode(array($this->data)));
 			
 			$url = $protocol . $this->server . "/?" . $this->cmd;
 			

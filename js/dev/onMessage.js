@@ -1,8 +1,9 @@
-APS.prototype.onMessage = function(data){
+APS.prototype.onMessage = function(data, push){
 	//var data = data;
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
+		this.log("JSON", e, data);
 		this.trigger("dead", [e]);
 		return clearTimeout(this.poller);
 	}
@@ -168,7 +169,7 @@ APS.prototype.onMessage = function(data){
 		}
 	}
 	
-	if(this.check && this.transport.id == 0 && this.transport.state == 1){
+	if(check && this.transport.id == 0 && this.transport.state == 1){
 		this.check();
 	}
 }

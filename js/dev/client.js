@@ -64,6 +64,37 @@ function APS( server, events, options ){
 		return this;
 	}
 	
+	function getTransport() {
+		if('XMLHttpRequest' in window) return XMLHttpRequest;
+		if('ActiveXObject' in window) {
+			var names = [
+				"Msxml2.XMLHTTP.6.0",
+				"Msxml2.XMLHTTP.3.0",
+				"Msxml2.XMLHTTP",
+				"Microsoft.XMLHTTP"
+			];
+			for(var i in names){
+				try{ return ActiveXObject(names[i]); }
+				catch(e){}
+			}
+		}
+		return false;
+	}
+		
+	var request;
+	var transport = getTransport();
+		
+	this.request = function(addr, data, callback){
+		request = new transport();
+		request.onreadystatechange = function(){
+			if(this.readyState == 4) 
+				callback(this.responseText);
+		};
+		request.open('POST', addr, true);
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+		request.send(data);
+	}
+	
 	this.session.client = this;
 	return this;
 }
@@ -157,7 +188,18 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 			this.log(data);
 		}
 		
-		this.transport.send(data, callback);
+		//Send command
+		switch(cmd){
+			case "Event":
+				if(typeof this.transport.push == "function"){
+					this.transport.push(data, callback);
+					break;
+				}
+			default:
+				this.transport.send(data, callback);
+			
+		}
+		
 		if(!(cmd in specialCmd)){
 			this.poll();
 		}
@@ -172,12 +214,14 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 
 APS.prototype.poll = function(){
 	if(this.transport.id == 0){
+		this.log("POLLING!");
 		clearTimeout(this.poller);
 		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
 	}
 }
 
 APS.prototype.check = function(force){
+	//this.log("Chec")
 	if(this.transport.id == 0 || !!force)
 		this.sendCmd('CHECK');
 }

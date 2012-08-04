@@ -4,10 +4,13 @@ $(document).ready(function(){
 	window.client = client;
 	
 	//client.option.transport = "lp";
+	client.option.poll = 5000;
 	
 	client.option.debug = true;
 	client.option.session = false;
 	//Current user's properties
+	
+	client.option.pushScript = "push.php";
 	
 	client.user = {
 		name: "User_"+randomString(5) //Generates a random name

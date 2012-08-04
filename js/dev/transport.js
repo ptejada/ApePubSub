@@ -24,7 +24,7 @@ APS.transport.wb = function(server, callback, client){
 		this.loop = setInterval(client.check.bind(client,true), 40000);
 		
 		try{
-			var ws = new WebSocket('ws://' + server + '/6/');			
+			var ws = new WebSocket('ws://' + server + '/6/');
 		}catch(e){
 			callback.onerror(e);
 			return false
@@ -46,6 +46,7 @@ APS.transport.wb = function(server, callback, client){
 		
 			for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
 			this.stack = [];
+			
 		}.bind(this);
 
 		ws.onmessage = function(ev){
