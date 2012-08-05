@@ -1,6 +1,7 @@
 //Generate a random string
 function randomString(l){
-	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+	//var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+	var chars = "0123456789ABCDEFabcdef";
 	var string_length = l;
 	var randomstring = '';
 	for (var i=0; i<string_length; i++) {
