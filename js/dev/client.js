@@ -116,8 +116,9 @@ APS.prototype.trigger = function(ev, args){
 	if("client" in this){
 		for(var i in this.client.events[ev]){
 			if(this.client.events[ev].hasOwnProperty(i)){ 
-				this.client.events[ev][i].apply(this, args);
 				this.log("{{{ " + ev + " }}} on client ", this.client);
+				if(this.client.events[ev][i].apply(this, args) === false)
+					return false;
 			}
 		}
 	}
@@ -125,12 +126,13 @@ APS.prototype.trigger = function(ev, args){
 	//Local
 	for(var i in this.events[ev]){
 		if(this.events[ev].hasOwnProperty(i)){
-			this.events[ev][i].apply(this, args);
 			if(!this.client){
 				this.log("{{{ " + ev + " }}} on client ", this);
 			}else{
 				this.log("{{{ " + ev + " }}} ", this);
 			}
+			if(this.events[ev][i].apply(this, args) === false);
+				return false;
 		}
 	}
 }
