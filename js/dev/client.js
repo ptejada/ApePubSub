@@ -236,6 +236,13 @@ APS.prototype.check = function(force){
 		this.sendCmd('CHECK');
 }
 
+APS.prototype.quit = function(){
+	this.sendCmd('QUIT');
+	if(this.option.session)
+		this.sesion.destroy();
+}
+
+
 APS.prototype.sub = function(channel, Events, callback){
 	//Handle the events
 	if(typeof Events == "object"){
