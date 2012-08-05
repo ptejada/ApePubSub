@@ -138,10 +138,6 @@ APS.prototype.onMessage = function(data, push){
 				
 				pipe.trigger('left', [user, pipe]);
 			break;
-			case 'NOSESSION':
-				this.session.connect();
-				
-			break;
 			case 'ERR' :
 				check = false;
 				switch(args.code){
@@ -154,7 +150,13 @@ APS.prototype.onMessage = function(data, push){
 					case "004":
 					case "250":
 						this.state = 0;
-						this.session.connect();
+						if(this.option.session)
+							if(this.trigger("nosession") !== false){
+								this.session.connect();
+							}else{
+								//destroy session to avoid a restore loop
+								this.session.destroy();
+							}
 						break;
 					default:
 						this.check();
