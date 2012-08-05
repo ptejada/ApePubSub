@@ -20,7 +20,15 @@ function APS( server, events, options ){
 	this.eQueue = {};
 	
 	//Add Events
-	this.on(events);
+	if(!!events)
+		this.on(events);
+	
+	//Update options
+	if(!!options){
+		for(var opt in options){
+			this.option[opt] = options[opt];
+		}
+	}
 	
 	//IE9 crap - log function fix
 	if(navigator.appName == "Microsoft Internet Explorer"){
