@@ -52,6 +52,17 @@ APS.transport.wb = function(server, callback, client){
 		ws.onmessage = function(ev){
 			callback.onmessage(ev.data);
 		}
+		
+		ws.onclose = function(){
+			clearInterval(this.loop);
+			this.state = client.state = 0;
+		}
+		
+		this.close = function(){
+			ws.close();
+			this.state = client.state = 0;
+		} 
+		
 	}else{
 		client.log("No Websocket support");
 		return false;
@@ -64,8 +75,6 @@ APS.transport.lp = function(server, callback, client){
 	var protocol = !!client.option.secure ? "https" : "http";
 	var origin = window.location.protocol+'//'+window.location.host;
 	
-	this.frame = frame;
-
 	with(frame.style){ 
 		position = 'absolute';
 		left = top = '-10px';
@@ -101,11 +110,17 @@ APS.transport.lp = function(server, callback, client){
 	
 	this.send = function(str, callback){
 		if(this.state > 0){
-			this.frame.contentWindow.postMessage(str, protocol + "://" + server);
+			frame.contentWindow.postMessage(str, protocol + "://" + server);
 			this.state = 2;
 		} else this.stack.push(str);
 		
 		if(typeof callback == "function") callback();
 		//this.callback.once = callback || function(){};
+	}
+	
+	this.close = function(){
+		clearTimeout(client.poller);
+		frame.parentElement.removeChild(frame);
+		this.state = client.state = 0;
 	}
 }
