@@ -69,6 +69,7 @@ APS.prototype.session = {
 		//Restoring session state == 2
 		client.state = 2;
 		client.sendCmd('RESTORE', {sid: this.id})
+		
 		return true;
 	},
 	
@@ -77,7 +78,8 @@ APS.prototype.session = {
 		var args = client.option.connectionArgs
 		
 		this.destroy();
-		client.sendCmd('CONNECT', args);
+		client.connect();
+		//client.sendCmd('CONNECT', args);
 	}
 	
 }
