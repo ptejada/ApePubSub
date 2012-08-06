@@ -5,7 +5,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta http-equiv="cache-control" content="no-cache" />
 		<!-- Load Style -->
-		<link rel="stylesheet" href="../style.css" type="text/css" />
+		<link rel="stylesheet" href="style.css" type="text/css" />
 		
 		<script type="text/javaScript" src="../js/jquery-min.js"></script>
 		
@@ -23,14 +23,19 @@
  
 	<body>
 		<div id="wrap">
-			<div id="chat" class="feed">
+			<div id="chat">
 				<h1>ApePubSub Chatter</h1>
-				<div class="feed-body"></div>
-				<form class="feed-send">
-					<input type="text" name="message" width="80%" /><input type="submit" value="Send" width="20%" />
-					<input type="hidden" name="channel" value="music" />
+				<div id="chat-messages"></div><div id="chat-userlist"></div>
+				<div id="chat-footer">
+					<form id="chat-form">
+						<input disabled type="text" name="message" width="80%" /><input disabled type="submit" value="Send" width="20%" />
+						<input type="hidden" name="channel" value="music" />
+					</form>
+					<img style="vertical-align: top; padding-top: 7px;" id="chat-user-icon" src="">
+					<strong id="chat-user-name"></strong>
 					
-				</form>
+					<a id="chat-logout" href="#" title="logout">[x]</a>
+				</div>
 			</div>
 		</div>		
 	</body>

@@ -1,124 +1,248 @@
-$(document).ready(function(){
-	var client = new APS("ape.crusthq.com:45138");
-	
-	window.client = client;
-	
-	//client.option.transport = "lp";
-	client.option.poll = 5000;
-	
-	client.option.debug = true;
-	client.option.session = false;
-	//Current user's properties
-	
-	client.option.pushScript = "push.php";
-	
-	client.user = {
-		name: "User_"+randomString(5) //Generates a random name
-		//id: 321,
-		//What ever you want to store in the user
-	}	
-	
-	var Events = {
-		/*
-		 * Function triggered when other users join the channel
-		 * 		+user
-		 * 			-pubid
-		 * 			...dynamic user properties like name, id, etc...
-		 * 		+channel
-		 * 			-name
-		 * 			-pipe
-		 * 			...more
-		 */
-		join: function(user, channel){
-			$("#feed-music .feed-body")
-				.append("<div class='bot'> >>> <b>"+user.name+"</b> has joined <<< </div>")
-				.trigger("newLine");
-		},
-		
-		/*
-		 * Function triggered when other users leave the channel
-		 * 		+user
-		 * 			-pubid
-		 * 			...dynamic user properties like name, id, etc...
-		 * 		+channel
-		 * 			-name
-		 * 			-pipe
-		 * 			...more
-		 */		
-		left: function(user, channel){
-			$("#feed-music .feed-body")
-				.append("<div class='bot'> <<< <b>"+user.name+"</b> has left >>> </div>")
-				.trigger("newLine");
-		},
+/*
+ * Initialize and configure the client object
+ */
+var client = new APS("ape.crusthq.com:45138", false, {
+	debug: true,
+	session: true,
+	transport: "lp"
+});
+var channelName = "APS_chatter";
+
+/*
+ * Client Events
+ */
+client.on({
+	connect: function(){
+		if(!!!client.user.name){
+			//Prompt for username if trting to connect without one
+			askForUsername();
 			
-		/*
-		 * Function triggered when a text message is recieved on this channel
-		 * 		+msg = (string) message
-		 * 		+from = sender(user) properties like name, id, pubid ... etc
-		 * 		+channel = multipipe object where the message came through
-		 */
-		message: function(message, from, channel){
-			//(jQuery)Append a Message to DIV container
-			$("#feed-music .feed-body")
-				.append("<div><b>"+from.name+":</b> "+message+"</div>")
-				.trigger("newLine");
+			//Pause connect to gather user information
+			return false;
 		}
-	};
+	},
+	
+	restored: function(){
+		//Session has been restored
+		if(client.getChannel(channelName) == false)
+			client.log("NO CHANNEL")
+	}
+});
+
+
+/*
+ * Predefine Events for the channel
+ */
+client.onChannel(channelName, {
+	/*
+	 * The current user has just join the channel
+	 */
+	joined: function(user, channel){
+		//Reference to the message input box
+		var formInput = $("#chat-form [name='message']");
+	
+		//get the channel object once and saved it in 'chan' for reference
+		var chan = client.getChannel(channelName);
+		
+		//Enable chat form
+		$("#chat-form input").removeProp("disabled");
+		
+		//Add DOM event to send the typing event to server
+		formInput.one("keyup", function(e){
+			chan.send("typing", "*");
+		});
+		
+		//Update curent user's name and icon
+		$("#chat-user-name").text(user.name);
+		$("#chat-user-icon").attr("src","http://www.gravatar.com/avatar/"+user.avatar+"?s=25&d=identicon");
+		
+		//Populate existing users in the userlist tray
+		for( var u in channel.users){
+			if(user.pubid != u)
+				addUser(channel.users[u], false);
+		}
+		
+		//Remove propmt asking for username
+		$("#chat-messages .ask").remove();
+		
+		//Show the logout button
+		$("#chat-logout").show();
+		
+		//Welcomes user to the channel
+		addBotMessage("Welcome <b>"+user.name+"</b> to APS Chatter");
+	},
 	
 	/*
-	 * Subscribe to channel
+	 * A user has join the channel
 	 */
-	
-	client.sub("music", Events, function(user, channel){
-		$("#username").text(user.name);
-	});
+	join: addUser,
 	
 	/*
-	 * To publish to a channel use the Pub() function
-	 * Pub(channel_name, message_or_object);
-	 * 
-	 * All the code below is mostly gathering the form data to publish
-	 *  
+	 * A user has left the channel
 	 */
+	left: removeUser,
 	
-	$(".feed-send").on("submit", function(e){
+	/*
+	 * A message has been revieved in the channel
+	 */
+	message: function(message, from, channel){
+		addMessage(message, from);
+		
+		$("#chat-userlist #u_"+from.name).removeClass("typing");
+	},
+	
+	/*
+	 * A user is typing
+	 */
+	typing: function(message, from, channel){
+		$("#chat-userlist #u_"+from.name).addClass("typing");
+	}
+})
+
+//============= Global Functions for document content manipulation ===============//
+
+/*
+ * Displays a form in the container asking for the user's name 
+ */
+function askForUsername(){
+	var form = $("#chat-messages .ask");
+	if(!form.length){
+		$("<form>").addClass("ask")
+			.append("<strong>Enter a username to join the chat </strong>")
+			.append("<input type='text' name='name' value='User_"+randomString(5)+"'>")
+			.append("<input type='submit' value='Join Chat'>")
+			.on("submit", function(e){
+				e.preventDefault();
+				client.user.name = $(this).find("[name]").val();
+				client.user.avatar = randomString(32).toLowerCase();
+				client.sub(channelName);
+			})
+			.prependTo("#chat-messages");
+	}else{
+		form.find("> strong").text("Please enter a different name: ")
+			.css({color: "red"});
+	}
+}
+
+/*
+ * Logs a message in the container and the user to the userlist
+ */
+function addUser(user, log){
+	var icon = $("<img>").addClass("icon")
+		.prop("src", "http://www.gravatar.com/avatar/"+user.avatar+"?s=25&d=identicon");
+	var name = $("<span>").text(user.name);
+	
+	$("<div>").attr("id", "u_"+user.name)
+		.append(icon, name)
+		.hide()
+		.appendTo("#chat-userlist")
+		.slideDown();
+	
+	if(!!log)
+		addBotMessage(">>> <b>"+user.name+"</b> has joined <<<");
+}
+
+/*
+ * Logs a message in the container and removes the user from the userlist
+ */
+function removeUser(user){
+	$("#chat-userlist #u_"+user.name).slideUp(function(){ $(this).remove()});
+	
+	addBotMessage(" <<< <b>"+user.name+"</b> has left >>> ");
+}
+
+/*
+ * Adds a generic message to the container
+ */
+function addBotMessage(str){
+	$("<div>").html(str).addClass("bot-message")
+		.appendTo("#chat-messages")
+	$("#chat-messages").trigger("newLine");
+}
+
+/*
+ * Adds a message from a user to the conainer
+ */
+function addMessage(message, from){
+	var icon = $("<img>").addClass("icon")
+		.prop("src", "http://www.gravatar.com/avatar/"+from.avatar+"?s=40&d=identicon");
+	var body = $("<p>").addClass("msg").html("<b>"+from.name+":</b> <br> "+message);
+	
+	$("<div>").append(icon, body)
+		.appendTo("#chat-messages");
+	
+	$("#chat-messages").trigger("newLine");
+}
+
+//================ DOM events binding in the usual jQuery closure =============//
+
+$(document).ready(function(){
+	/*
+	 * Add DOM event 'submit' to the form
+	 */
+	$("#chat-form").on("submit", function(e){
 		e.preventDefault();
 		
-		var formInput = $(this).find("[name='message']");
-		
+		var formInput = $("#chat-form [name='message']");
 		var formData = $(this).serializeArray();
 		var data = {};
+		
+		var chan = client.getChannel(channelName);
+		
+		formInput.one("keyup", function(e){
+			if(e.keyCode != 13){
+				chan.send("typing", "*");
+			}else{
+				$(this).one("keyup", function(e){
+					chan.send("typing", "*");
+				})
+			}
+		})
 		
 		for(var i in formData){
 			var d = formData[i];
 			data[d.name] = d.value;
 		}
 		
-		//Add current pubid data
-		//data.pubid = APS.user.pubid;
-		
 		//Send message
-		client.pub("music", data.message);
+		chan.pub(data.message);
 		
-		//Clear input and focus
+		//Clear message input and focus it
 		formInput.val("").focus();
 		
-		//Post My message on container
-		//Append a Message to DIV container
-		$("#feed-"+data.channel+" .feed-body").append("<div><b>Me:</b> "+data.message+"</div>")
-			.trigger("newLine");
+		//Manually add this message to the container
+		addMessage(data.message, client.user);
 		
 		return false;
 	})
 	
 	/*
-	 * Animate feed on new line message
+	 * Add DOM event click for the logout button
 	 */
-	$(".feed-body").on("newLine", function(){
+	$("#chat-logout").on("click", function(e){
+		e.preventDefault();
+		$(this).hide();
+		$("#chat-messages").empty();
+		$("#chat-userlist").empty();
+		askForUsername();
+		client.unSub(channelName);
+		client.quit();
+	})
+	
+	/*
+	 * Add DOM event to animate the messages feed on new row
+	 */
+	$("#chat-messages").on("newLine", function(){
 		var $this = $(this);
 		
 		$this.animate({scrollTop: $this.prop("scrollHeight") - $this.height()},{
 			queue: true
 		});
 	});
+	
+	/*
+	 * The below function call will trigger the chain reaction 
+	 * of events added to 'client' object in this whole script
+	 */
+	client.connect();
 })
