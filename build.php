@@ -10,16 +10,18 @@
 	$sufix = ".js";
 	$files = array("utilities","client", "onMessage", "transport", "user", "channel", "session");
 	
-	function build($list, $output){
-		global $path, $sufix;
-		
-		$date = date("Y-m-d \@ h:i");
-		$res = "/**
+	$date = date("Y-m-d \@ h:i");
+	$pre = "/**
  * @author Pablo Tejada
+ * @repo https://github.com/ptejada/ApePubSub
  * Built on {$date}
  */\n\n"
  ;
-	
+	function build($list, $output){
+		global $path, $sufix, $pre;
+		
+		
+		$res = $pre;
 		foreach($list as $file){
 			$res .= file_get_contents($path . $file . $sufix);
 			$res .= "\n\n";
@@ -30,7 +32,7 @@
 	}
 	
 	$min = JSMin::minify(build($files, "js/ApePubSub.js"));
-	file_put_contents("js/ApePubSub.min.js", $min);
+	file_put_contents("js/ApePubSub.min.js", str_replace("\n", "", $pre.$min));
 	
 	/*
 	 * Global API

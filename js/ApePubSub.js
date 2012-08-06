@@ -1,11 +1,13 @@
 /**
  * @author Pablo Tejada
- * Built on 2012-08-03 @ 03:36
+ * @repo https://github.com/ptejada/ApePubSub
+ * Built on 2012-08-06 @ 11:38
  */
 
 //Generate a random string
 function randomString(l){
-	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+	//var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+	var chars = "0123456789ABCDEFabcdef";
 	var string_length = l;
 	var randomstring = '';
 	for (var i=0; i<string_length; i++) {
@@ -52,7 +54,7 @@ function APS( server, events, options ){
 		secure: false
 	}
 	this.identifier = "APS";
-	this.version = '0.8b2';
+	this.version = '0.9b1';
 	this.state = 0;
 	this.events = {};
 	this.chl = 0;
@@ -62,7 +64,15 @@ function APS( server, events, options ){
 	this.eQueue = {};
 	
 	//Add Events
-	this.on(events);
+	if(!!events)
+		this.on(events);
+	
+	//Update options
+	if(!!options){
+		for(var opt in options){
+			this.option[opt] = options[opt];
+		}
+	}
 	
 	//IE9 crap - log function fix
 	if(navigator.appName == "Microsoft Internet Explorer"){
@@ -87,23 +97,71 @@ function APS( server, events, options ){
 	}
 
 	this.connect = function(args){
+		if(this.state == 1) 
+			return this.log("Already Connected!");
+		
 		var client = this;
 		this.option.connectionArgs = args || this.option.connectionArgs;
 		
-		server = server || APS.server;
-		if(this.state == 0)
+		//Handle transport
+		if(!!this.transport){
+			if(this.transport.state == 0){
+				this.transport.close();
+				this.transport = new APS.transport(server, cb, this);
+			}else{
+				//Use current active transport
+				
+			}
+		}else{
 			this.transport = new APS.transport(server, cb, this);
+		}
 		
-		//alert("connnecting...")
 		
 		//Handle sessions
 		if(this.option.session == true){
-			if(this.session.restore() == true) return this;
+			if(this.session.restore() == true){
+				return this;
+			}
 		}
+		
+		//Fresh Connect
+		if(this.trigger("connect") == false)
+			return false;
 		
 		this.sendCmd('CONNECT', args);
 		
 		return this;
+	}
+	
+	function getTransport() {
+		if('XMLHttpRequest' in window) return XMLHttpRequest;
+		if('ActiveXObject' in window) {
+			var names = [
+				"Msxml2.XMLHTTP.6.0",
+				"Msxml2.XMLHTTP.3.0",
+				"Msxml2.XMLHTTP",
+				"Microsoft.XMLHTTP"
+			];
+			for(var i in names){
+				try{ return ActiveXObject(names[i]); }
+				catch(e){}
+			}
+		}
+		return false;
+	}
+		
+	var request;
+	var transport = getTransport();
+		
+	this.request = function(addr, data, callback){
+		request = new transport();
+		request.onreadystatechange = function(){
+			if(this.readyState == 4) 
+				callback(this.responseText);
+		};
+		request.open('POST', addr, true);
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+		request.send(data);
 	}
 	
 	this.session.client = this;
@@ -119,8 +177,9 @@ APS.prototype.trigger = function(ev, args){
 	if("client" in this){
 		for(var i in this.client.events[ev]){
 			if(this.client.events[ev].hasOwnProperty(i)){ 
-				this.client.events[ev][i].apply(this, args);
 				this.log("{{{ " + ev + " }}} on client ", this.client);
+				if(this.client.events[ev][i].apply(this, args) === false)
+					return false;
 			}
 		}
 	}
@@ -128,14 +187,17 @@ APS.prototype.trigger = function(ev, args){
 	//Local
 	for(var i in this.events[ev]){
 		if(this.events[ev].hasOwnProperty(i)){
-			this.events[ev][i].apply(this, args);
 			if(!this.client){
 				this.log("{{{ " + ev + " }}} on client ", this);
 			}else{
 				this.log("{{{ " + ev + " }}} ", this);
 			}
+			if(this.events[ev][i].apply(this, args) === false)
+				return false;
 		}
 	}
+	
+	return true;
 }
 
 APS.prototype.on = function(ev, fn){
@@ -199,7 +261,18 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 			this.log(data);
 		}
 		
-		this.transport.send(data, callback);
+		//Send command
+		switch(cmd){
+			case "Event":
+				if(typeof this.transport.push == "function"){
+					this.transport.push(data, callback);
+					break;
+				}
+			default:
+				this.transport.send(data, callback);
+			
+		}
+		
 		if(!(cmd in specialCmd)){
 			this.poll();
 		}
@@ -220,8 +293,18 @@ APS.prototype.poll = function(){
 }
 
 APS.prototype.check = function(force){
+	//this.log("Chec")
 	if(this.transport.id == 0 || !!force)
 		this.sendCmd('CHECK');
+}
+
+APS.prototype.quit = function(){
+	this.sendCmd('QUIT');
+	this.transport.close();
+	this.trigger("quit");
+	//Clear session on 'quit'
+	this.session.destroy();
+	this.state = 0;
 }
 
 APS.prototype.sub = function(channel, Events, callback){
@@ -329,11 +412,12 @@ if(navigator.appName != "Microsoft Internet Explorer"){
 }
 
 
-APS.prototype.onMessage = function(data){
+APS.prototype.onMessage = function(data, push){
 	//var data = data;
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
+		this.log("JSON", e, data);
 		this.trigger("dead", [e]);
 		return clearTimeout(this.poller);
 	}
@@ -383,7 +467,8 @@ APS.prototype.onMessage = function(data){
 				check = true;
 				//Session restored completed
 				this.state = 1;
-				this.trigger('ready');
+				if(this.trigger('restored') !== false)
+					this.trigger('ready');
 			break;
 			case 'CHANNEL':
 				//this.log(pipe, args);
@@ -468,10 +553,6 @@ APS.prototype.onMessage = function(data){
 				
 				pipe.trigger('left', [user, pipe]);
 			break;
-			case 'NOSESSION':
-				this.session.connect();
-				
-			break;
 			case 'ERR' :
 				check = false;
 				switch(args.code){
@@ -484,7 +565,13 @@ APS.prototype.onMessage = function(data){
 					case "004":
 					case "250":
 						this.state = 0;
-						this.session.connect();
+						if(this.option.session)
+							if(this.trigger("nosession") !== false){
+								this.session.connect();
+							}else{
+								//destroy session to avoid a restore loop
+								this.session.destroy();
+							}
 						break;
 					default:
 						this.check();
@@ -499,7 +586,7 @@ APS.prototype.onMessage = function(data){
 		}
 	}
 	
-	if(this.check && this.transport.id == 0 && this.transport.state == 1){
+	if(check && this.transport.id == 0 && this.transport.state == 1){
 		this.check();
 	}
 }
@@ -531,8 +618,9 @@ APS.transport.wb = function(server, callback, client){
 		this.loop = setInterval(client.check.bind(client,true), 40000);
 		
 		try{
-			var ws = new WebSocket('ws://' + server + '/6/');			
+			var ws = new WebSocket('ws://' + server + '/6/');
 		}catch(e){
+			callback.onerror(e);
 			return false
 		}
 		
@@ -552,13 +640,25 @@ APS.transport.wb = function(server, callback, client){
 		
 			for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
 			this.stack = [];
-		}.bind(this)
-;
+			
+		}.bind(this);
 
 		ws.onmessage = function(ev){
 			callback.onmessage(ev.data);
 		}
+		
+		ws.onclose = function(){
+			clearInterval(this.loop);
+			this.state = client.state = 0;
+		}
+		
+		this.close = function(){
+			ws.close();
+			this.state = client.state = 0;
+		} 
+		
 	}else{
+		client.log("No Websocket support");
 		return false;
 	}
 }
@@ -569,8 +669,6 @@ APS.transport.lp = function(server, callback, client){
 	var protocol = !!client.option.secure ? "https" : "http";
 	var origin = window.location.protocol+'//'+window.location.host;
 	
-	this.frame = frame;
-
 	with(frame.style){ 
 		position = 'absolute';
 		left = top = '-10px';
@@ -606,12 +704,18 @@ APS.transport.lp = function(server, callback, client){
 	
 	this.send = function(str, callback){
 		if(this.state > 0){
-			this.frame.contentWindow.postMessage(str, protocol + "://" + server);
+			frame.contentWindow.postMessage(str, protocol + "://" + server);
 			this.state = 2;
 		} else this.stack.push(str);
 		
 		if(typeof callback == "function") callback();
 		//this.callback.once = callback || function(){};
+	}
+	
+	this.close = function(){
+		clearTimeout(client.poller);
+		frame.parentElement.removeChild(frame);
+		this.state = client.state = 0;
 	}
 }
 
@@ -756,6 +860,7 @@ APS.prototype.session = {
 		//Restoring session state == 2
 		client.state = 2;
 		client.sendCmd('RESTORE', {sid: this.id})
+		
 		return true;
 	},
 	
@@ -764,7 +869,8 @@ APS.prototype.session = {
 		var args = client.option.connectionArgs
 		
 		this.destroy();
-		client.sendCmd('CONNECT', args);
+		client.connect();
+		//client.sendCmd('CONNECT', args);
 	}
 	
 }
