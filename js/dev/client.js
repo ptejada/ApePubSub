@@ -53,19 +53,36 @@ function APS( server, events, options ){
 	}
 
 	this.connect = function(args){
+		if(this.state == 1) 
+			return this.log("Already Connected!");
+		
 		var client = this;
 		this.option.connectionArgs = args || this.option.connectionArgs;
 		
-		server = server || APS.server;
-		if(this.state == 0)
+		//Handle transport
+		if(!!this.transport){
+			if(this.transport.state == 0){
+				this.transport.close();
+				this.transport = new APS.transport(server, cb, this);
+			}else{
+				//Use current active transport
+				
+			}
+		}else{
 			this.transport = new APS.transport(server, cb, this);
+		}
 		
-		//alert("connnecting...")
 		
 		//Handle sessions
 		if(this.option.session == true){
-			if(this.session.restore() == true) return this;
+			if(this.session.restore() == true){
+				return this;
+			}
 		}
+		
+		//Fresh Connect
+		if(this.trigger("connect") == false)
+			return false;
 		
 		this.sendCmd('CONNECT', args);
 		
@@ -131,10 +148,12 @@ APS.prototype.trigger = function(ev, args){
 			}else{
 				this.log("{{{ " + ev + " }}} ", this);
 			}
-			if(this.events[ev][i].apply(this, args) === false);
+			if(this.events[ev][i].apply(this, args) === false)
 				return false;
 		}
 	}
+	
+	return true;
 }
 
 APS.prototype.on = function(ev, fn){
@@ -224,7 +243,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 
 APS.prototype.poll = function(){
 	if(this.transport.id == 0){
-		this.log("POLLING!");
 		clearTimeout(this.poller);
 		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
 	}
@@ -238,10 +256,12 @@ APS.prototype.check = function(force){
 
 APS.prototype.quit = function(){
 	this.sendCmd('QUIT');
-	if(this.option.session)
-		this.sesion.destroy();
+	this.transport.close();
+	this.trigger("quit");
+	//Clear session on 'quit'
+	this.session.destroy();
+	this.state = 0;
 }
-
 
 APS.prototype.sub = function(channel, Events, callback){
 	//Handle the events
