@@ -53,7 +53,8 @@ APS.prototype.onMessage = function(data, push){
 				check = true;
 				//Session restored completed
 				this.state = 1;
-				this.trigger('ready');
+				if(this.trigger('restored') !== false)
+					this.trigger('ready');
 			break;
 			case 'CHANNEL':
 				//this.log(pipe, args);
