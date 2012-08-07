@@ -9,17 +9,4 @@ Ape.addEvent("init", function() {
 	include("framework/cmd_event.js");
 	include("framework/hook_connect.js");
 	include("framework/hook_events.js");
-	
-	/*
-	 * Pending usefull objects rewrite
-	 */
-	//include("framework/Http.js");
-	//include("framework/http_auth.js");
-	
-	/*
-	 * User defined scripts below
-	 */
-	//include("cmd/myCommand.js");
-	//include("hoook/myHook.js");
-	
 });
