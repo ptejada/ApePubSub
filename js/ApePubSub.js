@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-08-07 @ 12:37
+ * Built on 2012-08-07 @ 02:26
  */
 
 //Generate a random string
@@ -229,7 +229,7 @@ APS.prototype.getPipe = function(user){
 	}
 }
 
-APS.prototype.send =function(pipe, $event, data, callback){
+APS.prototype.send = function(pipe, $event, data, callback){
 	this.sendCmd("Event", {
 		event: $event,
 		data: data
@@ -624,9 +624,11 @@ APS.transport.wb = function(server, callback, client){
 			return false
 		}
 		
-		this.send = function(str){
+		this.send = function(str, cb){
 			if(this.state > 0) ws.send(str);
 			else this.stack.push(str);
+			
+			if(typeof cb == "function") cb();
 		}.bind(this);
 		
 		ws.onerror = function(e){
@@ -702,14 +704,13 @@ APS.transport.lp = function(server, callback, client){
 		window.attachEvent('onmessage', recieveMessage.bind(this));
 	}
 	
-	this.send = function(str, callback){
+	this.send = function(str, cb){
 		if(this.state > 0){
 			frame.contentWindow.postMessage(str, protocol + "://" + server);
 			this.state = 2;
 		} else this.stack.push(str);
 		
-		if(typeof callback == "function") callback();
-		//this.callback.once = callback || function(){};
+		if(typeof cb == "function") cb();
 	}
 	
 	this.close = function(){

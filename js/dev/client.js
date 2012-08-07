@@ -185,7 +185,7 @@ APS.prototype.getPipe = function(user){
 	}
 }
 
-APS.prototype.send =function(pipe, $event, data, callback){
+APS.prototype.send = function(pipe, $event, data, callback){
 	this.sendCmd("Event", {
 		event: $event,
 		data: data
