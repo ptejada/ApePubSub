@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-08-06 @ 11:38
+ * Built on 2012-08-07 @ 12:37
  */
 
 //Generate a random string
@@ -128,7 +128,7 @@ function APS( server, events, options ){
 		if(this.trigger("connect") == false)
 			return false;
 		
-		this.sendCmd('CONNECT', args);
+		this.sendCmd('CONNECT', this.option.connectionArgs);
 		
 		return this;
 	}
