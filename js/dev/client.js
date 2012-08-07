@@ -84,7 +84,7 @@ function APS( server, events, options ){
 		if(this.trigger("connect") == false)
 			return false;
 		
-		this.sendCmd('CONNECT', args);
+		this.sendCmd('CONNECT', this.option.connectionArgs);
 		
 		return this;
 	}
