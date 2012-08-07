@@ -3,9 +3,9 @@
  */
 var client = new APS("ape.crusthq.com:45138", false, {
 	debug: true,
-	session: true,
-	transport: "lp"
+	session: true
 });
+
 var channelName = "APS_chatter";
 
 /*
@@ -23,9 +23,9 @@ client.on({
 	},
 	
 	restored: function(){
-		//Session has been restored
+		//Session has been restored, check if channel was restored if not ask for username
 		if(client.getChannel(channelName) == false)
-			client.log("NO CHANNEL")
+			askForUsername();
 	}
 });
 
