@@ -5,7 +5,7 @@ APS.prototype.onMessage = function(data, push){
 	}catch(e){
 		this.log("JSON", e, data);
 		this.trigger("dead", [e]);
-		return clearTimeout(this.poller);
+		return this.transport.close();
 	}
 	
 	var cmd, args, pipe;
@@ -152,12 +152,7 @@ APS.prototype.onMessage = function(data, push){
 					case "250":
 						this.state = 0;
 						if(this.option.session)
-							if(this.trigger("nosession") !== false){
-								this.session.connect();
-							}else{
-								//destroy session to avoid a restore loop
-								this.session.destroy();
-							}
+							this.session.connect();
 						break;
 					default:
 						this.check();
