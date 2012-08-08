@@ -10,7 +10,7 @@ function APS( server, events, options ){
 		secure: false
 	}
 	this.identifier = "APS";
-	this.version = '0.9b1';
+	this.version = '0.9b2';
 	this.state = 0;
 	this.events = {};
 	this.chl = 0;
@@ -257,7 +257,7 @@ APS.prototype.check = function(force){
 APS.prototype.quit = function(){
 	this.sendCmd('QUIT');
 	this.transport.close();
-	this.trigger("quit");
+	this.trigger("dead");
 	//Clear session on 'quit'
 	this.session.destroy();
 	this.state = 0;
