@@ -75,7 +75,6 @@ APS.prototype.session = {
 	
 	connect: function(){
 		var client = this.client;
-		var args = client.option.connectionArgs
 		
 		this.destroy();
 		client.connect();
