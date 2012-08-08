@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-08-07 @ 02:26
+ * Built on 2012-08-08 @ 02:27
  */
 
 //Generate a random string
@@ -54,7 +54,7 @@ function APS( server, events, options ){
 		secure: false
 	}
 	this.identifier = "APS";
-	this.version = '0.9b1';
+	this.version = '0.9b2';
 	this.state = 0;
 	this.events = {};
 	this.chl = 0;
@@ -301,7 +301,7 @@ APS.prototype.check = function(force){
 APS.prototype.quit = function(){
 	this.sendCmd('QUIT');
 	this.transport.close();
-	this.trigger("quit");
+	this.trigger("dead");
 	//Clear session on 'quit'
 	this.session.destroy();
 	this.state = 0;
@@ -419,7 +419,7 @@ APS.prototype.onMessage = function(data, push){
 	}catch(e){
 		this.log("JSON", e, data);
 		this.trigger("dead", [e]);
-		return clearTimeout(this.poller);
+		return this.transport.close();
 	}
 	
 	var cmd, args, pipe;
@@ -566,12 +566,7 @@ APS.prototype.onMessage = function(data, push){
 					case "250":
 						this.state = 0;
 						if(this.option.session)
-							if(this.trigger("nosession") !== false){
-								this.session.connect();
-							}else{
-								//destroy session to avoid a restore loop
-								this.session.destroy();
-							}
+							this.session.connect();
 						break;
 					default:
 						this.check();
@@ -867,7 +862,6 @@ APS.prototype.session = {
 	
 	connect: function(){
 		var client = this.client;
-		var args = client.option.connectionArgs
 		
 		this.destroy();
 		client.connect();
