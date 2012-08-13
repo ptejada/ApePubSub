@@ -36,7 +36,7 @@ APS.prototype.onMessage = function(data, push){
 				var user = new APS.user(args.user, this);
 				this.pipes[user.pubid] = user;
 				
-				user.events = {};
+				user._events = {};
 				user._client = this;
 				user.on = this.on.bind(user);
 				user.trigger = this.trigger.bind(user);

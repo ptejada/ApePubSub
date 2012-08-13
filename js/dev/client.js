@@ -12,7 +12,7 @@ function APS( server, events, options ){
 	this.identifier = "APS";
 	this.version = '0.9b2';
 	this.state = 0;
-	this.events = {};
+	this._events = {};
 	this.chl = 0;
 	this.user = {};
 	this.pipes = {};
@@ -131,24 +131,24 @@ APS.prototype.trigger = function(ev, args){
 	
 	//GLobal
 	if("client" in this){
-		for(var i in this._client.events[ev]){
-			if(this._client.events[ev].hasOwnProperty(i)){ 
+		for(var i in this._client._events[ev]){
+			if(this._client._events[ev].hasOwnProperty(i)){ 
 				this.log("{{{ " + ev + " }}} on client ", this._client);
-				if(this._client.events[ev][i].apply(this, args) === false)
+				if(this._client._events[ev][i].apply(this, args) === false)
 					return false;
 			}
 		}
 	}
 	
 	//Local
-	for(var i in this.events[ev]){
-		if(this.events[ev].hasOwnProperty(i)){
+	for(var i in this._events[ev]){
+		if(this._events[ev].hasOwnProperty(i)){
 			if(!this._client){
 				this.log("{{{ " + ev + " }}} on client ", this);
 			}else{
 				this.log("{{{ " + ev + " }}} ", this);
 			}
-			if(this.events[ev][i].apply(this, args) === false)
+			if(this._events[ev][i].apply(this, args) === false)
 				return false;
 		}
 	}
@@ -169,9 +169,9 @@ APS.prototype.on = function(ev, fn){
 	
 	for(var e in Events){
 		var fn = Events[e];
-		if(!this.events[e])
-			this.events[e] = [];
-		this.events[e].push(fn);
+		if(!this._events[e])
+			this._events[e] = [];
+		this._events[e].push(fn);
 	}
 	
 	return this;

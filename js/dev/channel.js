@@ -5,7 +5,7 @@ APS.channel = function(pipe, client) {
 		this[i] = pipe.properties[i]
 	}
 	
-	this.events = {};
+	this._events = {};
 	//this.properties = pipe.properties;
 	//this.name = pipe.properties.name;
 	this.pubid = pipe.pubid;
