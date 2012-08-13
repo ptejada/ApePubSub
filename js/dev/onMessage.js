@@ -42,6 +42,9 @@ APS.prototype.onMessage = function(data, push){
 				user.trigger = this.trigger.bind(user);
 				user.log = this.log.bind(this, "[user]");
 				
+				delete user.pub;
+				delete user.send;
+				
 				this.user = user;
 				
 				if(this.state == 1)
