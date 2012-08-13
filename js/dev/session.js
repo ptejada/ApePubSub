@@ -6,10 +6,10 @@ APS.prototype.session = {
 	data: {},
 	
 	save: function(){
-		if(!this.client.option.session) return;
+		if(!this._client.option.session) return;
 		
-		var pubid = this.client.user.pubid;
-		var client = this.client;
+		var pubid = this._client.user.pubid;
+		var client = this._client;
 		
 		var session = {
 			channels: Object.keys(client.channels),
@@ -24,17 +24,17 @@ APS.prototype.session = {
 	},
 	
 	saveChl: function(){
-		if(!this.client.option.session) return;
+		if(!this._client.option.session) return;
 
-		this.chl.change(this.client.chl);
+		this.chl.change(this._client.chl);
 	},
 	
 	destroy: function(){
-		if(!this.client.option.session) return;
+		if(!this._client.option.session) return;
 		
 		this.cookie.destroy();
 		this.chl.destroy();
-		this.client.chl = 0;
+		this._client.chl = 0;
 		this.id = null;
 		this.properties = {};
 	},
@@ -48,7 +48,7 @@ APS.prototype.session = {
 	},
 	
 	restore: function(){
-		var client = this.client;
+		var client = this._client;
 		
 		//alert("restoring")
 		this.chl = new APS.cookie(client.identifier + "_chl");
@@ -74,7 +74,7 @@ APS.prototype.session = {
 	},
 	
 	connect: function(){
-		var client = this.client;
+		var client = this._client;
 		
 		this.destroy();
 		client.connect();

@@ -9,7 +9,7 @@ APS.channel = function(pipe, client) {
 	//this.properties = pipe.properties;
 	//this.name = pipe.properties.name;
 	this.pubid = pipe.pubid;
-	this.client = client;
+	this._client = client;
 	this.users = {};
 	
 	this.addUser = function(u){

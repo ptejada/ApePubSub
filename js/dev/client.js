@@ -120,7 +120,7 @@ function APS( server, events, options ){
 		request.send(data);
 	}
 	
-	this.session.client = this;
+	this.session._client = this;
 	return this;
 }
 
@@ -131,10 +131,10 @@ APS.prototype.trigger = function(ev, args){
 	
 	//GLobal
 	if("client" in this){
-		for(var i in this.client.events[ev]){
-			if(this.client.events[ev].hasOwnProperty(i)){ 
-				this.log("{{{ " + ev + " }}} on client ", this.client);
-				if(this.client.events[ev][i].apply(this, args) === false)
+		for(var i in this._client.events[ev]){
+			if(this._client.events[ev].hasOwnProperty(i)){ 
+				this.log("{{{ " + ev + " }}} on client ", this._client);
+				if(this._client.events[ev][i].apply(this, args) === false)
 					return false;
 			}
 		}
@@ -143,7 +143,7 @@ APS.prototype.trigger = function(ev, args){
 	//Local
 	for(var i in this.events[ev]){
 		if(this.events[ev].hasOwnProperty(i)){
-			if(!this.client){
+			if(!this._client){
 				this.log("{{{ " + ev + " }}} on client ", this);
 			}else{
 				this.log("{{{ " + ev + " }}} ", this);

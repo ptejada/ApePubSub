@@ -5,7 +5,7 @@ APS.user = function(pipe, client){
 	}
 	
 	this.pubid = pipe.pubid;
-	//this.client = client;
+	//this._client = client;
 	this.channels = {};
 	
 	this.pub = APS.prototype.pub.bind(client, this.pubid);
