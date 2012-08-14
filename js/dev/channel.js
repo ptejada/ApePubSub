@@ -16,14 +16,11 @@ APS.channel = function(pipe, client) {
 		this.users[u.pubid] = u;
 	}
 	
-	/*
-	this.send = function(Event, data){
-		client.sendCmd("Event", {
-			event: Event,
-			data: data
-		}, this.pubid);
+	this.update = function(o){
+		for(var i in o){
+			if(this[i] != o[i]) this[i] = o[i];
+		}
 	}
-	*/
 	
 	this.leave = function(){
 		this.trigger("unsub", [client.user, this]);

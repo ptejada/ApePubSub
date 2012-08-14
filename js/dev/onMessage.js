@@ -72,8 +72,8 @@ APS.prototype.onMessage = function(data, push){
 				for(var i = 0; i < u.length; i++){
 					user = this.pipes[u[i].pubid]
 					if(!user){
-						user = new APS.user(u[i], this);
-						this.pipes[user.pubid] = user;
+						this.pipes[u[i].pubid] = new APS.user(u[i], this);
+						user = this.pipes[u[i].pubid];
 					}
 					
 					user.channels[pipe.name] = pipe;
@@ -107,8 +107,11 @@ APS.prototype.onMessage = function(data, push){
 				var user = this.pipes[args.from.pubid];
 				pipe = this.pipes[args.pipe.pubid];
 				
-				if(pipe instanceof APS.user)
+				if(pipe instanceof APS.user){
 					pipe = this.user;
+				}else{
+					pipe.update(args.pipe.properties);
+				}
 				
 				pipe.trigger(args.event, [args.data, user, pipe]);
 			break;
@@ -117,8 +120,8 @@ APS.prototype.onMessage = function(data, push){
 				pipe = this.pipes[args.pipe.pubid];
 
 				if(!user){
-					user = new APS.user(args.user, this);
-					this.pipes[user.pubid] = user;
+					this.pipes[args.user.pubid] = new APS.user(args.user, this);
+					user = this.pipes[args.user.pubid];
 				}
 				
 				//Add user's own pipe to channels list
@@ -127,18 +130,19 @@ APS.prototype.onMessage = function(data, push){
 				//Add user to channel list
 				pipe.addUser(user);
 				
+				//Update channel
+				pipe.update(args.pipe.properties);
+				
 				pipe.trigger('join', [user, pipe]);
 			break;
 			case 'LEFT':
 				pipe = this.pipes[args.pipe.pubid];
 				var user = this.pipes[args.user.pubid];
 				
-				delete user.channels[pipe.pubid];
+				delete pipe.users[user.pubid];
 				
-				for(var i in user.channels){
-					if(user.channels.hasOwnProperty(i)) delete this.pipes[user.pubid];
-					break;
-				}
+				//Update channel
+				pipe.update(args.pipe.properties);
 				
 				pipe.trigger('left', [user, pipe]);
 			break;
