@@ -10,7 +10,7 @@ function APS( server, events, options ){
 		secure: false
 	}
 	this.identifier = "APS";
-	this.version = '0.9b2';
+	this.version = '0.95';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;

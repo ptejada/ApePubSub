@@ -1,4 +1,5 @@
 ### Please check the project [wiki](https://github.com/ptejada/ApePubSub/wiki) for more information, documention and API reference
+Checkout the [live demos](http://crusthq.com/script/ApePubSub/demo/)
 ***
 
 What is it?
@@ -12,7 +13,5 @@ The client framework is based on @paraboul's next generation [APE_JSF](https://g
 
 TODOs
 =====================
-* Create additional demos to furhter illustrates the usage of the project
 * Keep working on the files in [php/](https://github.com/ptejada/ApePubSub/tree/master/php/) to create a PHP link between the APE server and the client framework for tighter PHP applications intregrration ( Been consider for separate project)
-* Implment pub() callback on all transports
 * Keep testing...

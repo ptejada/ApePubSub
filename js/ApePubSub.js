@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-08-08 @ 02:27
+ * Built on 2012-08-17 @ 03:37
  */
 
 //Generate a random string
@@ -54,9 +54,9 @@ function APS( server, events, options ){
 		secure: false
 	}
 	this.identifier = "APS";
-	this.version = '0.9b2';
+	this.version = '0.95';
 	this.state = 0;
-	this.events = {};
+	this._events = {};
 	this.chl = 0;
 	this.user = {};
 	this.pipes = {};
@@ -164,7 +164,7 @@ function APS( server, events, options ){
 		request.send(data);
 	}
 	
-	this.session.client = this;
+	this.session._client = this;
 	return this;
 }
 
@@ -175,24 +175,24 @@ APS.prototype.trigger = function(ev, args){
 	
 	//GLobal
 	if("client" in this){
-		for(var i in this.client.events[ev]){
-			if(this.client.events[ev].hasOwnProperty(i)){ 
-				this.log("{{{ " + ev + " }}} on client ", this.client);
-				if(this.client.events[ev][i].apply(this, args) === false)
+		for(var i in this._client._events[ev]){
+			if(this._client._events[ev].hasOwnProperty(i)){ 
+				this.log("{{{ " + ev + " }}} on client ", this._client);
+				if(this._client._events[ev][i].apply(this, args) === false)
 					return false;
 			}
 		}
 	}
 	
 	//Local
-	for(var i in this.events[ev]){
-		if(this.events[ev].hasOwnProperty(i)){
-			if(!this.client){
+	for(var i in this._events[ev]){
+		if(this._events[ev].hasOwnProperty(i)){
+			if(!this._client){
 				this.log("{{{ " + ev + " }}} on client ", this);
 			}else{
 				this.log("{{{ " + ev + " }}} ", this);
 			}
-			if(this.events[ev][i].apply(this, args) === false)
+			if(this._events[ev][i].apply(this, args) === false)
 				return false;
 		}
 	}
@@ -213,9 +213,9 @@ APS.prototype.on = function(ev, fn){
 	
 	for(var e in Events){
 		var fn = Events[e];
-		if(!this.events[e])
-			this.events[e] = [];
-		this.events[e].push(fn);
+		if(!this._events[e])
+			this._events[e] = [];
+		this._events[e].push(fn);
 	}
 	
 	return this;
@@ -450,11 +450,14 @@ APS.prototype.onMessage = function(data, push){
 				var user = new APS.user(args.user, this);
 				this.pipes[user.pubid] = user;
 				
-				user.events = {};
-				user.client = this;
+				user._events = {};
+				user._client = this;
 				user.on = this.on.bind(user);
 				user.trigger = this.trigger.bind(user);
 				user.log = this.log.bind(this, "[user]");
+				
+				delete user.pub;
+				delete user.send;
 				
 				this.user = user;
 				
@@ -483,8 +486,8 @@ APS.prototype.onMessage = function(data, push){
 				for(var i = 0; i < u.length; i++){
 					user = this.pipes[u[i].pubid]
 					if(!user){
-						user = new APS.user(u[i], this);
-						this.pipes[user.pubid] = user;
+						this.pipes[u[i].pubid] = new APS.user(u[i], this);
+						user = this.pipes[u[i].pubid];
 					}
 					
 					user.channels[pipe.name] = pipe;
@@ -518,8 +521,11 @@ APS.prototype.onMessage = function(data, push){
 				var user = this.pipes[args.from.pubid];
 				pipe = this.pipes[args.pipe.pubid];
 				
-				if(pipe instanceof APS.user)
+				if(pipe instanceof APS.user){
 					pipe = this.user;
+				}else{
+					pipe.update(args.pipe.properties);
+				}
 				
 				pipe.trigger(args.event, [args.data, user, pipe]);
 			break;
@@ -528,8 +534,8 @@ APS.prototype.onMessage = function(data, push){
 				pipe = this.pipes[args.pipe.pubid];
 
 				if(!user){
-					user = new APS.user(args.user, this);
-					this.pipes[user.pubid] = user;
+					this.pipes[args.user.pubid] = new APS.user(args.user, this);
+					user = this.pipes[args.user.pubid];
 				}
 				
 				//Add user's own pipe to channels list
@@ -538,18 +544,19 @@ APS.prototype.onMessage = function(data, push){
 				//Add user to channel list
 				pipe.addUser(user);
 				
+				//Update channel
+				pipe.update(args.pipe.properties);
+				
 				pipe.trigger('join', [user, pipe]);
 			break;
 			case 'LEFT':
 				pipe = this.pipes[args.pipe.pubid];
 				var user = this.pipes[args.user.pubid];
 				
-				delete user.channels[pipe.pubid];
+				delete pipe.users[user.pubid];
 				
-				for(var i in user.channels){
-					if(user.channels.hasOwnProperty(i)) delete this.pipes[user.pubid];
-					break;
-				}
+				//Update channel
+				pipe.update(args.pipe.properties);
 				
 				pipe.trigger('left', [user, pipe]);
 			break;
@@ -722,7 +729,7 @@ APS.user = function(pipe, client){
 	}
 	
 	this.pubid = pipe.pubid;
-	//this.client = client;
+	//this._client = client;
 	this.channels = {};
 	
 	this.pub = APS.prototype.pub.bind(client, this.pubid);
@@ -745,25 +752,22 @@ APS.channel = function(pipe, client) {
 		this[i] = pipe.properties[i]
 	}
 	
-	this.events = {};
+	this._events = {};
 	//this.properties = pipe.properties;
 	//this.name = pipe.properties.name;
 	this.pubid = pipe.pubid;
-	this.client = client;
+	this._client = client;
 	this.users = {};
 	
 	this.addUser = function(u){
 		this.users[u.pubid] = u;
 	}
 	
-	/*
-	this.send = function(Event, data){
-		client.sendCmd("Event", {
-			event: Event,
-			data: data
-		}, this.pubid);
+	this.update = function(o){
+		for(var i in o){
+			if(this[i] != o[i]) this[i] = o[i];
+		}
 	}
-	*/
 	
 	this.leave = function(){
 		this.trigger("unsub", [client.user, this]);
@@ -793,10 +797,10 @@ APS.prototype.session = {
 	data: {},
 	
 	save: function(){
-		if(!this.client.option.session) return;
+		if(!this._client.option.session) return;
 		
-		var pubid = this.client.user.pubid;
-		var client = this.client;
+		var pubid = this._client.user.pubid;
+		var client = this._client;
 		
 		var session = {
 			channels: Object.keys(client.channels),
@@ -811,17 +815,17 @@ APS.prototype.session = {
 	},
 	
 	saveChl: function(){
-		if(!this.client.option.session) return;
+		if(!this._client.option.session) return;
 
-		this.chl.change(this.client.chl);
+		this.chl.change(this._client.chl);
 	},
 	
 	destroy: function(){
-		if(!this.client.option.session) return;
+		if(!this._client.option.session) return;
 		
 		this.cookie.destroy();
 		this.chl.destroy();
-		this.client.chl = 0;
+		this._client.chl = 0;
 		this.id = null;
 		this.properties = {};
 	},
@@ -835,7 +839,7 @@ APS.prototype.session = {
 	},
 	
 	restore: function(){
-		var client = this.client;
+		var client = this._client;
 		
 		//alert("restoring")
 		this.chl = new APS.cookie(client.identifier + "_chl");
@@ -861,7 +865,7 @@ APS.prototype.session = {
 	},
 	
 	connect: function(){
-		var client = this.client;
+		var client = this._client;
 		
 		this.destroy();
 		client.connect();
