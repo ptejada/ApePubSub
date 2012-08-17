@@ -56,8 +56,9 @@
 						"params"	=> array(
 								"passkey"	=> $this->passkey,
 								"raw"		=> "EVENT",
-								"data"		=> $this->data->params,
-								"from"		=> $this->data->params->pipe
+								"data"		=> array("event" => $this->data->params->event, "data" => $this->data->params->data),
+								"to"		=> $this->data->params->pipe,
+								"from"		=> $_REQUEST['from']
 						)
 					);
 					$this->cmd = json_encode(array($inline));
@@ -74,8 +75,8 @@
 				$this->push();
 			
 			ignore_user_abort(true);
-			header("Connection: close");
-			header("Content-Length: " . mb_strlen($this->response));
+			//header("Connection: close");
+			//header("Content-Length: " . mb_strlen($this->response));
 			echo $this->response;
 			flush();
 		}

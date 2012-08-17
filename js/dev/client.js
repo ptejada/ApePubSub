@@ -219,7 +219,10 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		}
 		
 		//Send command
-		this.transport.send(data, callback, tmp);
+		if(this.transport.send(data, callback, tmp) != "pushed"){
+			this.chl++;
+			this.session.saveChl();
+		}
 		
 		/*
 		if(!(cmd in specialCmd)){
@@ -227,8 +230,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		}
 		*/
 		
-		this.chl++;
-		this.session.saveChl();
 	} else {
 		this.on('ready', this.sendCmd.bind(this, cmd, args));
 	}

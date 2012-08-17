@@ -1,4 +1,4 @@
-APS.prototype.onMessage = function(data, push){
+APS.prototype.onMessage = function(data){
 	//var data = data;
 	try { 
 		data = JSON.parse(data)
