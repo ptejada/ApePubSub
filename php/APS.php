@@ -1,4 +1,3 @@
-
 <?php
 	function p($data){
 		print_r($data);
@@ -39,26 +38,52 @@
 				$this->data->params->user = $user;
 			}
 			
-			$this->cmd = rawurlencode(json_encode(array($this->data)));
+			//$this->cmd = json_encode(array($this->data));
 			
-			$url = $protocol . $this->server . "/?" . $this->cmd;
+			$url = $protocol . $this->server . "/0/?";
 			
-			//$res = $this->post_curl($url);
-			$cmd = file_get_contents($url);
+			switch($this->data->cmd){
+				case "CONNECT":
+					
+					break;
+				case "JOIN":
+					$this->response = $this->cmd;
+					
+					break;
+				case "Event":
+					$inline = array(
+						"cmd" 		=> "inlinepush",
+						"params"	=> array(
+								"passkey"	=> $this->passkey,
+								"raw"		=> "EVENT",
+								"data"		=> $this->data->params,
+								"from"		=> $this->data->params->pipe
+						)
+					);
+					$this->cmd = json_encode(array($inline));
+					$response = $this->post_curl($url);
+					$this->response = $response;
+					break;
+			}
 			
-			$data = json_decode($cmd);
-			
-			$this->result = $cmd;
-			
-			return $this;			
+			return $this;
 		}
 		
 		function respond(){
-			echo $this->result;
+			if(empty($this->response))
+				$this->push();
+			
+			ignore_user_abort(true);
+			header("Connection: close");
+			header("Content-Length: " . mb_strlen($this->response));
+			echo $this->response;
+			flush();
 		}
 		
 		function post_curl($url) {
-			$ch = curl_init($this->server);
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->cmd);
 			$retdata = curl_exec($ch);

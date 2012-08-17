@@ -1,5 +1,5 @@
 //Pushpub Command
-Ape.registerCmd("inlinepub", false, function(params, info) {
+Ape.registerCmd("inlinepush", false, function(params, info) {
 	//Global inlinePass
 	if (params.password == inlinePass) {
 		

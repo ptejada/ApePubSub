@@ -13,9 +13,28 @@ APS.transport = function(server, callback, client){
 			if(ret != false) break;
 		}
 	}
+	
 	if(typeof trans == "string"){
 		APS.transport[trans].apply(this, args);
 	}
+	
+	if(!!client.option.eventPush){
+		
+		client.log("Event Push");
+		var realSend = this.send.bind(this);
+		
+		var requestCallback = function(res){
+			callback.onmessage(res);
+		}
+		this.send = function(str, cb, data){
+			if(data.cmd == "Event"){
+				client.request(client.option.eventPush, "cmd="+str, requestCallback);
+			}else{
+				realSend.apply(this, [str, cb]);
+			}
+		}
+	}
+	
 }
 
 APS.transport.wb = function(server, callback, client){
@@ -46,7 +65,7 @@ APS.transport.wb = function(server, callback, client){
 		ws.onopen = function(){
 			this.state = 2;
 		
-			for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
+			for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i], null, JSON.parse(this.stack[i])[0]);
 			this.stack = [];
 			
 		}.bind(this);
@@ -99,7 +118,7 @@ APS.transport.lp = function(server, callback, client){
 	function onLoad(){
 		this.state = 1;
 	
-		for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
+		for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i], null, JSON.parse(this.stack[i])[0]);
 		this.stack = [];
 	}
 	

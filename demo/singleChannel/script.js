@@ -4,6 +4,9 @@ $(document).ready(function(){
 	window.client = client;
 	
 	client.option.debug = true;
+	//client.option.poll = 5000;
+	client.option.transport = "lp";
+	client.option.eventPush = "/projects/ApePubSub/php/test.php";
 	//Current user's properties
 	
 	client.user = {
@@ -62,7 +65,6 @@ $(document).ready(function(){
 	/*
 	 * Subscribe to channel
 	 */
-	
 	client.sub("music", Events, function(user, channel){
 		$("#username").text(user.name);
 	});

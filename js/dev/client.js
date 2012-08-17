@@ -7,7 +7,9 @@ function APS( server, events, options ){
 		server: server,
 		transport: ["wb", "lp"],
 		//transport: "lp",
-		secure: false
+		secure: false,
+		eventPush: false,
+		authScript: false
 	}
 	this.identifier = "APS";
 	this.version = '0.95';
@@ -106,7 +108,6 @@ function APS( server, events, options ){
 		return false;
 	}
 		
-	var request;
 	var transport = getTransport();
 		
 	this.request = function(addr, data, callback){
@@ -218,20 +219,14 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		}
 		
 		//Send command
-		switch(cmd){
-			case "Event":
-				if(typeof this.transport.push == "function"){
-					this.transport.push(data, callback);
-					break;
-				}
-			default:
-				this.transport.send(data, callback);
-			
-		}
+		this.transport.send(data, callback, tmp);
 		
+		/*
 		if(!(cmd in specialCmd)){
 			this.poll();
 		}
+		*/
+		
 		this.chl++;
 		this.session.saveChl();
 	} else {
@@ -244,14 +239,15 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 APS.prototype.poll = function(){
 	if(this.transport.id == 0){
 		clearTimeout(this.poller);
-		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
+		this.poller = setTimeout(this.check.bind(this), this.option.poll);
 	}
 }
 
 APS.prototype.check = function(force){
-	//this.log("Chec")
-	if(this.transport.id == 0 || !!force)
+	if(this.transport.id == 0 || !!force){
 		this.sendCmd('CHECK');
+		this.poll();
+	}
 }
 
 APS.prototype.quit = function(){
@@ -306,7 +302,6 @@ APS.prototype.pub = function(channel, data, callback){
 		var $event = typeof data == "string" ? "message" : "data";
 		var args = {data: data};
 		pipe.send($event, data, callback);
-		//pipe.trigger("pub",args);
 	}else{
 		this.log("NO Channel " + channel);
 	}

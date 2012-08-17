@@ -2,7 +2,7 @@
  * Global variables
  */
 var userlist = {};
-var inlinePass = Ape.config("inlinepub.conf", "password");
+var passkey = Ape.config("key.conf", "passkey");
 
 /*
  * Enchance Ape.log function
