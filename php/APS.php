@@ -16,35 +16,21 @@
 			$this->data = json_decode($this->cmd);
 			$this->data = $this->data[0];
 			
-			if(strtolower($this->data->cmd) == "connect"){
-				$this->connect = true;
-			}
+			$this->event = $this->data->cmd;
 		}
 		
 		function push(){
-			if(empty($this->secured)){
-				$protocol = "http://";
-			}else{
-				$protocol = "https://";
-			}
-			
-			if($this->connect && $this->user){
-				if(empty($this->data->params->user)){
-					$user = $this->user;
-				}else{
-					$user = array_merge((array)$this->data->params->user, $this->user);
-				}
-				
-				$this->data->params->user = $user;
-			}
-			
-			//$this->cmd = json_encode(array($this->data));
-			
-			$url = $protocol . $this->server . "/0/?";
-			
-			switch($this->data->cmd){
+			switch($this->event){
 				case "CONNECT":
-					
+					if($this->user){
+						if(empty($this->data->params->user)){
+							$user = $this->user;
+						}else{
+							$user = array_merge((array)$this->data->params->user, $this->user);
+						}
+						
+						$this->data->params->user = $user;
+					}
 					break;
 				case "JOIN":
 					$this->response = $this->cmd;
@@ -54,13 +40,20 @@
 					$inline = array(
 						"cmd" 		=> "inlinepush",
 						"params"	=> array(
-								"passkey"	=> $this->passkey,
 								"raw"		=> "EVENT",
 								"data"		=> array("event" => $this->data->params->event, "data" => $this->data->params->data),
 								"to"		=> $this->data->params->pipe,
-								"from"		=> $_REQUEST['from']
+								"from"		=> $_REQUEST['from'],
+								"sessid"	=> $this->data->sessid
 						)
 					);
+					
+					if(empty($this->secured)){
+						$protocol = "http://";
+					}else{
+						$protocol = "https://";
+					}
+					$url = $protocol . $this->server . "/0/?";
 					$this->cmd = json_encode(array($inline));
 					$response = $this->post_curl($url);
 					$this->response = $response;

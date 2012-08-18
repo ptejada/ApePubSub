@@ -19,8 +19,6 @@ APS.transport = function(server, callback, client){
 	}
 	
 	if(!!client.option.eventPush){
-		
-		client.log("Event Push");
 		var realSend = this.send.bind(this);
 		
 		var requestCallback = function(res){

@@ -5,7 +5,7 @@ $(document).ready(function(){
 	
 	client.option.debug = true;
 	//client.option.poll = 5000;
-	//client.option.transport = "lp";
+	client.option.transport = "lp";
 	client.option.eventPush = "/projects/ApePubSub/php/test.php";
 	//Current user's properties
 	

@@ -9,7 +9,7 @@ function APS( server, events, options ){
 		//transport: "lp",
 		secure: false,
 		eventPush: false,
-		authScript: false
+		subCheck: false
 	}
 	this.identifier = "APS";
 	this.version = '0.95';
@@ -73,7 +73,6 @@ function APS( server, events, options ){
 		}else{
 			this.transport = new APS.transport(server, cb, this);
 		}
-		
 		
 		//Handle sessions
 		if(this.option.session == true){
@@ -224,12 +223,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 			this.session.saveChl();
 		}
 		
-		/*
-		if(!(cmd in specialCmd)){
-			this.poll();
-		}
-		*/
-		
 	} else {
 		this.on('ready', this.sendCmd.bind(this, cmd, args));
 	}
@@ -281,6 +274,18 @@ APS.prototype.sub = function(channel, Events, callback){
 		}else{
 			this.onChannel(channel, "joined", callback);
 		}
+	}
+	
+	if(this.option.subCheck){
+		this.request(this.option.subCheck, "channel="+channel, function(res){
+			if(res == "ok"){
+				this.sub(channel);
+			}else{
+				this.trigger("subDenied", [channel]);
+			}
+		}.bind(this));
+		
+		return this;
 	}
 	
 	//Join Channel
