@@ -1,5 +1,7 @@
 ### Please check the project [wiki](https://github.com/ptejada/ApePubSub/wiki) for more information, documention and API reference
 Checkout the [live demos](http://crusthq.com/script/ApePubSub/demo/)
+
+**NOTE:** when updating make sure that you update the server scripts as wells, you can tell if the server scripts need updating if the the folder **APE_Server** has been changed in the commit or recently.
 ***
 
 What is it?
