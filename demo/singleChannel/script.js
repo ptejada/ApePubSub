@@ -4,10 +4,6 @@ $(document).ready(function(){
 	window.client = client;
 	
 	client.option.debug = true;
-	//client.option.poll = 5000;
-	client.option.transport = "lp";
-	client.option.eventPush = "/projects/ApePubSub/php/test.php";
-	//Current user's properties
 	
 	client.user = {
 		name: "User_"+randomString(5) //Generates a random name
@@ -89,9 +85,6 @@ $(document).ready(function(){
 			var d = formData[i];
 			data[d.name] = d.value;
 		}
-		
-		//Add current pubid data
-		//data.pubid = APS.user.pubid;
 		
 		//Send message
 		client.pub("music", data.message);

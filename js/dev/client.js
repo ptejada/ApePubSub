@@ -8,11 +8,10 @@ function APS( server, events, options ){
 		transport: ["wb", "lp"],
 		//transport: "lp",
 		secure: false,
-		eventPush: false,
-		subCheck: false
+		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '0.95';
+	this.version = '1.0b1';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;

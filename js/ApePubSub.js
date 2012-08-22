@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-08-17 @ 03:37
+ * Built on 2012-08-22 @ 01:53
  */
 
 //Generate a random string
@@ -51,10 +51,11 @@ function APS( server, events, options ){
 		server: server,
 		transport: ["wb", "lp"],
 		//transport: "lp",
-		secure: false
+		secure: false,
+		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '0.95';
+	this.version = '1.0b1';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -116,7 +117,6 @@ function APS( server, events, options ){
 			this.transport = new APS.transport(server, cb, this);
 		}
 		
-		
 		//Handle sessions
 		if(this.option.session == true){
 			if(this.session.restore() == true){
@@ -150,7 +150,6 @@ function APS( server, events, options ){
 		return false;
 	}
 		
-	var request;
 	var transport = getTransport();
 		
 	this.request = function(addr, data, callback){
@@ -262,22 +261,11 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		}
 		
 		//Send command
-		switch(cmd){
-			case "Event":
-				if(typeof this.transport.push == "function"){
-					this.transport.push(data, callback);
-					break;
-				}
-			default:
-				this.transport.send(data, callback);
-			
+		if(this.transport.send(data, callback, tmp) != "pushed"){
+			this.chl++;
+			this.session.saveChl();
 		}
 		
-		if(!(cmd in specialCmd)){
-			this.poll();
-		}
-		this.chl++;
-		this.session.saveChl();
 	} else {
 		this.on('ready', this.sendCmd.bind(this, cmd, args));
 	}
@@ -288,14 +276,15 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 APS.prototype.poll = function(){
 	if(this.transport.id == 0){
 		clearTimeout(this.poller);
-		this.poller = setTimeout((function(){ this.check() }).bind(this), this.option.poll);
+		this.poller = setTimeout(this.check.bind(this), this.option.poll);
 	}
 }
 
 APS.prototype.check = function(force){
-	//this.log("Chec")
-	if(this.transport.id == 0 || !!force)
+	if(this.transport.id == 0 || !!force){
 		this.sendCmd('CHECK');
+		this.poll();
+	}
 }
 
 APS.prototype.quit = function(){
@@ -330,6 +319,18 @@ APS.prototype.sub = function(channel, Events, callback){
 		}
 	}
 	
+	if(this.option.subCheck){
+		this.request(this.option.subCheck, "channel="+channel, function(res){
+			if(res == "ok"){
+				this.sub(channel);
+			}else{
+				this.trigger("subDenied", [channel]);
+			}
+		}.bind(this));
+		
+		return this;
+	}
+	
 	//Join Channel
 	if(this.state == 0){
 		this.on("ready", this.sub.bind(this, channel));
@@ -350,7 +351,6 @@ APS.prototype.pub = function(channel, data, callback){
 		var $event = typeof data == "string" ? "message" : "data";
 		var args = {data: data};
 		pipe.send($event, data, callback);
-		//pipe.trigger("pub",args);
 	}else{
 		this.log("NO Channel " + channel);
 	}
@@ -412,7 +412,7 @@ if(navigator.appName != "Microsoft Internet Explorer"){
 }
 
 
-APS.prototype.onMessage = function(data, push){
+APS.prototype.onMessage = function(data){
 	//var data = data;
 	try { 
 		data = JSON.parse(data)
@@ -609,9 +609,28 @@ APS.transport = function(server, callback, client){
 			if(ret != false) break;
 		}
 	}
+	
 	if(typeof trans == "string"){
 		APS.transport[trans].apply(this, args);
 	}
+	
+	if(!!client.option.eventPush){
+		var realSend = this.send.bind(this);
+		
+		var requestCallback = function(res){
+			callback.onmessage(res);
+			client.check();
+		}
+		this.send = function(str, cb, data){
+			if(data.cmd == "Event"){
+				client.request(client.option.eventPush, "cmd="+str+"&from="+client.user.pubid, requestCallback);
+				return "pushed";
+			}else{
+				realSend.apply(this, [str, cb]);
+			}
+		}
+	}
+	
 }
 
 APS.transport.wb = function(server, callback, client){
@@ -642,7 +661,7 @@ APS.transport.wb = function(server, callback, client){
 		ws.onopen = function(){
 			this.state = 2;
 		
-			for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
+			for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i], null, JSON.parse(this.stack[i])[0]);
 			this.stack = [];
 			
 		}.bind(this);
@@ -695,7 +714,7 @@ APS.transport.lp = function(server, callback, client){
 	function onLoad(){
 		this.state = 1;
 	
-		for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i]);
+		for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i], null, JSON.parse(this.stack[i])[0]);
 		this.stack = [];
 	}
 	
