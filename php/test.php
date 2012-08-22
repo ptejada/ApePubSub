@@ -11,7 +11,6 @@
 	 * This option toggles wheater to use HTTPs or HTTP
 	 */
 	$c->secured = false;
-	$c->debug = true;
 	
 	switch($c->event){
 		case "message":

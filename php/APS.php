@@ -12,13 +12,16 @@
 			$this->server = $server;
 			
 			$this->cmd = $_REQUEST['cmd'];
+			if(get_magic_quotes_gpc()){
+				$this->cmd = stripslashes($this->cmd);
+			}
 			
 			$this->data = json_decode($this->cmd);
 			$this->data = $this->data[0];
 			
 			if($this->data->cmd == "Event"){
-				$this->event = &$this->data->params->event;
-				$this->eventData = &$this->data->params->data;
+				$this->event =& $this->data->params->event;
+				$this->eventData =& $this->data->params->data;
 				$this->from = $_REQUEST['from'];
 			}else{
 				/*
