@@ -2,7 +2,6 @@
  * Global variables
  */
 var userlist = {};
-var passkey = Ape.config("key.conf", "passkey");
 
 /*
  * Enchance Ape.log function
