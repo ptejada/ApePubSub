@@ -6,7 +6,7 @@
 	
 	class APS{
 		
-		var $server, $cmd, $secured, $connect, $user;
+		var $server, $cmd, $secured, $connect, $debug;
 		
 		function __construct($server){
 			$this->server = $server;
@@ -16,49 +16,40 @@
 			$this->data = json_decode($this->cmd);
 			$this->data = $this->data[0];
 			
-			$this->event = $this->data->cmd;
+			if($this->data->cmd == "Event"){
+				$this->event = &$this->data->params->event;
+				$this->eventData = &$this->data->params->data;
+				$this->from = $_REQUEST['from'];
+			}else{
+				/*
+				 * Event/CMD not supported respond with error
+				 * Work in progress... pending error
+				 */
+			}
 		}
 		
 		function push(){
-			switch($this->event){
-				case "CONNECT":
-					if($this->user){
-						if(empty($this->data->params->user)){
-							$user = $this->user;
-						}else{
-							$user = array_merge((array)$this->data->params->user, $this->user);
-						}
-						
-						$this->data->params->user = $user;
-					}
-					break;
-				case "JOIN":
-					$this->response = $this->cmd;
-					
-					break;
-				case "Event":
-					$inline = array(
-						"cmd" 		=> "inlinepush",
-						"params"	=> array(
-								"raw"		=> "EVENT",
-								"data"		=> array("event" => $this->data->params->event, "data" => $this->data->params->data),
-								"to"		=> $this->data->params->pipe,
-								"from"		=> $_REQUEST['from'],
-								"sessid"	=> $this->data->sessid
-						)
-					);
-					
-					if(empty($this->secured)){
-						$protocol = "http://";
-					}else{
-						$protocol = "https://";
-					}
-					$url = $protocol . $this->server . "/0/?";
-					$this->cmd = json_encode(array($inline));
-					$response = $this->post_curl($url);
-					$this->response = $response;
-					break;
+			$inline = array(
+				"cmd" 		=> "inlinepush",
+				"params"	=> array(
+						"raw"		=> "EVENT",
+						"data"		=> array("event" => $this->data->params->event, "data" => $this->data->params->data),
+						"to"		=> $this->data->params->pipe,
+						"from"		=> $this->from,
+						"sessid"	=> $this->data->sessid
+				)
+			);
+			
+			if(empty($this->secured)){
+				$protocol = "http://";
+			}else{
+				$protocol = "https://";
 			}
+			
+			$url = $protocol . $this->server . "/0/?";
+			$this->cmd = json_encode(array($inline));
+			$response = $this->post_curl($url);
+			$this->response = $response;
 			
 			return $this;
 		}
@@ -68,8 +59,12 @@
 				$this->push();
 			
 			ignore_user_abort(true);
-			//header("Connection: close");
-			//header("Content-Length: " . mb_strlen($this->response));
+			
+			if(empty($this->debug)){
+				header("Connection: close");
+				header("Content-Length: " . mb_strlen($this->response));
+			}
+			
 			echo $this->response;
 			flush();
 		}
