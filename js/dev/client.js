@@ -11,7 +11,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.0b1';
+	this.version = '1.0b2';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -168,6 +168,7 @@ APS.prototype.on = function(ev, fn){
 	
 	for(var e in Events){
 		var fn = Events[e];
+		e = e.toLowerCase();
 		if(!this._events[e])
 			this._events[e] = [];
 		this._events[e].push(fn);
