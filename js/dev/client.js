@@ -140,7 +140,7 @@ APS.prototype.trigger = function(ev, args){
 	if(!(args instanceof Array)) args = [args];
 	
 	//GLobal
-	if("client" in this){
+	if("_client" in this){
 		for(var i in this._client._events[ev]){
 			if(this._client._events[ev].hasOwnProperty(i)){ 
 				this.log("{{{ " + ev + " }}} on client ", this._client);
