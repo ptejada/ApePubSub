@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-09-01 @ 01:57
+ * Built on 2012-09-01 @ 02:08
  */
 
 //Generate a random string
@@ -55,7 +55,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.0b3';
+	this.version = '1.0b4';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -184,7 +184,7 @@ APS.prototype.trigger = function(ev, args){
 	if(!(args instanceof Array)) args = [args];
 	
 	//GLobal
-	if("client" in this){
+	if("_client" in this){
 		for(var i in this._client._events[ev]){
 			if(this._client._events[ev].hasOwnProperty(i)){ 
 				this.log("{{{ " + ev + " }}} on client ", this._client);
