@@ -3,7 +3,6 @@ APS.prototype.onMessage = function(data){
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
-		this.log("JSON", e, data);
 		this.trigger("dead", [e]);
 		return this.transport.close();
 	}
