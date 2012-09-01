@@ -42,8 +42,10 @@ APS.transport.wb = function(server, callback, client){
 		this.id = 6;
 		this.loop = setInterval(client.check.bind(client,true), 40000);
 		
+		var protocol = !!client.option.secure ? "wss" : "ws";
+		
 		try{
-			var ws = new WebSocket('ws://' + server + '/6/');
+			var ws = new WebSocket(protocol + '://' + server + '/6/');
 		}catch(e){
 			callback.onerror(e);
 			return false
