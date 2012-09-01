@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-09-01 @ 12:06
+ * Built on 2012-09-01 @ 01:57
  */
 
 //Generate a random string
@@ -55,7 +55,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.0b2';
+	this.version = '1.0b3';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -92,9 +92,14 @@ function APS( server, events, options ){
 		}
 	}
 	
+	function TransportError(e){
+		this.trigger("dead", [e]);
+		this.transport.close();
+	}
+	
 	var cb = {
 		'onmessage': this.onMessage.bind(this),
-		'onerror': this.log.bind(this, "T_ERR")
+		'onerror': TransportError.bind(this)
 	}
 
 	this.connect = function(args){
@@ -107,7 +112,6 @@ function APS( server, events, options ){
 		//Handle transport
 		if(!!this.transport){
 			if(this.transport.state == 0){
-				this.transport.close();
 				this.transport = new APS.transport(server, cb, this);
 			}else{
 				//Use current active transport
@@ -165,6 +169,13 @@ function APS( server, events, options ){
 	
 	this.session._client = this;
 	return this;
+}
+
+APS.prototype.reconnect = function(){
+	if(this.state > 0) return this.log("Client already connected!");
+	//Clear channels stack
+	this.channels = {};
+	this.connect();
 }
 
 APS.prototype.trigger = function(ev, args){
@@ -320,18 +331,6 @@ APS.prototype.sub = function(channel, Events, callback){
 		}
 	}
 	
-	if(this.option.subCheck){
-		this.request(this.option.subCheck, "channel="+channel, function(res){
-			if(res == "ok"){
-				this.sub(channel);
-			}else{
-				this.trigger("subDenied", [channel]);
-			}
-		}.bind(this));
-		
-		return this;
-	}
-	
 	//Join Channel
 	if(this.state == 0){
 		this.on("ready", this.sub.bind(this, channel));
@@ -418,7 +417,6 @@ APS.prototype.onMessage = function(data){
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
-		this.log("JSON", e, data);
 		this.trigger("dead", [e]);
 		return this.transport.close();
 	}
