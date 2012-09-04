@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-09-01 @ 02:08
+ * Built on 2012-09-04 @ 03:01
  */
 
 //Generate a random string
@@ -55,7 +55,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.0b4';
+	this.version = '1.0b5';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -637,8 +637,10 @@ APS.transport.wb = function(server, callback, client){
 		this.id = 6;
 		this.loop = setInterval(client.check.bind(client,true), 40000);
 		
+		var protocol = !!client.option.secure ? "wss" : "ws";
+		
 		try{
-			var ws = new WebSocket('ws://' + server + '/6/');
+			var ws = new WebSocket(protocol + '://' + server + '/6/');
 		}catch(e){
 			callback.onerror(e);
 			return false
@@ -690,6 +692,8 @@ APS.transport.lp = function(server, callback, client){
 	var frame = document.createElement('iframe');
 	var protocol = !!client.option.secure ? "https" : "http";
 	var origin = window.location.protocol+'//'+window.location.host;
+	//Fixes cranky IE9
+	server = server.toLowerCase();
 	
 	with(frame.style){ 
 		position = 'absolute';

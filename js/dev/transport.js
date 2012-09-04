@@ -97,6 +97,8 @@ APS.transport.lp = function(server, callback, client){
 	var frame = document.createElement('iframe');
 	var protocol = !!client.option.secure ? "https" : "http";
 	var origin = window.location.protocol+'//'+window.location.host;
+	//Fixes cranky IE9
+	server = server.toLowerCase();
 	
 	with(frame.style){ 
 		position = 'absolute';
