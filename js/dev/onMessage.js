@@ -27,7 +27,6 @@ APS.prototype.onMessage = function(data){
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
 				//this.poll();
-				this.session.save();
 			break;
 			case 'IDENT':
 				check = false;
@@ -49,6 +48,7 @@ APS.prototype.onMessage = function(data){
 				if(this.state == 1)
 					this.trigger('ready');
 				
+				this.session.save();
 				//this.poll(); //This call is under observation
 			break;
 			case 'RESTORED':

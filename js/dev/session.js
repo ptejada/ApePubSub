@@ -17,7 +17,7 @@ APS.prototype.session = {
 			pubid: pubid
 		}
 		
-		this.cookie.change(this.id);
+		this.cookie.change(this.id + ":" + pubid);
 		this.saveChl()
 		
 		//client.sendCmd("saveSESSION", session);
@@ -58,7 +58,8 @@ APS.prototype.session = {
 		client.chl = this.chl.value || 0;
 		
 		if(typeof this.cookie.value == "string"){
-			this.id = this.cookie.value;
+			var data = this.cookie.value.split(":");
+			this.id = data[0];
 		}else{
 			this.destroy();
 			//alert("no session")
@@ -68,7 +69,7 @@ APS.prototype.session = {
 		client.chl++;
 		//Restoring session state == 2
 		client.state = 2;
-		client.sendCmd('RESTORE', {sid: this.id})
+		client.sendCmd('RESTORE', {sid: data[0], pubid: data[1]})
 		
 		return true;
 	},

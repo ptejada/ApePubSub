@@ -5,6 +5,9 @@ $(document).ready(function(){
 	
 	client.option.debug = true;
 	
+	client.option.session = true;
+	client.option.transport = "lp";
+	
 	client.user = {
 		name: "User_"+randomString(5) //Generates a random name
 		//id: 321,
