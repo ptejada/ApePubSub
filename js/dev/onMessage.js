@@ -1,5 +1,4 @@
 APS.prototype.onMessage = function(data){
-	//var data = data;
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
@@ -31,17 +30,8 @@ APS.prototype.onMessage = function(data){
 			case 'IDENT':
 				check = false;
 				
-				var user = new APS.user(args.user, this);
+				var user = new APS.cUser(args.user, this);
 				this.pipes[user.pubid] = user;
-				
-				user._events = {};
-				user._client = this;
-				user.on = this.on.bind(user);
-				user.trigger = this.trigger.bind(user);
-				user.log = this.log.bind(this, "[user]");
-				
-				delete user.pub;
-				delete user.send;
 				
 				this.user = user;
 				
@@ -51,7 +41,7 @@ APS.prototype.onMessage = function(data){
 				this.session.save();
 				//this.poll(); //This call is under observation
 			break;
-			case 'RESTORED':
+			case 'RESTOREND':
 				check = true;
 				//Session restored completed
 				this.state = 1;
@@ -102,15 +92,19 @@ APS.prototype.onMessage = function(data){
 				this.trigger('newChannel', [pipe]);
 				
 			break;
+			case "SYNC":
+				var user = this.user;
+				
+				pipe = pipe = this.pipes[args.chanid];
+				
+				pipe.trigger(args.event, [args.data, user, pipe]);
+				//console.log(args.event, [args.data, user, pipe]);
+			break;
 			case "EVENT":
 				var user = this.pipes[args.from.pubid];
-				pipe = this.pipes[args.pipe.pubid];
 				
-				if(pipe instanceof APS.user){
-					pipe = this.user;
-				}else{
-					pipe.update(args.pipe.properties);
-				}
+				pipe = this.pipes[args.pipe.pubid];
+				pipe.update(args.pipe.properties);
 				
 				pipe.trigger(args.event, [args.data, user, pipe]);
 			break;

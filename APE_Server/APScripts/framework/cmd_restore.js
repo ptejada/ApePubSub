@@ -3,13 +3,13 @@ Ape.registerCmd("RESTORE", true, function(params, info) {
 	var user = info.user;
 	
 	if(user && user.pipe){
-		
-		restoreUser.bind(info)(user, params.sid);
+		info.sendResponse("RESTOREND", {data:1});
+		//restoreUser.bind(info)(user, params.sid);
+		//Ape.setTimeout(info.user.pipe.sendRaw("RESTORED", {data: 1}).bind(info),1000);
 		return 1;
+	}else{
+		return {name: "NOSESSION", data: {value: "failed"}};
 	}
-
-	return {name: "NOSESSION", data: {value: "failed"}};
-
 });
 
 function restoreUser(user,sid){
@@ -60,7 +60,9 @@ function restoreUser(user,sid){
 		data: {done: 1}
 	})
 	
+	
 	for(var i in res){
+		Ape.log(res[i].name, res[i].data);
 		this.sendResponse(res[i].name, res[i].data);
 	}
 	

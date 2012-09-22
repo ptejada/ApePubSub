@@ -35,6 +35,8 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
 	return this.pipe.toObject().properties;
 }
 
+APE.user.proxy = {};
+
 /*
  * Official bind polyfill at developer.mozilla.org
  */ 

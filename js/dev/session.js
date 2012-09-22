@@ -1,8 +1,9 @@
 APS.prototype.session = {
 	id: "",
 	chl: {},
-	client: {},
+	_client: {},
 	cookie: {},
+	freq: {},
 	data: {},
 	
 	save: function(){
@@ -18,11 +19,11 @@ APS.prototype.session = {
 		}
 		
 		this.cookie.change(this.id + ":" + pubid);
-		this.saveChl()
+		this.saveChl();
 		
 		//client.sendCmd("saveSESSION", session);
 	},
-	
+	 
 	saveChl: function(){
 		if(!this._client.option.session) return;
 
@@ -30,10 +31,12 @@ APS.prototype.session = {
 	},
 	
 	destroy: function(){
+		console.log("DESTROY");
 		if(!this._client.option.session) return;
 		
 		this.cookie.destroy();
 		this.chl.destroy();
+		this.freq.change(0);
 		this._client.chl = 0;
 		this.id = null;
 		this.properties = {};
@@ -53,23 +56,32 @@ APS.prototype.session = {
 		//alert("restoring")
 		this.chl = new APS.cookie(client.identifier + "_chl");
 		this.cookie = new APS.cookie(client.identifier + "_session");
-		
+		this.freq = new APS.cookie(client.identifier + "_frequency");
 		
 		client.chl = this.chl.value || 0;
+		
+		if(!!!this.freq.value){
+			console.log("changed FREQUENCY!");
+			console.log(this.freq.value);
+		}
+		
+		console.log(this.cookie.value);
 		
 		if(typeof this.cookie.value == "string"){
 			var data = this.cookie.value.split(":");
 			this.id = data[0];
 		}else{
 			this.destroy();
-			//alert("no session")
+			console.log("no restore", this.freq.value );
 			return false;
 		}
+		
 		
 		client.chl++;
 		//Restoring session state == 2
 		client.state = 2;
-		client.sendCmd('RESTORE', {sid: data[0], pubid: data[1]})
+		return {sid: data[0], pubid: data[1]};
+		//client.sendCmd('RESTORE', {sid: data[0], pubid: data[1]})
 		
 		return true;
 	},
@@ -95,6 +107,7 @@ APS.cookie = function(name,value,days){
 			var expires = "";
 		}
 		document.cookie = name+"="+value+expires+"; path="+this.path;
+		this.value = value;
 	}
 	
 	this.read = function(name){

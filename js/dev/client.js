@@ -62,8 +62,37 @@ function APS( server, events, options ){
 		if(this.state == 1) 
 			return this.log("Already Connected!");
 		
-		var client = this;
-		this.option.connectionArgs = args || this.option.connectionArgs;
+		var cmd = "CONNECT";
+		args = this.option.connectionArgs = args || this.option.connectionArgs;
+		
+		//Handle sessions
+		if(this.option.session == true){
+			var restore = this.session.restore();
+			if(typeof restore == "object"){
+				//args = this.option.connectionArgs;
+				args = restore;
+				cmd = "RESTORE";
+				this.log("Restoring... " + this.session.freq.value);
+				//Apply frequency to server
+				server = this.session.freq.value + "." + server;
+			}else{
+				this.log("FRESH CONNECT" + this.session.freq.value);
+				//Fresh Connect
+				if(this.trigger("connect") == false)
+					return false;
+			}
+			
+			
+			//increase frequency
+			this.session.freq.change(parseInt(this.session.freq.value) + 1);
+
+			
+		}else{
+			//Fresh Connect
+			if(this.trigger("connect") == false)
+				return false;
+		}
+		
 		
 		//Handle transport
 		if(!!this.transport){
@@ -77,18 +106,7 @@ function APS( server, events, options ){
 			this.transport = new APS.transport(server, cb, this);
 		}
 		
-		//Handle sessions
-		if(this.option.session == true){
-			if(this.session.restore() == true){
-				return this;
-			}
-		}
-		
-		//Fresh Connect
-		if(this.trigger("connect") == false)
-			return false;
-		
-		this.sendCmd('CONNECT', this.option.connectionArgs);
+		this.sendCmd(cmd, args);
 		
 		return this;
 	}

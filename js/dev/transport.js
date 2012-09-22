@@ -105,10 +105,10 @@ APS.transport.lp = function(server, callback, client){
 		left = top = '-10px';
 		width = height = '1px';
 	}
+	document.body.appendChild(frame);
 
 	frame.setAttribute('src', protocol + "://" + server + '/?[{"cmd":"frame","params": {"origin":"'+origin+'"}}]');
 	
-	document.body.appendChild(frame);
 	
 	function recieveMessage(ev){
 		if(ev.origin != protocol + "://" + server) return;

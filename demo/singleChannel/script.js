@@ -1,5 +1,6 @@
 $(document).ready(function(){
-	var client = new APS("ape.crusthq.com:45138");
+	//var client = new APS("ape.crusthq.com:45138");
+	var client = new APS("ape2.crusthq.com:53630");
 	
 	window.client = client;
 	
