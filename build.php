@@ -6,7 +6,7 @@
 	 
 	include "php/lib/jsmin.php";
 	 
-	$path = "js/dev/";
+	$path = "js/src/";
 	$sufix = ".js";
 	$files = array("utilities","client", "onMessage", "transport", "user", "channel", "session");
 	
