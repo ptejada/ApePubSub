@@ -2,10 +2,16 @@ APS.prototype.onMessage = function(data){
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
-		this.trigger("dead", [e]);
-		return this.transport.close();
+		//Temporary FIX for malformed JSON with scaped single quotes 
+		data = data.replace(/\\'/g, "'");
+		try {
+			data = JSON.parse(data);
+		}catch(e){
+			this.trigger("dead", [e]);
+			return this.transport.close();
+		}
 	}
-	
+		
 	var cmd, args, pipe;
 	var check = true;
 	
@@ -98,15 +104,22 @@ APS.prototype.onMessage = function(data){
 				pipe = pipe = this.pipes[args.chanid];
 				
 				pipe.trigger(args.event, [args.data, user, pipe]);
-				//console.log(args.event, [args.data, user, pipe]);
 			break;
 			case "EVENT":
 				var user = this.pipes[args.from.pubid];
 				
 				pipe = this.pipes[args.pipe.pubid];
-				pipe.update(args.pipe.properties);
 				
+				if(pipe instanceof APS.user){
+					pipe = this.user;
+				}
+				
+				//Trigger event on target
 				pipe.trigger(args.event, [args.data, user, pipe]);
+				
+				//Update properties
+				pipe.update(args.pipe.properties);
+				user.update(args.from.properties);
 			break;
 			case 'JOIN':
 				var user = this.pipes[args.user.pubid];
