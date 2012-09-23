@@ -11,7 +11,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.0b5';
+	this.version = '1.1b1';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
