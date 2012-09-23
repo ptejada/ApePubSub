@@ -318,9 +318,9 @@ APS.prototype.sub = function(channel, Events, callback){
 		}else{
 			//Multi Channel
 			var toJoin = [];
-			for(var chan in channel){
-				if(typeof this.channels[chan] != "object")
-					toJoin.push(chan);
+			for(var x in channel){
+				if(typeof this.channels[channel[x]] != "object")
+					toJoin.push(channel[x]);
 			}
 			
 			if(toJoin.length > 0)
