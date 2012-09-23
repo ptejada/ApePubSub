@@ -33,10 +33,13 @@
 		
 		function push(){
 			$inline = array(
-				"cmd" 		=> "inlinepush",
+				"cmd" 		=> "eventpush",
 				"params"	=> array(
-						"raw"		=> "EVENT",
-						"data"		=> array("event" => $this->data->params->event, "data" => $this->data->params->data),
+						"data"		=> array(
+							"event" => $this->data->params->event, 
+							"data" => $this->data->params->data,
+							),
+						"sync" 		=> $this->data->params->sync,
 						"to"		=> $this->data->params->pipe,
 						"from"		=> $this->from,
 						"sessid"	=> $this->data->sessid
@@ -50,7 +53,9 @@
 			}
 			
 			$url = $protocol . $this->server . "/0/?";
+			//p($inline);
 			$this->cmd = json_encode(array($inline));
+			//p($this->cmd);
 			$response = $this->post_curl($url);
 			$this->response = $response;
 			
