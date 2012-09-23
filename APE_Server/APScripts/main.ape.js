@@ -5,7 +5,7 @@ Ape.addEvent("init", function() {
 	include("framework/utils.js");
 	//include("framework/ES6.js");
 	include("framework/cmd_frame.js");
-	include("framework/cmd_inlinepush.js");
+	include("framework/cmd_eventpush.js");
 	include("framework/cmd_restore.js");
 	include("framework/cmd_event.js");
 	include("framework/hook_connect.js");

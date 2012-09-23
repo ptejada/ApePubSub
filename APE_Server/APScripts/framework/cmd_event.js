@@ -8,7 +8,7 @@ Ape.registerCmd("event", true, function(params, info) {
 		sync.chanid = params.pipe;
 		delete sync.pipe;
 		
-		info.user.pipe.sendRaw("SYNC", sync);
+		if(!!params.sync) info.sendResponse("SYNC", sync);
 		pipe.sendRaw("EVENT", params, {from: info.user.pipe});
 	}
 });

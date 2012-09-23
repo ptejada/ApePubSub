@@ -1,6 +1,6 @@
-//Pushpub Command
-Ape.registerCmd("inlinepush", false, function(params, info) {
-	if(params.to && params.raw && params.data){
+//eventpush Command
+Ape.registerCmd("eventpush", false, function(params, info) {
+	if(params.to && params.data){
 		
 		var to = Ape.getPipe(params.to);
 		
@@ -14,8 +14,15 @@ Ape.registerCmd("inlinepush", false, function(params, info) {
 		//Send Data to the Reccipient
 		to.sendRaw(params.raw, params.data, {"from": user.pipe});
 		
+		if(!!params.sync){
+			var sync = params.data;
+			sync.chanid = params.to;
+			user.pipe.sendRaw("SYNC", sync);
+			//return {"name": "SYNC", "data": sync};
+		}
+		
 		return {"name":"PUSHED","data":{"value":"ok"}};
-	} else {
+	}else{
 		return 0;
 	}
 });
