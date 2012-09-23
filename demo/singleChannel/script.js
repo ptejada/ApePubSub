@@ -1,26 +1,23 @@
 $(document).ready(function(){
-	//var client = new APS("ape.crusthq.com:45138");
-	var client = new APS("ape2.crusthq.com:53630");
+	var client = new APS("ape.crusthq.com:45138");
 	
+	//Makes the client object global for debugging
 	window.client = client;
 	
 	client.option.debug = true;
-	
-	client.option.session = true;
-	client.option.transport = "lp";
 	
 	client.user = {
 		name: "User_"+randomString(5) //Generates a random name
 		//id: 321,
 		//What ever you want to store in the user
-	}	
+	}
 	
 	var Events = {
 		/*
 		 * Function triggered when other users join the channel
 		 * 		+user
 		 * 			-pubid
-		 * 			...dynamic user properties like name, id, etc...
+		 * 			...dynamic user properties like name, etc...
 		 * 		+channel
 		 * 			-name
 		 * 			-pipe
@@ -50,14 +47,17 @@ $(document).ready(function(){
 			
 		/*
 		 * Function triggered when a text message is recieved on this channel
-		 * 		+msg = (string) message
-		 * 		+from = sender(user) properties like name, id, pubid ... etc
+		 * 		+message = (string) message
+		 * 		+from = sender(user) properties like name, pubid ... etc
 		 * 		+channel = multipipe object where the message came through
 		 */
 		message: function(message, from, channel){
+			//Use "Me" as the name if the message is from the current user
+			var name = this._client.user.pubid == from.pubid ? "Me" : from.name
+			
 			//(jQuery)Append a Message to DIV container
 			$("#feed-music .feed-body")
-				.append("<div><b>"+from.name+":</b> "+message+"</div>")
+				.append("<div><b>"+name+":</b> "+message+"</div>")
 				.trigger("newLine");
 		}
 	};
@@ -70,37 +70,19 @@ $(document).ready(function(){
 	});
 	
 	/*
-	 * To publish to a channel use the Pub() function
-	 * Pub(channel_name, message_or_object);
-	 * 
-	 * All the code below is mostly gathering the form data to publish
-	 *  
+	 * To publish to a channel use the pub() method
+	 * client.pub(channel_name, message_or_object);
 	 */
-	
 	$(".feed-send").on("submit", function(e){
 		e.preventDefault();
 		
 		var formInput = $(this).find("[name='message']");
 		
-		var formData = $(this).serializeArray();
-		var data = {};
-		
-		for(var i in formData){
-			var d = formData[i];
-			data[d.name] = d.value;
-		}
-		
 		//Send message
-		client.pub("music", data.message);
+		client.pub("music", formInput.val(), true);
 		
 		//Clear input and focus
 		formInput.val("").focus();
-		
-		//Post My message on container
-		//Append a Message to DIV container
-		$("#feed-"+data.channel+" .feed-body").append("<div><b>Me:</b> "+data.message+"</div>")
-			.trigger("newLine");
-		
 		return false;
 	})
 	

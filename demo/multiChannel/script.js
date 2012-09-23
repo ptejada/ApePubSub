@@ -5,8 +5,6 @@ $(document).ready(function(){
 	//Enable debug output to browser console
 	client.option.debug =true;
 	
-	client.option.transport = 'lp'
-	
 	//Current user's properties
 	client.user = {
 		name: "User_"+randomString(5), //Generates a random name
@@ -23,7 +21,7 @@ $(document).ready(function(){
 		 * Function triggered when other users join the channel
 		 * 		+user
 		 * 			-pubid
-		 * 			...dynamic user properties like name, id, etc...
+		 * 			...dynamic user properties like name, etc...
 		 * 		+channel
 		 * 			-name
 		 * 			-pipe
@@ -55,12 +53,15 @@ $(document).ready(function(){
 		 * Function triggered when a text message is recieved on this channel
 		 * 		+message = (string) message
 		 * 		+from = sender(user) properties like name, pubid ... etc
-		 * 		+channel = a channel object where the message came through
+		 * 		+channel = multipipe object where the message came through
 		 */
 		message: function(message, from, channel){
+			//Use "Me" as the name if the message is from the current user
+			var name = this._client.user.pubid == from.pubid ? "Me" : from.name
+			
 			//(jQuery)Append a Message to DIV container
 			$("#feed-"+channel.name+" .feed-body")
-				.append("<div><b>"+from.name+":</b> "+message+"</div>")
+				.append("<div><b>"+name+":</b> "+message+"</div>")
 				.trigger("newLine");
 		},
 		
@@ -88,8 +89,8 @@ $(document).ready(function(){
 	 * wrap all your sub() calls in a sub() callback
 	
 			client.sub("music", musicEvents, function(){
-				Sub("games", gamesEvents, callback);
-				Sub("dance", danceEvents, callback);
+				this.sub("games", gamesEvents, callback);
+				this.sub("dance", danceEvents, callback);
 			});
 	
 	 * The reason we should call parallel client.sub() requests inside a callback is to avoid
@@ -97,43 +98,23 @@ $(document).ready(function(){
 	 */
 	
 	/*
-	 * To publish to a channel use the pub() function
-	 *		client.pub(channel_name, message_or_object);
-	 * 
+	 * To publish to a channel use the pub() method
+	 * client.pub(channel_name, message_or_object);
+	 *
 	 * You may also call the pub() function directly from channel object
 	 * 		client.getChannel(channel_name).pub(message_or_object)
-	 */
-	
-	/*
-	 * All the code below is mostly gathering the form data to publish 
-	 * and adding some basic effects to the chat box 
 	 */
 	$(".feed-send").on("submit", function(e){
 		e.preventDefault();
 		
 		var formInput = $(this).find("[name='message']");
-		
-		var formData = $(this).serializeArray();
-		var data = {};
-		
-		for(var i in formData){
-			var d = formData[i];
-			data[d.name] = d.value;
-		}
-		
-		//Add current pubid data
-		//data.pubid = APS.PubSub.user.pubid;
+		var chanName = $(this).find("[name='channel']").val();
 		
 		//Send message
-		client.pub(data.channel, data.message);
+		client.pub(chanName, formInput.val(), true);
 		
 		//Clear input and focus
 		formInput.val("").focus();
-		
-		//Post My message on container
-		//Append a Message to DIV container
-		$("#feed-"+data.channel+" .feed-body").append("<div><b>Me:</b> "+data.message+"</div>")
-			.trigger("newLine");
 		
 		return false;
 	})

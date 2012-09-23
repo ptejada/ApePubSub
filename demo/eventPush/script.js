@@ -1,4 +1,5 @@
 $(document).ready(function(){
+	//Create a new APS client
 	var client = new APS("ape.crusthq.com:45138");
 	
 	window.client = client;
@@ -11,7 +12,7 @@ $(document).ready(function(){
 	client.option.eventPush = "../../php/test.php";
 	
 	client.on("dead", function(){
-		alert("Make sure the client.option.eventPush option is pointing to the correct file. \n\nIts current value is " + client.option.eventPush +"\n\nYou may update this value in the script.js file around line 11.");
+		//alert("Make sure the client.option.eventPush option is pointing to the correct file. \n\nIts current value is " + client.option.eventPush +"\n\nYou may update this value in the script.js file around line 11.");
 	});
 	
 	//Current user's properties	
@@ -61,9 +62,13 @@ $(document).ready(function(){
 		 * 		+channel = multipipe object where the message came through
 		 */
 		message: function(message, from, channel){
+			console.log(from);
+			//Use "Me" as the name if the message is from the current user
+			var name = this._client.user.pubid == from.pubid ? "Me" : from.name
+			
 			//(jQuery)Append a Message to DIV container
 			$("#feed-music .feed-body")
-				.append("<div><b>"+from.name+":</b> "+message+"</div>")
+				.append("<div><b>"+name+":</b> "+message+"</div>")
 				.trigger("newLine");
 		}
 	};
@@ -88,27 +93,11 @@ $(document).ready(function(){
 		
 		var formInput = $(this).find("[name='message']");
 		
-		var formData = $(this).serializeArray();
-		var data = {};
-		
-		for(var i in formData){
-			var d = formData[i];
-			data[d.name] = d.value;
-		}
-		
-		//Add current pubid data
-		//data.pubid = APS.user.pubid;
-		
 		//Send message
-		client.pub("music", data.message);
+		client.pub("music", formInput.val(), true);
 		
 		//Clear input and focus
 		formInput.val("").focus();
-		
-		//Post My message on container
-		//Append a Message to DIV container
-		$("#feed-"+data.channel+" .feed-body").append("<div><b>Me:</b> "+data.message+"</div>")
-			.trigger("newLine");
 		
 		return false;
 	})

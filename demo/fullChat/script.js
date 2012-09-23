@@ -22,10 +22,15 @@ client.on({
 		}
 	},
 	
-	restored: function(){
+	restorend: function(){
 		//Session has been restored, check if channel was restored if not ask for username
 		if(client.getChannel(channelName) == false)
 			askForUsername();
+	},
+	
+	dead: function(){
+		//Refresh page
+		window.location.reload();
 	}
 });
 
@@ -125,7 +130,7 @@ function askForUsername(){
 }
 
 /*
- * Logs a message in the container and the user to the userlist
+ * Logs a message in the container and adds the user to the userlist
  */
 function addUser(user, log){
 	var icon = $("<img>").addClass("icon")
@@ -184,8 +189,6 @@ $(document).ready(function(){
 		e.preventDefault();
 		
 		var formInput = $("#chat-form [name='message']");
-		var formData = $(this).serializeArray();
-		var data = {};
 		
 		var chan = client.getChannel(channelName);
 		
@@ -199,19 +202,11 @@ $(document).ready(function(){
 			}
 		})
 		
-		for(var i in formData){
-			var d = formData[i];
-			data[d.name] = d.value;
-		}
-		
 		//Send message
-		chan.pub(data.message);
+		chan.pub(formInput.val(), true);
 		
 		//Clear message input and focus it
 		formInput.val("").focus();
-		
-		//Manually add this message to the container
-		addMessage(data.message, client.user);
 		
 		return false;
 	})
@@ -221,10 +216,6 @@ $(document).ready(function(){
 	 */
 	$("#chat-logout").on("click", function(e){
 		e.preventDefault();
-		$(this).hide();
-		$("#chat-messages").empty();
-		$("#chat-userlist").empty();
-		askForUsername();
 		client.unSub(channelName);
 		client.quit();
 	})
