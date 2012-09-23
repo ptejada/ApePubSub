@@ -1,15 +1,7 @@
 //Pub Command
 Ape.registerCmd("RESTORE", true, function(params, info) {
-	var user = info.user;
-	
-	if(user && user.pipe){
-		info.sendResponse("RESTOREND", {data:1});
-		//restoreUser.bind(info)(user, params.sid);
-		//Ape.setTimeout(info.user.pipe.sendRaw("RESTORED", {data: 1}).bind(info),1000);
-		return 1;
-	}else{
-		return {name: "NOSESSION", data: {value: "failed"}};
-	}
+	info.sendResponse("RESTOREND", {data:1});
+	return 1;
 });
 
 function restoreUser(user,sid){

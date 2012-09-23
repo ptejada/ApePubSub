@@ -118,7 +118,7 @@ APS.prototype.onMessage = function(data){
 				}
 				
 				//Add user's own pipe to channels list
-				user.channels[pipe.pubid] = user;
+				user.channels[args.user.pubid] = user;
 				
 				//Add user to channel list
 				pipe.addUser(user);
@@ -132,7 +132,7 @@ APS.prototype.onMessage = function(data){
 				pipe = this.pipes[args.pipe.pubid];
 				var user = this.pipes[args.user.pubid];
 				
-				delete pipe.users[user.pubid];
+				delete pipe.users[args.user.pubid];
 				
 				//Update channel
 				pipe.update(args.pipe.properties);
@@ -151,8 +151,11 @@ APS.prototype.onMessage = function(data){
 					case "004":
 					case "250":
 						this.state = 0;
-						if(this.option.session)
-							this.session.connect();
+						this.session.destroy();
+						
+						if(this.option.session){
+							this.reconnect();
+						}
 						break;
 					default:
 						this.check();

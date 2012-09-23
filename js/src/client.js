@@ -69,23 +69,19 @@ function APS( server, events, options ){
 		if(this.option.session == true){
 			var restore = this.session.restore();
 			if(typeof restore == "object"){
-				//args = this.option.connectionArgs;
 				args = restore;
+				//Change initial command CONNECT by RESTORE
 				cmd = "RESTORE";
-				this.log("Restoring... " + this.session.freq.value);
-				//Apply frequency to server
+				//Apply frequency to the server
 				server = this.session.freq.value + "." + server;
 			}else{
-				this.log("FRESH CONNECT" + this.session.freq.value);
 				//Fresh Connect
 				if(this.trigger("connect") == false)
 					return false;
 			}
 			
-			
 			//increase frequency
 			this.session.freq.change(parseInt(this.session.freq.value) + 1);
-
 			
 		}else{
 			//Fresh Connect
@@ -106,6 +102,7 @@ function APS( server, events, options ){
 			this.transport = new APS.transport(server, cb, this);
 		}
 		
+		//Send seleced command arguments
 		this.sendCmd(cmd, args);
 		
 		return this;
@@ -214,10 +211,11 @@ APS.prototype.getPipe = function(user){
 	}
 }
 
-APS.prototype.send = function(pipe, $event, data, callback){
+APS.prototype.send = function(pipe, $event, data, sync, callback){
 	this.sendCmd("Event", {
 		event: $event,
-		data: data
+		data: data,
+		sync: sync
 	}, pipe, callback);
 }
 
@@ -317,14 +315,13 @@ APS.prototype.sub = function(channel, Events, callback){
 	return this;
 }
 
-APS.prototype.pub = function(channel, data, callback){
+APS.prototype.pub = function(channel, data, sync, callback){
 	var pipe = this.getChannel(channel);
 	if(!pipe && channel.length == 32) pipe = this.getPipe(channel);
 	
 	if(pipe){
 		var $event = typeof data == "string" ? "message" : "data";
-		var args = {data: data};
-		pipe.send($event, data, callback);
+		pipe.send($event, data, sync, callback);
 	}else{
 		this.log("NO Channel " + channel);
 	}

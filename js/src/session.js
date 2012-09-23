@@ -31,7 +31,6 @@ APS.prototype.session = {
 	},
 	
 	destroy: function(){
-		console.log("DESTROY");
 		if(!this._client.option.session) return;
 		
 		this.cookie.destroy();
@@ -53,26 +52,18 @@ APS.prototype.session = {
 	restore: function(){
 		var client = this._client;
 		
-		//alert("restoring")
+		//Load cookies
 		this.chl = new APS.cookie(client.identifier + "_chl");
 		this.cookie = new APS.cookie(client.identifier + "_session");
 		this.freq = new APS.cookie(client.identifier + "_frequency");
 		
 		client.chl = this.chl.value || 0;
 		
-		if(!!!this.freq.value){
-			console.log("changed FREQUENCY!");
-			console.log(this.freq.value);
-		}
-		
-		console.log(this.cookie.value);
-		
 		if(typeof this.cookie.value == "string"){
 			var data = this.cookie.value.split(":");
 			this.id = data[0];
 		}else{
 			this.destroy();
-			console.log("no restore", this.freq.value );
 			return false;
 		}
 		
@@ -81,21 +72,12 @@ APS.prototype.session = {
 		//Restoring session state == 2
 		client.state = 2;
 		return {sid: data[0], pubid: data[1]};
-		//client.sendCmd('RESTORE', {sid: data[0], pubid: data[1]})
-		
-		return true;
-	},
-	
-	connect: function(){
-		var client = this._client;
-		
-		this.destroy();
-		client.connect();
-		//client.sendCmd('CONNECT', args);
 	}
-	
 }
 
+/*
+ * the cookie object consructor
+ */
 APS.cookie = function(name,value,days){
 	this.change = function(value,days){
 		var name = this.name;
