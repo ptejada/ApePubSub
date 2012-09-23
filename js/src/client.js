@@ -308,8 +308,25 @@ APS.prototype.sub = function(channel, Events, callback){
 		this.on("ready", this.sub.bind(this, channel));
 		this.connect({user: this.user});
 		
-	}else if(typeof this.channels[channel] != "object"){
-		this.sendCmd('JOIN', {'channels': channel});
+	}else{
+		//Logic to only send the JOIN request to only non-existing channels in the client object
+		if(typeof channel == "string"){
+			//Single Channel
+			if(typeof this.channels[channel] != "object"){
+				this.sendCmd('JOIN', {'channels': channel});
+			}
+		}else{
+			//Multi Channel
+			var toJoin = [];
+			for(var chan in channel){
+				if(typeof this.channels[chan] != "object")
+					toJoin.push(chan);
+			}
+			
+			if(toJoin.length > 0)
+				this.sendCmd('JOIN', {'channels': toJoin});
+				
+		}
 	}
 	
 	return this;
