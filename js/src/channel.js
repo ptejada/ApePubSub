@@ -27,7 +27,7 @@ APS.channel = function(pipe, client) {
 		
 		client.sendCmd('LEFT', {"channel": this.name});
 		
-		this.log("Unsubscribed from ("+this.name+")");
+		this.log("Unsubscribed");
 		
 		delete client.channels[this.name];
 	}

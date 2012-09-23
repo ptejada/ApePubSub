@@ -35,5 +35,5 @@ APS.cUser = function(pipe, client){
 	
 	this.on = client.on.bind(this);
 	this.trigger = client.trigger.bind(this);
-	this.log = client.log.bind(this, "[CurrentUser]");
+	this.log = client.log.bind(client, "[CurrentUser]");
 }
