@@ -6,6 +6,8 @@ var client = new APS("ape.crusthq.com:45138", false, {
 	session: true
 });
 
+client.identifier = "fullChat";
+
 var channelName = "APS_chatter";
 
 /*
@@ -20,12 +22,6 @@ client.on({
 			//Pause connect to gather user information
 			return false;
 		}
-	},
-	
-	restorend: function(){
-		//Session has been restored, check if channel was restored if not ask for username
-		if(client.getChannel(channelName) == false)
-			askForUsername();
 	},
 	
 	dead: function(){

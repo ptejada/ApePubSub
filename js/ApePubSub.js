@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-09-23 @ 10:58
+ * Built on 2012-09-23 @ 11:32
  */
 
 //Generate a random string
@@ -497,7 +497,7 @@ APS.prototype.onMessage = function(data){
 				check = true;
 				//Session restored completed
 				this.state = 1;
-				if(this.trigger('restored') !== false)
+				if(this.trigger('restorend') !== false)
 					this.trigger('ready');
 			break;
 			case 'CHANNEL':
