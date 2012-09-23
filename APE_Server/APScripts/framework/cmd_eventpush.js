@@ -12,7 +12,7 @@ Ape.registerCmd("eventpush", false, function(params, info) {
 			return ["424", "UNKNOWN_SENDER"];
 		
 		//Send Data to the Reccipient
-		to.sendRaw(params.raw, params.data, {"from": user.pipe});
+		to.sendRaw("EVENT", params.data, {"from": user.pipe});
 		
 		if(!!params.sync){
 			var sync = params.data;
