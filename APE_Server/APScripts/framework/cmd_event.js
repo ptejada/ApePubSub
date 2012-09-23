@@ -3,6 +3,8 @@ Ape.registerCmd("event", true, function(params, info) {
 	
 	var pipe = Ape.getPipe(params.pipe);
 	
+	Ape.log(params);
+	
 	if(pipe){
 		var sync = params;
 		sync.chanid = params.pipe;
