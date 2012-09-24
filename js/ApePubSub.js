@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-09-23 @ 11:32
+ * Built on 2012-09-24 @ 12:03
  */
 
 //Generate a random string
@@ -610,7 +610,7 @@ APS.prototype.onMessage = function(data){
 					case "004":
 					case "250":
 						this.state = 0;
-						this.session.destroy();
+						this.session.destroy(true);
 						
 						if(this.option.session){
 							this.reconnect();
@@ -903,12 +903,13 @@ APS.prototype.session = {
 		this.chl.change(this._client.chl);
 	},
 	
-	destroy: function(){
+	destroy: function(Keepfreq){
 		if(!this._client.option.session) return;
 		
 		this.cookie.destroy();
 		this.chl.destroy();
-		this.freq.change(0);
+		if(!!!Keepfreq)
+			this.freq.change(0);
 		this._client.chl = 0;
 		this.id = null;
 		this.properties = {};
@@ -936,7 +937,6 @@ APS.prototype.session = {
 			var data = this.cookie.value.split(":");
 			this.id = data[0];
 		}else{
-			this.destroy();
 			return false;
 		}
 		

@@ -30,12 +30,13 @@ APS.prototype.session = {
 		this.chl.change(this._client.chl);
 	},
 	
-	destroy: function(){
+	destroy: function(Keepfreq){
 		if(!this._client.option.session) return;
 		
 		this.cookie.destroy();
 		this.chl.destroy();
-		this.freq.change(0);
+		if(!!!Keepfreq)
+			this.freq.change(0);
 		this._client.chl = 0;
 		this.id = null;
 		this.properties = {};
@@ -63,7 +64,6 @@ APS.prototype.session = {
 			var data = this.cookie.value.split(":");
 			this.id = data[0];
 		}else{
-			this.destroy();
 			return false;
 		}
 		

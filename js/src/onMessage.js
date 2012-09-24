@@ -164,7 +164,7 @@ APS.prototype.onMessage = function(data){
 					case "004":
 					case "250":
 						this.state = 0;
-						this.session.destroy();
+						this.session.destroy(true);
 						
 						if(this.option.session){
 							this.reconnect();
