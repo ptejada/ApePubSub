@@ -1,6 +1,6 @@
 //Pub Command
 Ape.registerCmd("RESTORE", true, function(params, info) {
-	info.sendResponse("RESTOREND", {data:1});
+	info.sendResponse("RESTORED", {data:1});
 	return 1;
 });
 

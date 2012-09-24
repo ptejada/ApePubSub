@@ -47,11 +47,11 @@ APS.prototype.onMessage = function(data){
 				this.session.save();
 				//this.poll(); //This call is under observation
 			break;
-			case 'RESTOREND':
+			case 'RESTORED':
 				check = true;
 				//Session restored completed
 				this.state = 1;
-				if(this.trigger('restorend') !== false)
+				if(this.trigger('restored') !== false)
 					this.trigger('ready');
 			break;
 			case 'CHANNEL':

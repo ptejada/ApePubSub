@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-09-24 @ 12:03
+ * Built on 2012-09-24 @ 12:08
  */
 
 //Generate a random string
@@ -55,7 +55,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.1b1';
+	this.version = '1.1b2';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -493,11 +493,11 @@ APS.prototype.onMessage = function(data){
 				this.session.save();
 				//this.poll(); //This call is under observation
 			break;
-			case 'RESTOREND':
+			case 'RESTORED':
 				check = true;
 				//Session restored completed
 				this.state = 1;
-				if(this.trigger('restorend') !== false)
+				if(this.trigger('restored') !== false)
 					this.trigger('ready');
 			break;
 			case 'CHANNEL':
