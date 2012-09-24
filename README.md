@@ -27,8 +27,6 @@ The old scheme looked `client.pub( channel_name , message , callback)`
  
 The new scheme looks `client.pub( channel_name , message , sync , callback)` where _sync_ is a boolean which if **true** will sync the message accross the user session.
 
-The client event `RESTORED` has been changed to `RESTOREND`
-
 Users and channels objects are currently been updated from every event. Soon an `update()` method will allow the current user to updated and add its public properties on the server.
 
 ### For more information, documention and API reference check the [wiki](https://github.com/ptejada/ApePubSub/wiki)
