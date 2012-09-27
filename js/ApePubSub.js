@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-09-27 @ 01:52
+ * Built on 2012-09-27 @ 02:03
  */
 
 //Generate a random string
@@ -640,7 +640,9 @@ APS.transport = function(server, callback, client){
 		return false;
 	}
 		
-	var req = new getRequest()();
+	var req = new getRequest();
+	
+	req = new req();
 	
 	this.request = function(addr, data, callback){
 		req.onreadystatechange = function(){

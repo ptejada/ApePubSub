@@ -33,7 +33,9 @@ APS.transport = function(server, callback, client){
 		return false;
 	}
 		
-	var req = new getRequest()();
+	var req = new getRequest();
+	
+	req = new req();
 	
 	this.request = function(addr, data, callback){
 		req.onreadystatechange = function(){
