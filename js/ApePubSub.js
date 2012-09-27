@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-09-24 @ 12:08
+ * Built on 2012-09-27 @ 01:52
  */
 
 //Generate a random string
@@ -50,12 +50,12 @@ function APS( server, events, options ){
 		connectionArgs: {},
 		server: server,
 		transport: ["wb", "lp"],
-		//transport: "lp",
+		//transport: "lp",	//Should be the default transport option for APE Server v1.1.1
 		secure: false,
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.1b2';
+	this.version = '1.1b3';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -111,18 +111,20 @@ function APS( server, events, options ){
 		
 		//Handle sessions
 		if(this.option.session == true){
+			
 			var restore = this.session.restore();
 			if(typeof restore == "object"){
 				args = restore;
 				//Change initial command CONNECT by RESTORE
 				cmd = "RESTORE";
-				//Apply frequency to the server
-				server = this.session.freq.value + "." + server;
 			}else{
 				//Fresh Connect
 				if(this.trigger("connect") == false)
 					return false;
 			}
+			
+			//Apply frequency to the server
+			server = this.session.freq.value + "." + server;
 			
 			//increase frequency
 			this.session.freq.change(parseInt(this.session.freq.value) + 1);
@@ -146,40 +148,10 @@ function APS( server, events, options ){
 			this.transport = new APS.transport(server, cb, this);
 		}
 		
-		//Send seleced command arguments
+		//Send seleced command and arguments
 		this.sendCmd(cmd, args);
 		
 		return this;
-	}
-	
-	function getTransport() {
-		if('XMLHttpRequest' in window) return XMLHttpRequest;
-		if('ActiveXObject' in window) {
-			var names = [
-				"Msxml2.XMLHTTP.6.0",
-				"Msxml2.XMLHTTP.3.0",
-				"Msxml2.XMLHTTP",
-				"Microsoft.XMLHTTP"
-			];
-			for(var i in names){
-				try{ return ActiveXObject(names[i]); }
-				catch(e){}
-			}
-		}
-		return false;
-	}
-		
-	var transport = getTransport();
-		
-	this.request = function(addr, data, callback){
-		request = new transport();
-		request.onreadystatechange = function(){
-			if(this.readyState == 4) 
-				callback(this.responseText);
-		};
-		request.open('POST', addr, true);
-		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-		request.send(data);
 	}
 	
 	this.session._client = this;
@@ -290,7 +262,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		
 		//Send command
 		if(this.transport.send(data, callback, tmp) != "pushed"){
-			this.chl++;
 			this.session.saveChl();
 		}
 		
@@ -458,11 +429,10 @@ APS.prototype.onMessage = function(data){
 		}
 	}
 		
-	var cmd, args, pipe;
-	var check = true;
+	var cmd, args, pipe, check = true;
 	
 	//Clear the timeout;
-	clearTimeout(this.poller);
+	//clearTimeout(this.poller);
 	
 	for(var i in data){
 		cmd = data[i].raw;
@@ -649,10 +619,37 @@ APS.transport = function(server, callback, client){
 			var ret = APS.transport[trans[t]].apply(this, args);
 			if(ret != false) break;
 		}
+	}else if(typeof trans == "string"){
+		APS.transport[trans].apply(this, args);
 	}
 	
-	if(typeof trans == "string"){
-		APS.transport[trans].apply(this, args);
+	function getRequest() {
+		if('XMLHttpRequest' in window) return XMLHttpRequest;
+		if('ActiveXObject' in window) {
+			var names = [
+				"Msxml2.XMLHTTP.6.0",
+				"Msxml2.XMLHTTP.3.0",
+				"Msxml2.XMLHTTP",
+				"Microsoft.XMLHTTP"
+			];
+			for(var i in names){
+				try{ return ActiveXObject(names[i]); }
+				catch(e){}
+			}
+		}
+		return false;
+	}
+		
+	var req = new getRequest()();
+	
+	this.request = function(addr, data, callback){
+		req.onreadystatechange = function(){
+			if(this.readyState == 4) 
+				callback(this.responseText);
+		};
+		req.open('POST', addr, true);
+		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+		req.send(data);
 	}
 	
 	if(!!client.option.eventPush){
@@ -660,18 +657,16 @@ APS.transport = function(server, callback, client){
 		
 		var requestCallback = function(res){
 			callback.onmessage(res);
-			client.check();
 		}
 		this.send = function(str, cb, data){
 			if(data.cmd == "Event"){
-				client.request(client.option.eventPush, "cmd="+str+"&from="+client.user.pubid, requestCallback);
+				this.request(client.option.eventPush, "cmd="+str+"&from="+client.user.pubid, requestCallback);
 				return "pushed";
 			}else{
 				realSend.apply(this, [str, cb]);
 			}
 		}
-	}
-	
+	} 
 }
 
 APS.transport.wb = function(server, callback, client){
@@ -899,7 +894,8 @@ APS.prototype.session = {
 	 
 	saveChl: function(){
 		if(!this._client.option.session) return;
-
+		
+		this._client.chl++;
 		this.chl.change(this._client.chl);
 	},
 	
@@ -933,15 +929,17 @@ APS.prototype.session = {
 		
 		client.chl = this.chl.value || 0;
 		
-		if(typeof this.cookie.value == "string"){
+		//Initial frequency value
+		if(!this.freq.value) this.freq.change("0");
+		
+		if(typeof this.cookie.value == "string" && this.cookie.value.length >= 32){
 			var data = this.cookie.value.split(":");
 			this.id = data[0];
 		}else{
 			return false;
 		}
 		
-		
-		client.chl++;
+		//client.chl++;
 		//Restoring session state == 2
 		client.state = 2;
 		return {sid: data[0], pubid: data[1]};
@@ -988,7 +986,7 @@ APS.cookie = function(name,value,days){
 	if(exists && typeof value == "undefined"){
 		this.value = exists;
 	}else{
-		this.value = value;
+		this.value = value || "";
 		this.change(this.value, days);
 	}
 	return this;
