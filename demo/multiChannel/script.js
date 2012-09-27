@@ -2,6 +2,9 @@ $(document).ready(function(){
 	//Create a new APS client
 	var client = new APS("ape.crusthq.com:45138");
 	
+	//Makes the client object global for debugging
+	window.client = client;
+	
 	//Enable debug output to browser console
 	client.option.debug =true;
 	
