@@ -6,7 +6,7 @@ function APS( server, events, options ){
 		connectionArgs: {},
 		server: server,
 		transport: ["wb", "lp"],
-		//transport: "lp",
+		//transport: "lp",	//Should be the default transport option for APE Server v1.1.1
 		secure: false,
 		eventPush: false
 	}
@@ -67,18 +67,20 @@ function APS( server, events, options ){
 		
 		//Handle sessions
 		if(this.option.session == true){
+			
 			var restore = this.session.restore();
 			if(typeof restore == "object"){
 				args = restore;
 				//Change initial command CONNECT by RESTORE
 				cmd = "RESTORE";
-				//Apply frequency to the server
-				server = this.session.freq.value + "." + server;
 			}else{
 				//Fresh Connect
 				if(this.trigger("connect") == false)
 					return false;
 			}
+			
+			//Apply frequency to the server
+			server = this.session.freq.value + "." + server;
 			
 			//increase frequency
 			this.session.freq.change(parseInt(this.session.freq.value) + 1);
@@ -102,7 +104,7 @@ function APS( server, events, options ){
 			this.transport = new APS.transport(server, cb, this);
 		}
 		
-		//Send seleced command arguments
+		//Send seleced command and arguments
 		this.sendCmd(cmd, args);
 		
 		return this;

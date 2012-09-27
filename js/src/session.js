@@ -60,15 +60,17 @@ APS.prototype.session = {
 		
 		client.chl = this.chl.value || 0;
 		
-		if(typeof this.cookie.value == "string"){
+		//Initial frequency value
+		if(!this.freq.value) this.freq.change("0");
+		
+		if(typeof this.cookie.value == "string" && this.cookie.value.length >= 32){
 			var data = this.cookie.value.split(":");
 			this.id = data[0];
 		}else{
 			return false;
 		}
 		
-		
-		client.chl++;
+		//client.chl++;
 		//Restoring session state == 2
 		client.state = 2;
 		return {sid: data[0], pubid: data[1]};
@@ -115,7 +117,7 @@ APS.cookie = function(name,value,days){
 	if(exists && typeof value == "undefined"){
 		this.value = exists;
 	}else{
-		this.value = value;
+		this.value = value || "";
 		this.change(this.value, days);
 	}
 	return this;
