@@ -26,7 +26,8 @@ APS.prototype.session = {
 	 
 	saveChl: function(){
 		if(!this._client.option.session) return;
-
+		
+		this._client.chl++;
 		this.chl.change(this._client.chl);
 	},
 	
