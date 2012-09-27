@@ -5,6 +5,7 @@ $(document).ready(function(){
 	window.client = client;
 	
 	client.option.debug = true;
+	
 	/*
 	 * Enables pushing events to a script which then should relay the message to the APE server
 	 * This is great if you would like to parse the messages or store then in a database
@@ -62,7 +63,6 @@ $(document).ready(function(){
 		 * 		+channel = multipipe object where the message came through
 		 */
 		message: function(message, from, channel){
-			console.log(from);
 			//Use "Me" as the name if the message is from the current user
 			var name = this._client.user.pubid == from.pubid ? "Me" : from.name
 			

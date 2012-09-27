@@ -12,10 +12,37 @@ APS.transport = function(server, callback, client){
 			var ret = APS.transport[trans[t]].apply(this, args);
 			if(ret != false) break;
 		}
+	}else if(typeof trans == "string"){
+		APS.transport[trans].apply(this, args);
 	}
 	
-	if(typeof trans == "string"){
-		APS.transport[trans].apply(this, args);
+	function getRequest() {
+		if('XMLHttpRequest' in window) return XMLHttpRequest;
+		if('ActiveXObject' in window) {
+			var names = [
+				"Msxml2.XMLHTTP.6.0",
+				"Msxml2.XMLHTTP.3.0",
+				"Msxml2.XMLHTTP",
+				"Microsoft.XMLHTTP"
+			];
+			for(var i in names){
+				try{ return ActiveXObject(names[i]); }
+				catch(e){}
+			}
+		}
+		return false;
+	}
+		
+	var req = new getRequest()();
+	
+	this.request = function(addr, data, callback){
+		req.onreadystatechange = function(){
+			if(this.readyState == 4) 
+				callback(this.responseText);
+		};
+		req.open('POST', addr, true);
+		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+		req.send(data);
 	}
 	
 	if(!!client.option.eventPush){
@@ -23,18 +50,16 @@ APS.transport = function(server, callback, client){
 		
 		var requestCallback = function(res){
 			callback.onmessage(res);
-			client.check();
 		}
 		this.send = function(str, cb, data){
 			if(data.cmd == "Event"){
-				client.request(client.option.eventPush, "cmd="+str+"&from="+client.user.pubid, requestCallback);
+				this.request(client.option.eventPush, "cmd="+str+"&from="+client.user.pubid, requestCallback);
 				return "pushed";
 			}else{
 				realSend.apply(this, [str, cb]);
 			}
 		}
-	}
-	
+	} 
 }
 
 APS.transport.wb = function(server, callback, client){

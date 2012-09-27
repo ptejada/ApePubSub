@@ -11,7 +11,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.1b2';
+	this.version = '1.1b3';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -108,36 +108,6 @@ function APS( server, events, options ){
 		this.sendCmd(cmd, args);
 		
 		return this;
-	}
-	
-	function getTransport() {
-		if('XMLHttpRequest' in window) return XMLHttpRequest;
-		if('ActiveXObject' in window) {
-			var names = [
-				"Msxml2.XMLHTTP.6.0",
-				"Msxml2.XMLHTTP.3.0",
-				"Msxml2.XMLHTTP",
-				"Microsoft.XMLHTTP"
-			];
-			for(var i in names){
-				try{ return ActiveXObject(names[i]); }
-				catch(e){}
-			}
-		}
-		return false;
-	}
-		
-	var transport = getTransport();
-		
-	this.request = function(addr, data, callback){
-		request = new transport();
-		request.onreadystatechange = function(){
-			if(this.readyState == 4) 
-				callback(this.responseText);
-		};
-		request.open('POST', addr, true);
-		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-		request.send(data);
 	}
 	
 	this.session._client = this;
@@ -248,7 +218,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		
 		//Send command
 		if(this.transport.send(data, callback, tmp) != "pushed"){
-			this.chl++;
 			this.session.saveChl();
 		}
 		

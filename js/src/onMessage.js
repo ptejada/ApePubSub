@@ -12,11 +12,10 @@ APS.prototype.onMessage = function(data){
 		}
 	}
 		
-	var cmd, args, pipe;
-	var check = true;
+	var cmd, args, pipe, check = true;
 	
 	//Clear the timeout;
-	clearTimeout(this.poller);
+	//clearTimeout(this.poller);
 	
 	for(var i in data){
 		cmd = data[i].raw;
