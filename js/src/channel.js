@@ -6,15 +6,9 @@ APS.channel = function(pipe, client) {
 	}
 	
 	this._events = {};
-	//this.properties = pipe.properties;
-	//this.name = pipe.properties.name;
 	this.pubid = pipe.pubid;
 	this._client = client;
-	this.users = {};
 	
-	this.addUser = function(u){
-		this.users[u.pubid] = u;
-	}
 	
 	this.update = function(o){
 		for(var i in o){
@@ -32,11 +26,17 @@ APS.channel = function(pipe, client) {
 		delete client.channels[this.name];
 	}
 	
-	this.send = APS.prototype.send.bind(client, this.pubid);
+	if(this.name.indexOf("*") !== 0){
+		//Methods and prop for interactive channels
+		this.users = {};
+		this.addUser = function(u){
+			this.users[u.pubid] = u;
+		}
+		this.send = APS.prototype.send.bind(client, this.pubid);
+		this.pub = client.pub.bind(client, this.name);
+	}
 	
 	this.on = client.on.bind(this);
-	this.pub = client.pub.bind(client, this.name);
 	this.trigger = client.trigger.bind(this);
 	this.log = client.log.bind(client, "[channel]", "["+this.name+"]");
-	//this.log = client.log.bind(client);
 }

@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-09-27 @ 02:03
+ * Built on 2012-10-09 @ 04:03
  */
 
 //Generate a random string
@@ -55,7 +55,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.1b3';
+	this.version = '1.1b4';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -477,24 +477,26 @@ APS.prototype.onMessage = function(data){
 				this.channels[pipe.name] = pipe;
 				
 				var u = args.users;
-				var user;
 				
-				//import users from channel to client
-				for(var i = 0; i < u.length; i++){
-					user = this.pipes[u[i].pubid]
-					if(!user){
-						this.pipes[u[i].pubid] = new APS.user(u[i], this);
-						user = this.pipes[u[i].pubid];
+				if(!!u){
+					var user;
+					//import users from channel to client if any
+					for(var i = 0; i < u.length; i++){
+						user = this.pipes[u[i].pubid]
+						if(!user){
+							this.pipes[u[i].pubid] = new APS.user(u[i], this);
+							user = this.pipes[u[i].pubid];
+						}
+						
+						user.channels[pipe.name] = pipe;
+						pipe.users[user.pubid] = user;
+						
+						//Add user's own pipe to channels list
+						user.channels[user.pubid] = user;
+	
+						//No Need to trigger this event
+						//this.trigger('join', [user, pipe]);
 					}
-					
-					user.channels[pipe.name] = pipe;
-					pipe.users[user.pubid] = user;
-					
-					//Add user's own pipe to channels list
-					user.channels[user.pubid] = user;
-
-					//No Need to trigger this event
-					//this.trigger('join', [user, pipe]);
 				}
 				
 				//Add events from queue
@@ -524,6 +526,11 @@ APS.prototype.onMessage = function(data){
 			case "EVENT":
 				var user = this.pipes[args.from.pubid];
 				
+				if(!!user){
+					//Create user it doesn't exists
+					user = client.pipe[args.from.pubid] = new APS.user(args.from)
+				}
+				
 				pipe = this.pipes[args.pipe.pubid];
 				
 				if(pipe instanceof APS.user){
@@ -534,8 +541,8 @@ APS.prototype.onMessage = function(data){
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
 				//Update properties
-				pipe.update(args.pipe.properties);
-				user.update(args.from.properties);
+				//pipe.update(args.pipe.properties);
+				//user.update(args.from.properties);
 			break;
 			case 'JOIN':
 				var user = this.pipes[args.user.pubid];
@@ -832,15 +839,9 @@ APS.channel = function(pipe, client) {
 	}
 	
 	this._events = {};
-	//this.properties = pipe.properties;
-	//this.name = pipe.properties.name;
 	this.pubid = pipe.pubid;
 	this._client = client;
-	this.users = {};
 	
-	this.addUser = function(u){
-		this.users[u.pubid] = u;
-	}
 	
 	this.update = function(o){
 		for(var i in o){
@@ -858,10 +859,17 @@ APS.channel = function(pipe, client) {
 		delete client.channels[this.name];
 	}
 	
-	this.send = APS.prototype.send.bind(client, this.pubid);
+	if(this.name.indexOf("*") !== 0){
+		//Methods and prop for interactive channels
+		this.users = {};
+		this.addUser = function(u){
+			this.users[u.pubid] = u;
+		}
+		this.send = APS.prototype.send.bind(client, this.pubid);
+		this.pub = client.pub.bind(client, this.name);
+	}
 	
 	this.on = client.on.bind(this);
-	this.pub = client.pub.bind(client, this.name);
 	this.trigger = client.trigger.bind(this);
 	this.log = client.log.bind(client, "[channel]", "["+this.name+"]");
 	//this.log = client.log.bind(client);

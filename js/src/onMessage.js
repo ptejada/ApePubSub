@@ -60,24 +60,26 @@ APS.prototype.onMessage = function(data){
 				this.channels[pipe.name] = pipe;
 				
 				var u = args.users;
-				var user;
 				
-				//import users from channel to client
-				for(var i = 0; i < u.length; i++){
-					user = this.pipes[u[i].pubid]
-					if(!user){
-						this.pipes[u[i].pubid] = new APS.user(u[i], this);
-						user = this.pipes[u[i].pubid];
+				if(!!u){
+					var user;
+					//import users from channel to client if any
+					for(var i = 0; i < u.length; i++){
+						user = this.pipes[u[i].pubid]
+						if(!user){
+							this.pipes[u[i].pubid] = new APS.user(u[i], this);
+							user = this.pipes[u[i].pubid];
+						}
+						
+						user.channels[pipe.name] = pipe;
+						pipe.users[user.pubid] = user;
+						
+						//Add user's own pipe to channels list
+						user.channels[user.pubid] = user;
+	
+						//No Need to trigger this event
+						//this.trigger('join', [user, pipe]);
 					}
-					
-					user.channels[pipe.name] = pipe;
-					pipe.users[user.pubid] = user;
-					
-					//Add user's own pipe to channels list
-					user.channels[user.pubid] = user;
-
-					//No Need to trigger this event
-					//this.trigger('join', [user, pipe]);
 				}
 				
 				//Add events from queue
@@ -107,6 +109,11 @@ APS.prototype.onMessage = function(data){
 			case "EVENT":
 				var user = this.pipes[args.from.pubid];
 				
+				if(!!user){
+					//Create user it doesn't exists
+					user = client.pipe[args.from.pubid] = new APS.user(args.from)
+				}
+				
 				pipe = this.pipes[args.pipe.pubid];
 				
 				if(pipe instanceof APS.user){
@@ -117,8 +124,8 @@ APS.prototype.onMessage = function(data){
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
 				//Update properties
-				pipe.update(args.pipe.properties);
-				user.update(args.from.properties);
+				//pipe.update(args.pipe.properties);
+				//user.update(args.from.properties);
 			break;
 			case 'JOIN':
 				var user = this.pipes[args.user.pubid];
