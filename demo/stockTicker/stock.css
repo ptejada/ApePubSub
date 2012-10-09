@@ -1,0 +1,61 @@
+#tray {
+	width: 800px;
+	border: outset 2px #cdcdcd;
+	font-size: 1.4em;
+	margin: 0 auto;
+}
+#add-stock {
+	font-size: 1.4em;
+	display: block;
+}
+
+#stock-list {
+	padding: 1em;
+}
+
+.stock {
+	padding: 0.5em;
+}
+.stock-lv1 {
+	border: 2px #ccc solid;
+	display: inline-block;	
+	vertical-align: top;
+}
+.stock-lv2 {
+	display: block;
+	text-align: center;
+	background: #bababa;
+}
+.stock-visual {
+	border: 2px #ccc solid;
+	vertical-align: top;
+	display: inline-block;
+}
+.stock-name {
+	display: block;
+	padding: 0.3em 0;
+	font-weight: bolder;
+}
+.stock-value {
+	padding: 0.1em;
+	font-size: 1.5em;
+	font-weight: bolder;
+	color: #0a0;
+	display: block;
+}
+.stock-direction {
+
+}
+.stock-direction-up {
+	color: #0a0;
+}
+.stock-direction-down {
+	color: #a00;
+}
+.stock-change {
+	color: #eee;
+}
+
+.red {
+	color: #a00;
+}

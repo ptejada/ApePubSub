@@ -1,0 +1,3 @@
+1. Update the APE configuration in the index.htm file to your server's info
+	NOTE: The configurations as they are will work with my server via JSONP
+2. Install the server module in the server folder

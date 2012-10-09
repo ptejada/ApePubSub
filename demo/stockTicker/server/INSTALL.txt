@@ -1,0 +1,3 @@
+1. Copy stockTicker.js to the scripts folder in your server
+2. In the scripts folder in your server update te file main.ape.js to include 'stockTicker.js'
+3. Restart your server
