@@ -17,8 +17,8 @@ Ape.registerCmd("eventpush", false, function(params, info) {
 		if(!!params.sync){
 			var sync = params.data;
 			sync.chanid = params.to;
-			//user.pipe.sendRaw("SYNC", sync);
-			return {"name": "SYNC", "data": sync};
+			user.pipe.sendRaw("SYNC", sync);
+			//return {"name": "SYNC", "data": sync};
 		}
 		
 		return {"name":"PUSHED","data":{"value":"ok"}};
