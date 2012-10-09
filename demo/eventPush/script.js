@@ -10,7 +10,7 @@ $(document).ready(function(){
 	 * Enables pushing events to a script which then should relay the message to the APE server
 	 * This is great if you would like to parse the messages or store then in a database
 	 */
-	client.option.eventPush = "../../php/test.php";
+	client.option.eventPush = "push.php";
 	
 	client.on("dead", function(){
 		//alert("Make sure the client.option.eventPush option is pointing to the correct file. \n\nIts current value is " + client.option.eventPush +"\n\nYou may update this value in the script.js file around line 11.");

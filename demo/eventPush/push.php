@@ -1,5 +1,5 @@
 <?php
-	include("APS.php");
+	include("../../php/lib/APS.php");
 	
 	/*
 	 * The JS APS client framework sends an ajax request with two request parameters 'cmd' and 'from'
