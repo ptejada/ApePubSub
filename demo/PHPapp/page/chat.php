@@ -2,10 +2,6 @@
 	//If user is not signed in refirect
 	if(!$user->signed) redirect("./?page=login");	
 ?>
-<div class="report">
-	<?php echo showMsg()?>
-</div>
-
 	<div id="chat">
 		<h1>ApePubSub Chatter</h1>
 		<div id="chat-messages"></div><div id="chat-userlist"></div>

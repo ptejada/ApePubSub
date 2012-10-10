@@ -30,6 +30,8 @@
 		}
 	}
 	
-	redirect();
+	if(!isset($_GET['noredirect'])){
+		redirect();
+	}
 	
 ?>

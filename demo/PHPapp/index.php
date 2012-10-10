@@ -23,6 +23,7 @@
 	<link rel=stylesheet type=text/css href="style/chat.css" />
 	<link rel=stylesheet type=text/css href="style/style.css" />
 	<title><?php echo $page_title?> | uFlex</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body>
 	<div id="wrapper">

@@ -3,7 +3,8 @@
  */
 var client = new APS("ape.crusthq.com:45138", false, {
 	debug: true,
-	session: true
+	session: true,
+	eventPush: "ps/push.php"
 });
 
 client.identifier = "fullChat";
@@ -15,18 +16,24 @@ var channelName = "APS_chatter";
  */
 client.on({
 	connect: function(){
-		if(!!!client.user.name){
-			//Prompt for username if trting to connect without one
-			askForUsername();
+		if(!!this.user.name) return;
+		$.getJSON("ps/connect.php", function(data){
+			//client.session.id = data.sessid;
+			client.session.cookie.change(data.sessid);
+			client.user = data.user;
+			client.sub(channelName);
+		})
 			
-			//Pause connect to gather user information
-			return false;
-		}
+		//Pause connect to gather user information
+		return false;
 	},
-	
+	login: function(id){
+		console.log(id)
+		$.post("ps/update.php?noredirect=1", {ape_session: id});
+	},
 	dead: function(){
 		//Refresh page
-		window.location.reload();
+		//window.location.reload();
 	}
 });
 
@@ -101,29 +108,6 @@ client.onChannel(channelName, {
 })
 
 //============= Global Functions for document content manipulation ===============//
-
-/*
- * Displays a form in the container asking for the user's name 
- */
-function askForUsername(){
-	var form = $("#chat-messages .ask");
-	if(!form.length){
-		$("<form>").addClass("ask")
-			.append("<strong>Enter a username to join the chat </strong>")
-			.append("<input type='text' name='name' value='User_"+randomString(5)+"'>")
-			.append("<input type='submit' value='Join Chat'>")
-			.on("submit", function(e){
-				e.preventDefault();
-				client.user.name = $(this).find("[name]").val();
-				client.user.avatar = randomString(32).toLowerCase();
-				client.sub(channelName);
-			})
-			.prependTo("#chat-messages");
-	}else{
-		form.find("> strong").text("Please enter a different name: ")
-			.css({color: "red"});
-	}
-}
 
 /*
  * Logs a message in the container and adds the user to the userlist
