@@ -11,7 +11,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.1b4';
+	this.version = '1.1b5';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -283,6 +283,7 @@ APS.prototype.sub = function(channel, Events, callback){
 		//Logic to only send the JOIN request to only non-existing channels in the client object
 		if(typeof channel == "string"){
 			//Single Channel
+			//console.log(channel, typeof this.channels[channel])
 			if(typeof this.channels[channel] != "object"){
 				this.sendCmd('JOIN', {'channels': channel});
 			}

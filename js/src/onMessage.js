@@ -30,7 +30,7 @@ APS.prototype.onMessage = function(data){
 				
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
-				//this.poll();
+				this.trigger("login", [args.sessid]);
 			break;
 			case 'IDENT':
 				check = false;

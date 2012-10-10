@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-10-10 @ 02:40
+ * Built on 2012-10-10 @ 05:34
  */
 
 //Generate a random string
@@ -55,7 +55,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.1b4';
+	this.version = '1.1b5';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -327,6 +327,7 @@ APS.prototype.sub = function(channel, Events, callback){
 		//Logic to only send the JOIN request to only non-existing channels in the client object
 		if(typeof channel == "string"){
 			//Single Channel
+			//console.log(channel, typeof this.channels[channel])
 			if(typeof this.channels[channel] != "object"){
 				this.sendCmd('JOIN', {'channels': channel});
 			}
@@ -447,7 +448,7 @@ APS.prototype.onMessage = function(data){
 				
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
-				//this.poll();
+				this.trigger("login", [args.sessid]);
 			break;
 			case 'IDENT':
 				check = false;
