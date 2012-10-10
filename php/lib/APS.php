@@ -39,12 +39,14 @@
 							"event" => $this->data->params->event, 
 							"data" => $this->data->params->data,
 							),
-						"sync" 		=> $this->data->params->sync,
 						"to"		=> $this->data->params->pipe,
 						"from"		=> $this->from,
 						"sessid"	=> $this->data->sessid
 				)
 			);
+			
+			if(property_exists($this->data->params, "sync"))
+				$inline['params']['sync'] = $this->data->params->sync;
 			
 			if(empty($this->secured)){
 				$protocol = "http://";
