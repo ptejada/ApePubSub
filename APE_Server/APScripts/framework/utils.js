@@ -43,6 +43,10 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
 	return this.pipe.toObject().properties;
 }
 
+Ape.getUserByName = function(name){
+	return userlist[name]
+}
+
 /*
  * Official bind polyfill at developer.mozilla.org
  */ 
