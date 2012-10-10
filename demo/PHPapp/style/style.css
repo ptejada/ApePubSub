@@ -1,4 +1,4 @@
-input {
+.uf input {
 	display:block;
 }
 a {
@@ -7,21 +7,21 @@ a {
 body {
 	margin: 0;
 }
-form, form input {
+form.uf, form.uf input {
 	font-size: 1.1em;
 }
-form label, form input {
+form.uf label, form.uf input {
 	background: #eee;
 	border: solid 1px #ccc;
 }
-form label {
+form.uf label {
 	padding: 0.2em;
 	padding-bottom: 0;
 	border-top-left-radius: 0.3em; 
 	border-top-right-radius: 0.3em;
 	
 }
-form input {
+form.uf input {
 	padding: 0.2em 0.5em;
 	border-radius: 0.3em;
 	border-top-left-radius: 0;

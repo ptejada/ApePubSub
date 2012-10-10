@@ -20,6 +20,7 @@
 ?>
 <html>
 <head>
+	<link rel=stylesheet type=text/css href="style/chat.css" />
 	<link rel=stylesheet type=text/css href="style/style.css" />
 	<title><?php echo $page_title?> | uFlex</title>
 </head>

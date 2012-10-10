@@ -4,7 +4,7 @@
 		<?php echo showMsg()?>
 	</div>
 
-	<form method="post" action="ps/change_password.php">
+	<form class="uf" method="post" action="ps/change_password.php">
 		<label>New Password:</label><span class="required">*</span>
 		<input name="password" type="password">		
 		

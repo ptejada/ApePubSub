@@ -13,12 +13,11 @@
 		if($data){
 			?>
 			<h3><?php echo $data['username']?>'s Profile</h3>
-			<img src="http://www.gravatar.com/avatar/<?php echo md5($data['email'])?>?d=monsterid">
+			<img src="http://www.gravatar.com/avatar/<?php echo md5($data['username'])?>?d=monsterid">
 			<table border=0>
 				<tr><td></td><td></td></tr>
 				<?php
 					foreach($data as $field=>$val){
-						if($field == "email") continue;
 						echo "<tr><td>{$field}</td><td>  =>  </td><td> {$val}</td></tr>";
 					}
 				?>
@@ -47,7 +46,7 @@
 			foreach($data as $u){
 				?>
 				<a href="?page=user&id=<?php echo $u['user_id']?>">
-					<img src="http://www.gravatar.com/avatar/<?php echo md5($u['email'])?>?d=monsterid">
+					<img src="http://www.gravatar.com/avatar/<?php echo md5($u['username'])?>?d=monsterid">
 					<br>
 					<?php echo $u['username']?>
 				</a>

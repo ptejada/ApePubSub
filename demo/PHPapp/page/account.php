@@ -13,10 +13,10 @@
 	<a class="md_bnt" href="?page=change-password">Change Password</a>
 	<a class="md_bnt" href="ps/logout.php">Logout</a>
 	<hr>
-	<img src="http://www.gravatar.com/avatar/<?php echo md5($user->data['email'])?>?d=monsterid">
+	<img src="http://www.gravatar.com/avatar/<?php echo md5($user->username)?>?d=monsterid">
 	<br>
 	<br>
-	<form>
+	<form class="uf">
 		
 		<?php
 			foreach($user->data as $field=>$val){

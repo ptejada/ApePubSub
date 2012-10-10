@@ -7,7 +7,7 @@
 		<?php echo showMsg()?>
 	</div>
 	
-	<form method="post" action="ps/login.php">
+	<form class="uf" method="post" action="ps/login.php">
 		<label>Username or Email:</label>
 		<input name="username" type="text" value="">
 		

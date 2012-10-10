@@ -6,9 +6,9 @@
 	
 	//Add database credentials and information 
 	$user->db['host'] = "localhost";
-	$user->db['user'] = "ptejada";
-	$user->db['pass'] = "mspress#1";
-	$user->db['name'] = "uflex_demo"; //Database name
+	$user->db['user'] = "root";
+	$user->db['pass'] = "";
+	$user->db['name'] = "chatapp"; //Database name
 	
 	/*
 	 * Instead of editing the class.uFlex.php file directly you may make
