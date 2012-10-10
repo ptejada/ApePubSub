@@ -109,7 +109,7 @@ APS.prototype.onMessage = function(data){
 			case "EVENT":
 				var user = this.pipes[args.from.pubid];
 				
-				if(!!user){
+				if(typeof user == "undefined" && !!args.from){
 					//Create user it doesn't exists
 					user = client.pipe[args.from.pubid] = new APS.user(args.from)
 				}

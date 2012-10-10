@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-10-09 @ 04:03
+ * Built on 2012-10-10 @ 02:40
  */
 
 //Generate a random string
@@ -526,7 +526,7 @@ APS.prototype.onMessage = function(data){
 			case "EVENT":
 				var user = this.pipes[args.from.pubid];
 				
-				if(!!user){
+				if(typeof user == "undefined" && !!args.from){
 					//Create user it doesn't exists
 					user = client.pipe[args.from.pubid] = new APS.user(args.from)
 				}
@@ -872,7 +872,6 @@ APS.channel = function(pipe, client) {
 	this.on = client.on.bind(this);
 	this.trigger = client.trigger.bind(this);
 	this.log = client.log.bind(client, "[channel]", "["+this.name+"]");
-	//this.log = client.log.bind(client);
 }
 
 
