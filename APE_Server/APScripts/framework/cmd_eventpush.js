@@ -4,7 +4,7 @@ Ape.registerCmd("eventpush", false, function(params, info) {
 		
 		var to = Ape.getPipe(params.to);
 		
-		if (!!to.pipe) return ["425", "UNKNOWN_RECIPIENT"];
+		if(!!!to) return ["425", "UNKNOWN_RECIPIENT"];
 		
 		//User Source From
 		var user = Ape.getUserByPubid(params.from);
