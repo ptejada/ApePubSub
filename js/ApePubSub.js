@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-10-15 @ 04:16
+ * Built on 2012-10-15 @ 04:19
  */
 
 //Generate a random string
@@ -55,7 +55,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.1b6';
+	this.version = '1.2';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
