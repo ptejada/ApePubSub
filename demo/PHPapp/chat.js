@@ -23,17 +23,18 @@ client.on({
 			client.user = data.user;
 			client.sub(channelName);
 		})
-			
+		
 		//Pause connect to gather user information
 		return false;
 	},
 	login: function(id){
-		console.log(id)
 		$.post("ps/update.php?noredirect=1", {ape_session: id});
 	},
 	dead: function(){
 		//Refresh page
-		//window.location.reload();
+		setTimeout(client.reconnect.bind(client), 5000);
+		addBotMessage("Connection is lost");
+		addBotMessage("Attempting to re-connect...");
 	}
 });
 
@@ -62,7 +63,7 @@ client.onChannel(channelName, {
 		
 		//Update curent user's name and icon
 		$("#chat-user-name").text(user.name);
-		$("#chat-user-icon").attr("src","http://www.gravatar.com/avatar/"+user.avatar+"?s=25&d=identicon");
+		$("#chat-user-icon").attr("src","http://www.gravatar.com/avatar/"+user.avatar+"?s=25&d=monsterid");
 		
 		//Populate existing users in the userlist tray
 		for( var u in channel.users){
@@ -114,7 +115,7 @@ client.onChannel(channelName, {
  */
 function addUser(user, log){
 	var icon = $("<img>").addClass("icon")
-		.prop("src", "http://www.gravatar.com/avatar/"+user.avatar+"?s=25&d=identicon");
+		.prop("src", "http://www.gravatar.com/avatar/"+user.avatar+"?s=25&d=monsterid");
 	var name = $("<span>").text(user.name);
 	
 	$("<div>").attr("id", "u_"+user.name)
@@ -150,7 +151,7 @@ function addBotMessage(str){
  */
 function addMessage(message, from){
 	var icon = $("<img>").addClass("icon")
-		.prop("src", "http://www.gravatar.com/avatar/"+from.avatar+"?s=40&d=identicon");
+		.prop("src", "http://www.gravatar.com/avatar/"+from.avatar+"?s=40&d=monsterid");
 	var body = $("<p>").addClass("msg").html("<b>"+from.name+":</b> <br> "+message);
 	
 	$("<div>").append(icon, body)
@@ -197,7 +198,7 @@ $(document).ready(function(){
 	$("#chat-logout").on("click", function(e){
 		e.preventDefault();
 		client.unSub(channelName);
-		client.quit();
+		window.location.href = "?";
 	})
 	
 	/*
