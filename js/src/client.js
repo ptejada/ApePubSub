@@ -48,6 +48,15 @@ function APS( server, events, options ){
 		}
 	}
 	
+	this.session._client = this;
+	return this;
+}
+
+
+APS.prototype.connect = function(args){
+	var server = this.option.server;
+	var fserver = this.option.server;
+	
 	function TransportError(e){
 		this.trigger("dead", [e]);
 		this.transport.close();
@@ -57,62 +66,58 @@ function APS( server, events, options ){
 		'onmessage': this.onMessage.bind(this),
 		'onerror': TransportError.bind(this)
 	}
-
-	this.connect = function(args){
-		if(this.state == 1) 
-			return this.log("Already Connected!");
+	
+	if(this.state == 1) 
+		return this.log("Already Connected!");
+	
+	var cmd = "CONNECT";
+	args = this.option.connectionArgs = args || this.option.connectionArgs;
+	
+	//Handle sessions
+	if(this.option.session == true){
 		
-		var cmd = "CONNECT";
-		args = this.option.connectionArgs = args || this.option.connectionArgs;
-		
-		//Handle sessions
-		if(this.option.session == true){
-			
-			var restore = this.session.restore();
-			if(typeof restore == "object"){
-				args = restore;
-				//Change initial command CONNECT by RESTORE
-				cmd = "RESTORE";
-			}else{
-				//Fresh Connect
-				if(this.trigger("connect") == false)
-					return false;
-			}
-			
-			//Apply frequency to the server
-			server = this.session.freq.value + "." + server;
-			
-			//increase frequency
-			this.session.freq.change(parseInt(this.session.freq.value) + 1);
-			
+		var restore = this.session.restore();
+		if(typeof restore == "object"){
+			args = restore;
+			//Change initial command CONNECT by RESTORE
+			cmd = "RESTORE";
 		}else{
 			//Fresh Connect
 			if(this.trigger("connect") == false)
 				return false;
 		}
 		
+		//Apply frequency to the server
+		var fserver = this.session.freq.value + "." + server;
 		
-		//Handle transport
-		if(!!this.transport){
-			if(this.transport.state == 0){
-				this.transport = new APS.transport(server, cb, this);
-			}else{
-				//Use current active transport
-				
-			}
-		}else{
-			this.transport = new APS.transport(server, cb, this);
-		}
+		//increase frequency
+		this.session.freq.change(parseInt(this.session.freq.value) + 1);
 		
-		//Send seleced command and arguments
-		this.sendCmd(cmd, args);
-		
-		return this;
+	}else{
+		//Fresh Connect
+		if(this.trigger("connect") == false)
+			return false;
 	}
 	
-	this.session._client = this;
+	
+	//Handle transport
+	if(!!this.transport){
+		if(this.transport.state == 0){
+			this.transport = new APS.transport(fserver, cb, this);
+		}else{
+			//Use current active transport
+			
+		}
+	}else{
+		this.transport = new APS.transport(fserver, cb, this);
+	}
+	
+	//Send seleced command and arguments
+	this.sendCmd(cmd, args);
+	
 	return this;
 }
+
 
 APS.prototype.reconnect = function(){
 	if(this.state > 0) return this.log("Client already connected!");
