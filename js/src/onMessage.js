@@ -116,7 +116,7 @@ APS.prototype.onMessage = function(data){
 				
 				pipe = this.pipes[args.pipe.pubid];
 				
-				if(pipe instanceof APS.user){
+				if(pipe.pubid == user.pubid){
 					pipe = this.user;
 				}
 				
