@@ -12,38 +12,18 @@
 		$db_pass = $_POST['db_pass'];
 		$db_name = $_POST['db_name'];
 		
-		$db_link = mysql_connect($db_host, $db_user, $db_pass);
+		$db = $con = new mysqli($db_host,$db_user,$db_pass, $db_name);
 		
-		if(!$db_link){
+		if($db->connect_errno){
+			print_r($db->connect_error);
 			$R['connection'] = "Could not connect to <b>{$db_host}</b> with username <b>{$db_user}</b> and password <b>{$db_pass}</b>";
 		}else{
-			$connection = mysql_select_db($db_name, $db_link);
+			//Import database
+			$sql = file_get_contents("uFlex_database.sql");
 			
-			if(!$connection){
-				$R['database'] = "Could not access the database <b>{$db_name}</b>";
-				
-				//Create Database
-				$created = mysql_query("CREATE DATABASE {$db_name}");
-				
-				if($created){
-					
-					$S[] = "Database Created OK!";
-					
-					//Retry to connect to database
-					$connection = mysql_select_db($db_name, $db_link);
-					
-					if($connection) unset($R['database']);
-				}
-			}
+			$import = $db->query($sql);
 			
-			if($connection){
-				//Import database
-				$sql = file_get_contents("uFlex_database.sql");
-				
-				$import = mysql_query($sql);
-				
-				if($import) $S[] = "Database Populated OK!";
-			}
+			if($import) $S[] = "Database Populated OK!";
 			
 			//Create Configuration file
 			if($import){				
