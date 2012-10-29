@@ -1,7 +1,10 @@
 /*
  * Initialize and configure the client object
  */
-var client = new APS("ape.crusthq.com:45138", false, {
+var inst = new APS.cookie("PHPSESSID").value;
+inst = inst.substring(11,15) + ".";
+
+var client = new APS(inst + "ape.crusthq.com:45138", false, {
 	debug: true,
 	session: true,
 	eventPush: "ps/push.php"
