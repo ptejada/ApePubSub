@@ -1,8 +1,10 @@
-//Generate a random string
+/*
+ * Generates a random string
+ *  - First paramater(integer) determines the length
+ */
 function randomString(l){
-	//var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-	var chars = "0123456789ABCDEFabcdef";
-	var string_length = l;
+	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+	var string_length = l || 32;
 	var randomstring = '';
 	for (var i=0; i<string_length; i++) {
 		var rnum = Math.floor(Math.random() * chars.length);
@@ -11,7 +13,9 @@ function randomString(l){
 	return randomstring;
 }
 
-// Official bind polyfill at developer.mozilla.org
+/*
+ * Official bind polyfill at developer.mozilla.org
+ */
 if(!Function.prototype.bind){
 	Function.prototype.bind = function(oThis){
 	if(typeof this !== "function"){

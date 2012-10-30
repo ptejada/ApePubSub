@@ -1,3 +1,6 @@
+/*
+ * User object constructor
+ */
 APS.user = function(pipe, client){
 	for(var i in pipe.properties){
 		this[i] = pipe.properties[i]
@@ -16,7 +19,9 @@ APS.user = function(pipe, client){
 	}
 }
 
-//Object for current user
+/*
+ * Current user object constructor
+ */
 APS.cUser = function(pipe, client){
 	for(var i in pipe.properties){
 		this[i] = pipe.properties[i]

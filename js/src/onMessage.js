@@ -14,9 +14,6 @@ APS.prototype.onMessage = function(data){
 		
 	var cmd, args, pipe, check = true;
 	
-	//Clear the timeout;
-	//clearTimeout(this.poller);
-	
 	for(var i in data){
 		cmd = data[i].raw;
 		args = data[i].data;
@@ -31,6 +28,7 @@ APS.prototype.onMessage = function(data){
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
 				this.trigger("login", [args.sessid]);
+				
 			break;
 			case 'IDENT':
 				check = false;
@@ -44,7 +42,7 @@ APS.prototype.onMessage = function(data){
 					this.trigger('ready');
 				
 				this.session.save();
-				//this.poll(); //This call is under observation
+				
 			break;
 			case 'RESTORED':
 				check = true;
@@ -52,9 +50,9 @@ APS.prototype.onMessage = function(data){
 				this.state = 1;
 				if(this.trigger('restored') !== false)
 					this.trigger('ready');
+				
 			break;
 			case 'CHANNEL':
-				//this.log(pipe, args);
 				pipe = new APS.channel(args.pipe, this);
 				this.pipes[pipe.pubid] = pipe;
 				this.channels[pipe.name] = pipe;
@@ -76,9 +74,6 @@ APS.prototype.onMessage = function(data){
 						
 						//Add user's own pipe to channels list
 						user.channels[user.pubid] = user;
-	
-						//No Need to trigger this event
-						//this.trigger('join', [user, pipe]);
 					}
 				}
 				
@@ -100,11 +95,13 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case "SYNC":
+				//Event that synchronizes events accross multiple client instances
 				var user = this.user;
 				
 				pipe = pipe = this.pipes[args.chanid];
 				
 				pipe.trigger(args.event, [args.data, user, pipe]);
+				
 			break;
 			case "EVENT":
 				var user = this.pipes[args.from.pubid];
@@ -123,9 +120,6 @@ APS.prototype.onMessage = function(data){
 				//Trigger event on target
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
-				//Update properties
-				//pipe.update(args.pipe.properties);
-				//user.update(args.from.properties);
 			break;
 			case 'JOIN':
 				var user = this.pipes[args.user.pubid];
@@ -146,6 +140,7 @@ APS.prototype.onMessage = function(data){
 				pipe.update(args.pipe.properties);
 				
 				pipe.trigger('join', [user, pipe]);
+				
 			break;
 			case 'LEFT':
 				pipe = this.pipes[args.pipe.pubid];
@@ -157,6 +152,7 @@ APS.prototype.onMessage = function(data){
 				pipe.update(args.pipe.properties);
 				
 				pipe.trigger('left', [user, pipe]);
+				
 			break;
 			case 'ERR' :
 				check = false;
@@ -181,11 +177,11 @@ APS.prototype.onMessage = function(data){
 				}
 				this.trigger("error",args);
 				this.trigger("error"+args.code,args);
+				
 			break;
 			default:
 				//trigger custom commands
 				this.trigger(cmd, args);
-				//this.check();
 		}
 	}
 	

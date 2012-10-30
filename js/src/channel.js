@@ -1,4 +1,3 @@
-//var APSChannel = function(pipe, client) {
 APS.channel = function(pipe, client) {
 	
 	for(var i in pipe.properties){

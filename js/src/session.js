@@ -20,8 +20,6 @@ APS.prototype.session = {
 		
 		this.cookie.change(this.id + ":" + pubid);
 		this.saveChl();
-		
-		//client.sendCmd("saveSESSION", session);
 	},
 	 
 	saveChl: function(){
@@ -71,7 +69,6 @@ APS.prototype.session = {
 			return false;
 		}
 		
-		//client.chl++;
 		//Restoring session state == 2
 		client.state = 2;
 		return {sid: data[0], pubid: data[1]};

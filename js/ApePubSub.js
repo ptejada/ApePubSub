@@ -1,14 +1,17 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-10-15 @ 04:19
+ * Built on 2012-10-30 @ 10:27
  */
 
-//Generate a random string
+/*
+ * Generates a random string
+ *  - First paramater(integer) determines the length
+ */
 function randomString(l){
 	//var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
 	var chars = "0123456789ABCDEFabcdef";
-	var string_length = l;
+	var string_length = l || 32;
 	var randomstring = '';
 	for (var i=0; i<string_length; i++) {
 		var rnum = Math.floor(Math.random() * chars.length);
@@ -17,7 +20,9 @@ function randomString(l){
 	return randomstring;
 }
 
-// Official bind polyfill at developer.mozilla.org
+/*
+ * Official bind polyfill at developer.mozilla.org
+ */
 if(!Function.prototype.bind){
 	Function.prototype.bind = function(oThis){
 	if(typeof this !== "function"){
@@ -96,7 +101,9 @@ function APS( server, events, options ){
 	return this;
 }
 
-
+/*
+ * Handles the initial connection to the server
+ */
 APS.prototype.connect = function(args){
 	var server = this.option.server;
 	var fserver = this.option.server;
@@ -162,7 +169,9 @@ APS.prototype.connect = function(args){
 	return this;
 }
 
-
+/*
+ * Attempts to reconnect to the server
+ */
 APS.prototype.reconnect = function(){
 	if(this.state > 0) return this.log("Client already connected!");
 	//Clear channels stack
@@ -170,6 +179,9 @@ APS.prototype.reconnect = function(){
 	this.connect();
 }
 
+/*
+ * Fires events on object's _events stack
+ */
 APS.prototype.trigger = function(ev, args){
 	ev = ev.toLowerCase();
 	
@@ -202,6 +214,9 @@ APS.prototype.trigger = function(ev, args){
 	return true;
 }
 
+/*
+ * Use to handles events on all object
+ */
 APS.prototype.on = function(ev, fn){
 	var Events = [];
 	
@@ -224,6 +239,9 @@ APS.prototype.on = function(ev, fn){
 	return this;
 }
 
+/*
+ * Get any object by its unique pubid
+ */
 APS.prototype.getPipe = function(user){
 	if(typeof user == 'string'){
 		return this.pipes[user];
@@ -232,6 +250,9 @@ APS.prototype.getPipe = function(user){
 	}
 }
 
+/*
+ * Sends an event throught a pipe/user/channel
+ */
 APS.prototype.send = function(pipe, $event, data, sync, callback){
 	this.sendCmd("Event", {
 		event: $event,
@@ -240,6 +261,9 @@ APS.prototype.send = function(pipe, $event, data, sync, callback){
 	}, pipe, callback);
 }
 
+/*
+ * Internal method to wrap events and send them as commands to the server
+ */
 APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 	var specialCmd = {CONNECT: 0, RESTORE:0};
 	if(this.state == 1 || cmd in specialCmd){
@@ -277,6 +301,9 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 	return this;
 }
 
+/*
+ * Polls the server for information when using the Long Polling transport
+ */
 APS.prototype.poll = function(){
 	if(this.transport.id == 0){
 		clearTimeout(this.poller);
@@ -284,6 +311,9 @@ APS.prototype.poll = function(){
 	}
 }
 
+/*
+ * Sends a check command to the server
+ */
 APS.prototype.check = function(force){
 	if(this.transport.id == 0 || !!force){
 		this.sendCmd('CHECK');
@@ -291,6 +321,9 @@ APS.prototype.check = function(force){
 	}
 }
 
+/*
+ * Sends the QUIT command to the server and completely destroys the client instance
+ */
 APS.prototype.quit = function(){
 	this.sendCmd('QUIT');
 	this.transport.close();
@@ -300,6 +333,9 @@ APS.prototype.quit = function(){
 	this.state = 0;
 }
 
+/*
+ * Subscribe to a channel
+ */
 APS.prototype.sub = function(channel, Events, callback){
 	//Handle the events
 	if(typeof Events == "object"){
@@ -353,6 +389,9 @@ APS.prototype.sub = function(channel, Events, callback){
 	return this;
 }
 
+/*
+ * Publish data/message in a channel or to a user
+ */
 APS.prototype.pub = function(channel, data, sync, callback){
 	var pipe = this.getChannel(channel);
 	if(!pipe && channel.length == 32) pipe = this.getPipe(channel);
@@ -365,6 +404,9 @@ APS.prototype.pub = function(channel, data, sync, callback){
 	}
 };
 
+/*
+ * Get a channel object by its name
+ */
 APS.prototype.getChannel = function(channel){
 	channel = channel.toLowerCase();
 	if(channel in this.channels){
@@ -374,6 +416,9 @@ APS.prototype.getChannel = function(channel){
 	return false;
 }
 
+/*
+ * Add events to a channel, even is user has not subscribed to it yet
+ */
 APS.prototype.onChannel = function(channel, Events, fn){
 	channel = channel.toLowerCase();
 	
@@ -402,12 +447,17 @@ APS.prototype.onChannel = function(channel, Events, fn){
 	}
 }
 
+/*
+ * Unsubscribe from a channel
+ */
 APS.prototype.unSub = function(channel){
 	if(channel == "") return;
 	this.getChannel(channel).leave();
 }
 
-//Debug Function for Browsers console
+/*
+ * Debug Function for Browsers console
+ */
 if(navigator.appName != "Microsoft Internet Explorer"){
 	APS.prototype.log = function(){
 		if(!this.option.debug) return;
@@ -437,9 +487,6 @@ APS.prototype.onMessage = function(data){
 		
 	var cmd, args, pipe, check = true;
 	
-	//Clear the timeout;
-	//clearTimeout(this.poller);
-	
 	for(var i in data){
 		cmd = data[i].raw;
 		args = data[i].data;
@@ -454,6 +501,7 @@ APS.prototype.onMessage = function(data){
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
 				this.trigger("login", [args.sessid]);
+				
 			break;
 			case 'IDENT':
 				check = false;
@@ -467,7 +515,7 @@ APS.prototype.onMessage = function(data){
 					this.trigger('ready');
 				
 				this.session.save();
-				//this.poll(); //This call is under observation
+				
 			break;
 			case 'RESTORED':
 				check = true;
@@ -475,9 +523,9 @@ APS.prototype.onMessage = function(data){
 				this.state = 1;
 				if(this.trigger('restored') !== false)
 					this.trigger('ready');
+				
 			break;
 			case 'CHANNEL':
-				//this.log(pipe, args);
 				pipe = new APS.channel(args.pipe, this);
 				this.pipes[pipe.pubid] = pipe;
 				this.channels[pipe.name] = pipe;
@@ -499,9 +547,6 @@ APS.prototype.onMessage = function(data){
 						
 						//Add user's own pipe to channels list
 						user.channels[user.pubid] = user;
-	
-						//No Need to trigger this event
-						//this.trigger('join', [user, pipe]);
 					}
 				}
 				
@@ -523,11 +568,13 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case "SYNC":
+				//Event that synchronizes events accross multiple client instances
 				var user = this.user;
 				
 				pipe = pipe = this.pipes[args.chanid];
 				
 				pipe.trigger(args.event, [args.data, user, pipe]);
+				
 			break;
 			case "EVENT":
 				var user = this.pipes[args.from.pubid];
@@ -546,9 +593,6 @@ APS.prototype.onMessage = function(data){
 				//Trigger event on target
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
-				//Update properties
-				//pipe.update(args.pipe.properties);
-				//user.update(args.from.properties);
 			break;
 			case 'JOIN':
 				var user = this.pipes[args.user.pubid];
@@ -569,6 +613,7 @@ APS.prototype.onMessage = function(data){
 				pipe.update(args.pipe.properties);
 				
 				pipe.trigger('join', [user, pipe]);
+				
 			break;
 			case 'LEFT':
 				pipe = this.pipes[args.pipe.pubid];
@@ -580,6 +625,7 @@ APS.prototype.onMessage = function(data){
 				pipe.update(args.pipe.properties);
 				
 				pipe.trigger('left', [user, pipe]);
+				
 			break;
 			case 'ERR' :
 				check = false;
@@ -604,11 +650,11 @@ APS.prototype.onMessage = function(data){
 				}
 				this.trigger("error",args);
 				this.trigger("error"+args.code,args);
+				
 			break;
 			default:
 				//trigger custom commands
 				this.trigger(cmd, args);
-				//this.check();
 		}
 	}
 	
@@ -618,7 +664,6 @@ APS.prototype.onMessage = function(data){
 }
 
 
-//var APSTransport = function(server, callback, options){
 APS.transport = function(server, callback, client){
 	this.state = 0;//0 = Not initialized, 1 = Initialized and ready to exchange data, 2 = Request is running
 	this.stack = [];
@@ -636,6 +681,7 @@ APS.transport = function(server, callback, client){
 		APS.transport[trans].apply(this, args);
 	}
 	
+	//Ajax request functions for eventPush
 	function getRequest() {
 		if('XMLHttpRequest' in window) return XMLHttpRequest;
 		if('ActiveXObject' in window) {
@@ -684,6 +730,9 @@ APS.transport = function(server, callback, client){
 	} 
 }
 
+/*
+ * Websocket Transport
+ */
 APS.transport.wb = function(server, callback, client){
 	if('WebSocket' in window){
 		this.id = 6;
@@ -739,6 +788,9 @@ APS.transport.wb = function(server, callback, client){
 	}
 }
 
+/*
+ * Long Polling Transport
+ */
 APS.transport.lp = function(server, callback, client){
 	this.id = 0;
 	var frame = document.createElement('iframe');
@@ -763,8 +815,6 @@ APS.transport.lp = function(server, callback, client){
 		
 		this.state = 1;
 		this.callback.onmessage(ev.data);
-		//this.callback.once(ev.data);
-		//this.callback.once = function(){};
 	}
 	function onLoad(){
 		this.state = 1;
@@ -796,6 +846,9 @@ APS.transport.lp = function(server, callback, client){
 	}
 }
 
+/*
+ * User object constructor
+ */
 APS.user = function(pipe, client){
 	for(var i in pipe.properties){
 		this[i] = pipe.properties[i]
@@ -814,7 +867,9 @@ APS.user = function(pipe, client){
 	}
 }
 
-//Object for current user
+/*
+ * Current user object constructor
+ */
 APS.cUser = function(pipe, client){
 	for(var i in pipe.properties){
 		this[i] = pipe.properties[i]
@@ -837,7 +892,6 @@ APS.cUser = function(pipe, client){
 }
 
 
-//var APSChannel = function(pipe, client) {
 APS.channel = function(pipe, client) {
 	
 	for(var i in pipe.properties){
@@ -903,8 +957,6 @@ APS.prototype.session = {
 		
 		this.cookie.change(this.id + ":" + pubid);
 		this.saveChl();
-		
-		//client.sendCmd("saveSESSION", session);
 	},
 	 
 	saveChl: function(){
@@ -954,7 +1006,6 @@ APS.prototype.session = {
 			return false;
 		}
 		
-		//client.chl++;
 		//Restoring session state == 2
 		client.state = 2;
 		return {sid: data[0], pubid: data[1]};

@@ -1,4 +1,3 @@
-//var APSTransport = function(server, callback, options){
 APS.transport = function(server, callback, client){
 	this.state = 0;//0 = Not initialized, 1 = Initialized and ready to exchange data, 2 = Request is running
 	this.stack = [];
@@ -16,6 +15,7 @@ APS.transport = function(server, callback, client){
 		APS.transport[trans].apply(this, args);
 	}
 	
+	//Ajax request functions for eventPush
 	function getRequest() {
 		if('XMLHttpRequest' in window) return XMLHttpRequest;
 		if('ActiveXObject' in window) {
@@ -64,6 +64,9 @@ APS.transport = function(server, callback, client){
 	} 
 }
 
+/*
+ * Websocket Transport
+ */
 APS.transport.wb = function(server, callback, client){
 	if('WebSocket' in window){
 		this.id = 6;
@@ -119,6 +122,9 @@ APS.transport.wb = function(server, callback, client){
 	}
 }
 
+/*
+ * Long Polling Transport
+ */
 APS.transport.lp = function(server, callback, client){
 	this.id = 0;
 	var frame = document.createElement('iframe');
@@ -143,8 +149,6 @@ APS.transport.lp = function(server, callback, client){
 		
 		this.state = 1;
 		this.callback.onmessage(ev.data);
-		//this.callback.once(ev.data);
-		//this.callback.once = function(){};
 	}
 	function onLoad(){
 		this.state = 1;
