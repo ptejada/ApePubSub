@@ -2,8 +2,8 @@
  * Generates a random string
  *  - First paramater(integer) determines the length
  */
-function randomString(l){
-	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+function randomString(l, keys){
+	var chars = keys || "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
 	var string_length = l || 32;
 	var randomstring = '';
 	for (var i=0; i<string_length; i++) {

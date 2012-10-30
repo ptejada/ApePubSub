@@ -115,7 +115,7 @@ function askForUsername(){
 			.on("submit", function(e){
 				e.preventDefault();
 				client.user.name = $(this).find("[name]").val();
-				client.user.avatar = randomString(32).toLowerCase();
+				client.user.avatar = randomString(32, "0123456789ABCDEF").toLowerCase();
 				client.sub(channelName);
 			})
 			.prependTo("#chat-messages");
