@@ -156,12 +156,14 @@ APS.prototype.onMessage = function(data){
 			break;
 			case 'ERR' :
 				check = false;
+				var info = [args.code, args.value, args];
+				
 				switch(args.code){
 					case "001":
 					case "002":
 					case "003":
 						clearTimeout(this.poller);
-						this.trigger("dead", args);
+						this.trigger("dead", info);
 						break;
 					case "004":
 					case "250":
@@ -175,13 +177,17 @@ APS.prototype.onMessage = function(data){
 					default:
 						this.check();
 				}
-				this.trigger("error",args);
-				this.trigger("error"+args.code,args);
+				this.trigger("error", info);
+				this.trigger("error"+args.code, info);
 				
 			break;
 			default:
 				//trigger custom commands
-				this.trigger(cmd, args);
+				var info = new Array();
+				for(var i in args){
+					info.push(args[i]);
+				}
+				this.trigger(cmd, info);
 		}
 	}
 	
