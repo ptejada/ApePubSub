@@ -1,16 +1,15 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-10-30 @ 10:27
+ * Built on 2012-10-31 @ 03:51
  */
 
 /*
  * Generates a random string
  *  - First paramater(integer) determines the length
  */
-function randomString(l){
-	//var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-	var chars = "0123456789ABCDEFabcdef";
+function randomString(l, keys){
+	var chars = keys || "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
 	var string_length = l || 32;
 	var randomstring = '';
 	for (var i=0; i<string_length; i++) {
@@ -60,7 +59,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.2';
+	this.version = '1.3';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -629,12 +628,14 @@ APS.prototype.onMessage = function(data){
 			break;
 			case 'ERR' :
 				check = false;
+				var info = [args.code, args.value, args];
+				
 				switch(args.code){
 					case "001":
 					case "002":
 					case "003":
 						clearTimeout(this.poller);
-						this.trigger("dead", args);
+						this.trigger("dead", info);
 						break;
 					case "004":
 					case "250":
@@ -648,13 +649,17 @@ APS.prototype.onMessage = function(data){
 					default:
 						this.check();
 				}
-				this.trigger("error",args);
-				this.trigger("error"+args.code,args);
+				this.trigger("error", info);
+				this.trigger("error"+args.code, info);
 				
 			break;
 			default:
 				//trigger custom commands
-				this.trigger(cmd, args);
+				var info = new Array();
+				for(var i in args){
+					info.push(args[i]);
+				}
+				this.trigger(cmd, info);
 		}
 	}
 	
