@@ -1,4 +1,6 @@
-//custom events commands
+/*
+ * Command to handle APS events
+ */
 Ape.registerCmd("event", true, function(params, info) {
 	
 	var pipe = Ape.getPipe(params.pipe);

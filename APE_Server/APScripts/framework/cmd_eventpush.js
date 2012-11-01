@@ -1,4 +1,6 @@
-//eventpush Command
+/*
+ * Command to handle eventPush from APS
+ */
 Ape.registerCmd("eventpush", false, function(params, info) {
 	if(params.to && params.data){
 		
@@ -18,7 +20,6 @@ Ape.registerCmd("eventpush", false, function(params, info) {
 			var sync = params.data;
 			sync.chanid = params.to;
 			user.pipe.sendRaw("SYNC", sync);
-			//return {"name": "SYNC", "data": sync};
 		}
 		
 		return {"name":"PUSHED","data":{"value":"ok"}};
