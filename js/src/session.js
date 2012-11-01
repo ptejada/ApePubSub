@@ -12,12 +12,6 @@ APS.prototype.session = {
 		var pubid = this._client.user.pubid;
 		var client = this._client;
 		
-		var session = {
-			channels: Object.keys(client.channels),
-			id: this.id,
-			pubid: pubid
-		}
-		
 		this.cookie.change(this.id + ":" + pubid);
 		this.saveChl();
 	},
