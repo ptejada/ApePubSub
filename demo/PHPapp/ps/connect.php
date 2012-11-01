@@ -3,12 +3,13 @@
 	
 	//Proccess Login
 	if($user->signed){
+		$u = $user->getRow(array("user_id" => $user->id));
 		$data = array(
-			"sessid" => $user->data["ape_session"],
+			"sessid" => $u["ape_session"],
 			"user" => array(
-				"name" => $user->data["username"],
-				"id" => $user->data["user_id"],
-				"avatar" => md5($user->username)
+				"name" => $u["username"],
+				"id" => $u["user_id"],
+				"avatar" => md5($u["username"])
 			)
 		);
 		echo json_encode($data);

@@ -10,9 +10,9 @@ var client = new APS(inst + "ape.crusthq.com:45138", false, {
 	eventPush: "ps/push.php"
 });
 
-client.identifier = "fullChat";
+client.identifier = "pChat";
 
-var channelName = "APS_chatter";
+var channelName = "privateChat";
 
 /*
  * Client Events
