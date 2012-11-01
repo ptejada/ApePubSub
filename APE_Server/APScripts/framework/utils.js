@@ -23,10 +23,10 @@ Ape.log = function(data){
 /*
  * Globalize Some Ape methods
  */
-setTimeout = Ape.setTimeout;
-setInterval = Ape.setInterval;
-clearTimeout = Ape.clearTimeout;
-clearInterval = Ape.clearInterval;
+var setTimeout = Ape.setTimeout;
+var setInterval = Ape.setInterval;
+var clearTimeout = Ape.clearTimeout;
+var clearInterval = Ape.clearInterval;
 
 /*
  * Built-in object modifications
@@ -44,6 +44,7 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
 }
 
 Ape.getUserByName = function(name){
+	name = name.toLowerCase();
 	return userlist[name]
 }
 
