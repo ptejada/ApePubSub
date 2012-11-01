@@ -45,6 +45,10 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case 'RESTORED':
+				if(this.state == 1){
+					check = false;
+					return;
+				};
 				check = true;
 				//Session restored completed
 				this.state = 1;
