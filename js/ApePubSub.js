@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-10-31 @ 03:51
+ * Built on 2012-11-02 @ 02:23
  */
 
 /*
@@ -59,7 +59,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.3';
+	this.version = '1.4';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -367,7 +367,7 @@ APS.prototype.sub = function(channel, Events, callback){
 		//Logic to only send the JOIN request to only non-existing channels in the client object
 		if(typeof channel == "string"){
 			//Single Channel
-			//console.log(channel, typeof this.channels[channel])
+			channel = channel.toLowerCase();
 			if(typeof this.channels[channel] != "object"){
 				this.sendCmd('JOIN', {'channels': channel});
 			}
@@ -375,7 +375,7 @@ APS.prototype.sub = function(channel, Events, callback){
 			//Multi Channel
 			var toJoin = [];
 			for(var x in channel){
-				if(typeof this.channels[channel[x]] != "object")
+				if(typeof this.channels[channel[x].toLowerCase()] != "object")
 					toJoin.push(channel[x]);
 			}
 			
@@ -517,6 +517,10 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case 'RESTORED':
+				if(this.state == 1){
+					check = false;
+					return;
+				};
 				check = true;
 				//Session restored completed
 				this.state = 1;
@@ -953,12 +957,6 @@ APS.prototype.session = {
 		
 		var pubid = this._client.user.pubid;
 		var client = this._client;
-		
-		var session = {
-			channels: Object.keys(client.channels),
-			id: this.id,
-			pubid: pubid
-		}
 		
 		this.cookie.change(this.id + ":" + pubid);
 		this.saveChl();
