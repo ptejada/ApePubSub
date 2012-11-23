@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2012-11-02 @ 02:23
+ * Built on 2012-11-23 @ 07:17
  */
 
 /*
@@ -59,7 +59,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.4';
+	this.version = '1.4.1';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -190,7 +190,7 @@ APS.prototype.trigger = function(ev, args){
 	if("_client" in this){
 		for(var i in this._client._events[ev]){
 			if(this._client._events[ev].hasOwnProperty(i)){ 
-				this.log("{{{ " + ev + " }}} on client ", this._client);
+				this.log("{{{ " + ev + " }}}["+i+"] on client ", this._client);
 				if(this._client._events[ev][i].apply(this, args) === false)
 					return false;
 			}
@@ -201,9 +201,9 @@ APS.prototype.trigger = function(ev, args){
 	for(var i in this._events[ev]){
 		if(this._events[ev].hasOwnProperty(i)){
 			if(!this._client){
-				this.log("{{{ " + ev + " }}} on client ", this);
+				this.log("{{{ " + ev + " }}}["+i+"] on client ", this);
 			}else{
-				this.log("{{{ " + ev + " }}} ", this);
+				this.log("{{{ " + ev + " }}}["+i+"] ", this);
 			}
 			if(this._events[ev][i].apply(this, args) === false)
 				return false;
@@ -228,6 +228,7 @@ APS.prototype.on = function(ev, fn){
 	}
 	
 	for(var e in Events){
+		if(!Events.hasOwnProperty(e)) continue;
 		var fn = Events[e];
 		e = e.toLowerCase();
 		if(!this._events[e])
@@ -487,6 +488,8 @@ APS.prototype.onMessage = function(data){
 	var cmd, args, pipe, check = true;
 	
 	for(var i in data){
+		if(!data.hasOwnProperty(i)) continue;
+		
 		cmd = data[i].raw;
 		args = data[i].data;
 		pipe = null;
@@ -559,6 +562,7 @@ APS.prototype.onMessage = function(data){
 					var queue = this.eQueue[chanName];
 					var ev, fn;
 					for(var i in queue){
+						if(!queue.hasOwnProperty(i)) continue;
 						ev = queue[i][0];
 						fn = queue[i][1];
 						
@@ -661,6 +665,7 @@ APS.prototype.onMessage = function(data){
 				//trigger custom commands
 				var info = new Array();
 				for(var i in args){
+					if(!args.hasOwnProperty(i)) continue;
 					info.push(args[i]);
 				}
 				this.trigger(cmd, info);
