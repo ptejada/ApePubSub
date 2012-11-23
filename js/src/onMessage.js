@@ -15,6 +15,8 @@ APS.prototype.onMessage = function(data){
 	var cmd, args, pipe, check = true;
 	
 	for(var i in data){
+		if(!data.hasOwnProperty(i)) continue;
+		
 		cmd = data[i].raw;
 		args = data[i].data;
 		pipe = null;
@@ -87,6 +89,7 @@ APS.prototype.onMessage = function(data){
 					var queue = this.eQueue[chanName];
 					var ev, fn;
 					for(var i in queue){
+						if(!queue.hasOwnProperty(i)) continue;
 						ev = queue[i][0];
 						fn = queue[i][1];
 						
@@ -189,6 +192,7 @@ APS.prototype.onMessage = function(data){
 				//trigger custom commands
 				var info = new Array();
 				for(var i in args){
+					if(!args.hasOwnProperty(i)) continue;
 					info.push(args[i]);
 				}
 				this.trigger(cmd, info);

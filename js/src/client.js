@@ -11,7 +11,7 @@ function APS( server, events, options ){
 		eventPush: false
 	}
 	this.identifier = "APS";
-	this.version = '1.4';
+	this.version = '1.4.1';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -142,7 +142,7 @@ APS.prototype.trigger = function(ev, args){
 	if("_client" in this){
 		for(var i in this._client._events[ev]){
 			if(this._client._events[ev].hasOwnProperty(i)){ 
-				this.log("{{{ " + ev + " }}} on client ", this._client);
+				this.log("{{{ " + ev + " }}}["+i+"] on client ", this._client);
 				if(this._client._events[ev][i].apply(this, args) === false)
 					return false;
 			}
@@ -153,9 +153,9 @@ APS.prototype.trigger = function(ev, args){
 	for(var i in this._events[ev]){
 		if(this._events[ev].hasOwnProperty(i)){
 			if(!this._client){
-				this.log("{{{ " + ev + " }}} on client ", this);
+				this.log("{{{ " + ev + " }}}["+i+"] on client ", this);
 			}else{
-				this.log("{{{ " + ev + " }}} ", this);
+				this.log("{{{ " + ev + " }}}["+i+"] ", this);
 			}
 			if(this._events[ev][i].apply(this, args) === false)
 				return false;
@@ -180,6 +180,7 @@ APS.prototype.on = function(ev, fn){
 	}
 	
 	for(var e in Events){
+		if(!Events.hasOwnProperty(e)) continue;
 		var fn = Events[e];
 		e = e.toLowerCase();
 		if(!this._events[e])
