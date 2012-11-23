@@ -21,9 +21,8 @@ $(document).ready(function(){
 		addInput: $("#add-stock"),	//Element - Button to add new Stock
 		visual: [],					//Store Graph values
 		
-		update: function(s,pipe){
-			//var s = raw.data;
-			var chanName = s.channel.substring(1);
+		update: function(value, direction, change, chanName){
+			chanName = chanName.substring(1);
 			var obj = $("#"+chanName);
 			if(obj.length == 0){
 				//Creates a new stock stream element for the DOM
@@ -38,11 +37,11 @@ $(document).ready(function(){
 			}
 			
 			//Convert Values from string to integers	
-			s.value = parseFloat(s.value).toFixed(2);
-			s.change = parseFloat(s.change).toFixed(2);
+			value = parseFloat(value).toFixed(2);
+			change = parseFloat(change).toFixed(2);
 			
 			//Update stock visual array
-			stock.visual[chanName].push(s.value);
+			stock.visual[chanName].push(value);
 			
 			//Limit stock visual array to 30 entries
 			if(stock.visual[chanName].length > 30) stock.visual[chanName].splice(0,1);
@@ -54,18 +53,18 @@ $(document).ready(function(){
 			});
 			
 			//Update the document with new data
-			obj.find(".stock-value").html(s.value);
-			obj.find(".stock-change").html(s.change);
+			obj.find(".stock-value").html(value);
+			obj.find(".stock-change").html(change);
 			
 			//Handles the stock value color, red OR green
-			if(s.value < 0){
+			if(value < 0){
 				obj.find(".stock-value:not('.red')").addClass('red');
 			}else{
 				obj.find(".stock-value.red").removeClass('red');
 			}
 			
 			//Handles the stock direction(arrow) up(green)/down(red)
-			if(s.direction == "up"){
+			if(direction == "up"){
 				obj.find(".stock-direction-down").attr("class","stock-direction-up").html("▲");
 			}else{
 				obj.find(".stock-direction-up").attr("class","stock-direction-down").html("▼");				
