@@ -19,4 +19,6 @@ Ape.registerCmd("event", true, function(params, info) {
 		
 		pipe.sendRaw("EVENT", params, {from: info.user.pipe});
 	}
+	
+	return 1;
 });
