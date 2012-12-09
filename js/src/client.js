@@ -8,10 +8,11 @@ function APS( server, events, options ){
 		transport: ["wb", "lp"],
 		//transport: "lp",	//Should be the default transport option for APE Server v1.1.1
 		secure: false,
-		eventPush: false
+		eventPush: false,
+		addFrequency: true
 	}
 	this.identifier = "APS";
-	this.version = '1.4.1';
+	this.version = '1.5';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -56,7 +57,6 @@ function APS( server, events, options ){
  * Handles the initial connection to the server
  */
 APS.prototype.connect = function(args){
-	var server = this.option.server;
 	var fserver = this.option.server;
 	
 	function TransportError(e){
@@ -69,16 +69,19 @@ APS.prototype.connect = function(args){
 		'onerror': TransportError.bind(this)
 	}
 	
-	if(this.state == 1) 
+	if(this.state == 1)
 		return this.log("Already Connected!");
 	
 	var cmd = "CONNECT";
 	args = this.option.connectionArgs = args || this.option.connectionArgs;
 	
+	var restore = this.session.restore();
+	//increase frequency
+	this.session.freq.change(parseInt(this.session.freq.value) + 1);
+	
 	//Handle sessions
 	if(this.option.session == true){
 		
-		var restore = this.session.restore();
 		if(typeof restore == "object"){
 			args = restore;
 			//Change initial command CONNECT by RESTORE
@@ -90,13 +93,14 @@ APS.prototype.connect = function(args){
 		}
 		
 		//Apply frequency to the server
-		var fserver = this.session.freq.value + "." + server;
+		if(this.option.addFrequency)
+			fserver = this.session.freq.value + "." + fserver;
 		
-		//increase frequency
-		this.session.freq.change(parseInt(this.session.freq.value) + 1);
 		
 	}else{
 		//Fresh Connect
+		this.state = 0;
+		//this.session.id = "";
 		if(this.trigger("connect") == false)
 			return false;
 	}
@@ -222,7 +226,8 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 
 		var tmp = {
 			'cmd': cmd,
-			'chl': this.chl
+			'chl': this.chl,
+			'freq': this.session.freq.value
 		}
 
 		if(args) tmp.params = args;
