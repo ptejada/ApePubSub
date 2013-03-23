@@ -7,6 +7,7 @@ APS.prototype.onMessage = function(data){
 		try {
 			data = JSON.parse(data);
 		}catch(e){
+			e.type = "close";
 			this.trigger("dead", [e]);
 			return this.transport.close();
 		}
@@ -22,7 +23,7 @@ APS.prototype.onMessage = function(data){
 		pipe = null;
 		
 		this.log('>>>> ', cmd , " <<<< ", args);
-
+		
 		switch(cmd){
 			case 'LOGIN':
 				check = false;
@@ -131,7 +132,7 @@ APS.prototype.onMessage = function(data){
 			case 'JOIN':
 				var user = this.pipes[args.user.pubid];
 				pipe = this.pipes[args.pipe.pubid];
-
+				
 				if(!user){
 					this.pipes[args.user.pubid] = new APS.user(args.user, this);
 					user = this.pipes[args.user.pubid];

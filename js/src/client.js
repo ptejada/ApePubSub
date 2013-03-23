@@ -12,7 +12,7 @@ function APS( server, events, options ){
 		addFrequency: true
 	}
 	this.identifier = "APS";
-	this.version = '1.5';
+	this.version = '1.5.1';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -42,7 +42,7 @@ function APS( server, events, options ){
 				
 				var args =  Array.prototype.slice.call(arguments);
 				args.unshift("["+this.identifier+"]");
-		
+				
 				window.console.log(args.join().replace(",",""));
 			}
 			
@@ -71,7 +71,7 @@ APS.prototype.connect = function(args){
 	
 	if(this.state == 1)
 		return this.log("Already Connected!");
-	
+		
 	var cmd = "CONNECT";
 	args = this.option.connectionArgs = args || this.option.connectionArgs;
 	
@@ -95,8 +95,7 @@ APS.prototype.connect = function(args){
 		//Apply frequency to the server
 		if(this.option.addFrequency)
 			fserver = this.session.freq.value + "." + fserver;
-		
-		
+			
 	}else{
 		//Fresh Connect
 		this.state = 0;
@@ -123,12 +122,13 @@ APS.prototype.connect = function(args){
 	
 	return this;
 }
-
+	
 /*
  * Attempts to reconnect to the server
  */
 APS.prototype.reconnect = function(){
-	if(this.state > 0) return this.log("Client already connected!");
+	if(this.state > 0 && this.transport.state > 0)
+		return this.log("Client already connected!");
 	//Clear channels stack
 	this.channels = {};
 	this.connect();
@@ -145,14 +145,14 @@ APS.prototype.trigger = function(ev, args){
 	//GLobal
 	if("_client" in this){
 		for(var i in this._client._events[ev]){
-			if(this._client._events[ev].hasOwnProperty(i)){ 
+			if(this._client._events[ev].hasOwnProperty(i)){
 				this.log("{{{ " + ev + " }}}["+i+"] on client ", this._client);
 				if(this._client._events[ev][i].apply(this, args) === false)
 					return false;
 			}
 		}
 	}
-	
+
 	//Local
 	for(var i in this._events[ev]){
 		if(this._events[ev].hasOwnProperty(i)){
@@ -165,7 +165,7 @@ APS.prototype.trigger = function(ev, args){
 				return false;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -174,7 +174,7 @@ APS.prototype.trigger = function(ev, args){
  */
 APS.prototype.on = function(ev, fn){
 	var Events = [];
-	
+
 	if(typeof ev == 'string' && typeof fn == 'function'){
 		Events[ev] = fn;
 	}else if(typeof ev == "object"){
@@ -182,7 +182,7 @@ APS.prototype.on = function(ev, fn){
 	}else{
 		return this;
 	}
-	
+
 	for(var e in Events){
 		if(!Events.hasOwnProperty(e)) continue;
 		var fn = Events[e];
@@ -223,23 +223,23 @@ APS.prototype.send = function(pipe, $event, data, sync, callback){
 APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 	var specialCmd = {CONNECT: 0, RESTORE:0};
 	if(this.state == 1 || cmd in specialCmd){
-
+		
 		var tmp = {
 			'cmd': cmd,
 			'chl': this.chl,
 			'freq': this.session.freq.value
 		}
-
+		
 		if(args) tmp.params = args;
 		if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid;
 		if(this.session.id) tmp.sessid = this.session.id;
-
+		
 		this.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
 		
 		if(typeof callback != "function")	callback = function(){};
 		
 		var data = [];
-		try { 
+		try {
 			data = JSON.stringify([tmp]);
 		}catch(e){
 			this.log(e);
@@ -304,7 +304,7 @@ APS.prototype.sub = function(channel, Events, callback){
 			this.onChannel(channel, Events);
 		}
 	}
-	
+
 	//Handle callback
 	if(typeof callback == "function"){
 		if(typeof channel == "object"){
@@ -315,7 +315,7 @@ APS.prototype.sub = function(channel, Events, callback){
 			this.onChannel(channel, "joined", callback);
 		}
 	}
-	
+
 	//Join Channel
 	if(this.state == 0){
 		this.on("ready", this.sub.bind(this, channel));
@@ -342,7 +342,7 @@ APS.prototype.sub = function(channel, Events, callback){
 				
 		}
 	}
-	
+
 	return this;
 }
 
@@ -383,12 +383,12 @@ APS.prototype.onChannel = function(channel, Events, fn){
 		this.channels[channel].on(Events, fn);
 		return true;
 	}
-	
+		
 	if(typeof Events == "object"){
 		//add events to queue
 		if(typeof this.eQueue[channel] != "object")
 			this.eQueue[channel] = [];
-		
+			
 		//this.eQueue[channel].push(Events);
 		for(var $event in Events){
 			var fn = Events[$event];
@@ -424,5 +424,5 @@ if(navigator.appName != "Microsoft Internet Explorer"){
 		
 		window.console.log.apply(console, args);
 	};
-	
+
 }

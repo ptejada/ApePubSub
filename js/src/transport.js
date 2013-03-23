@@ -32,14 +32,14 @@ APS.transport = function(server, callback, client){
 		}
 		return false;
 	}
-		
+	
 	var req = new getRequest();
 	
 	req = new req();
 	
 	this.request = function(addr, data, callback){
 		req.onreadystatechange = function(){
-			if(this.readyState == 4) 
+			if(this.readyState == 4)
 				callback(this.responseText);
 		};
 		req.open('POST', addr, true);
@@ -61,7 +61,7 @@ APS.transport = function(server, callback, client){
 				realSend.apply(this, [str, cb]);
 			}
 		}
-	} 
+	}
 }
 
 /*
@@ -96,26 +96,27 @@ APS.transport.wb = function(server, callback, client){
 		
 		ws.onopen = function(){
 			this.state = 2;
-		
+			
 			for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i], null, JSON.parse(this.stack[i])[0]);
 			this.stack = [];
 			
 		}.bind(this);
-
+		
 		ws.onmessage = function(ev){
 			callback.onmessage(ev.data);
 		}
 		
-		ws.onclose = function(){
+		ws.onclose = function(e){
 			clearInterval(this.loop);
 			this.state = client.state = 0;
-		}
+			callback.onerror(e);
+		}.bind(this)
 		
 		this.close = function(){
 			ws.close();
 			this.state = client.state = 0;
-		} 
-		
+		}
+	
 	}else{
 		client.log("No Websocket support");
 		return false;
@@ -133,30 +134,30 @@ APS.transport.lp = function(server, callback, client){
 	//Fixes cranky IE9
 	server = server.toLowerCase();
 	
-	with(frame.style){ 
+	with(frame.style){
 		position = 'absolute';
 		left = top = '-10px';
 		width = height = '1px';
 	}
 	document.body.appendChild(frame);
-
+	
 	frame.setAttribute('src', protocol + "://" + server + '/?[{"cmd":"frame","params": {"origin":"'+origin+'"}}]');
 	
 	
 	function recieveMessage(ev){
 		if(ev.origin != protocol + "://" + server) return;
 		if(ev.source !== frame.contentWindow) return;
-		
+
 		this.state = 1;
 		this.callback.onmessage(ev.data);
 	}
 	function onLoad(){
 		this.state = 1;
-	
+		
 		for(var i = 0; i < this.stack.length; i++) this.send(this.stack[i], null, JSON.parse(this.stack[i])[0]);
 		this.stack = [];
 	}
-	
+		
 	if('addEventListener' in window){
 		window.addEventListener('message', recieveMessage.bind(this), 0);
 		frame.addEventListener('load', onLoad.bind(this), 0);
@@ -175,7 +176,7 @@ APS.transport.lp = function(server, callback, client){
 	
 	this.close = function(){
 		clearTimeout(client.poller);
-		frame.parentElement.removeChild(frame);
-		this.state = client.state = 0;
+		//frame.parentElement.removeChild(frame);
+		client.state = 0;
 	}
 }
