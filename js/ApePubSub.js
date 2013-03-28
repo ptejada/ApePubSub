@@ -60,7 +60,7 @@ function APS( server, events, options ){
 		addFrequency: true
 	}
 	this.identifier = "APS";
-	this.version = '1.5.1';
+	this.version = '1.5.2';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -457,6 +457,9 @@ APS.prototype.onChannel = function(channel, Events, fn){
 APS.prototype.unSub = function(channel){
 	if(channel == "") return;
 	this.getChannel(channel).leave();
+	
+	//Delete the Event Queue in case the channel is created again
+	delete this.eQueue[channel];
 }
 
 /*
