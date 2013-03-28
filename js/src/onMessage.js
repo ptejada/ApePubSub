@@ -13,18 +13,18 @@ APS.prototype.onMessage = function(data){
 		}
 	}
 		
-	var cmd, args, pipe, check = true;
+	var raw, args, pipe, check = true;
 	
 	for(var i in data){
 		if(!data.hasOwnProperty(i)) continue;
 		
-		cmd = data[i].raw;
+		raw = data[i].raw;
 		args = data[i].data;
 		pipe = null;
 		
-		this.log('>>>> ', cmd , " <<<< ", args);
+		this.log('>>>> ', raw , " <<<< ", args);
 		
-		switch(cmd){
+		switch(raw){
 			case 'LOGIN':
 				check = false;
 				
@@ -196,7 +196,7 @@ APS.prototype.onMessage = function(data){
 					if(!args.hasOwnProperty(i)) continue;
 					info.push(args[i]);
 				}
-				this.trigger(cmd, info);
+				this.trigger(raw, info);
 		}
 	}
 	
