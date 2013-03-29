@@ -231,7 +231,14 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		}
 		
 		if(args) tmp.params = args;
-		if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid;
+		if(pipe) {
+			tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid;
+			if(this.getPipe(tmp.params.pipe) instanceof APS.channel){
+				//tmp.params.multi = true;
+			}else{
+				//tmp.params.multi = false;
+			}
+		}
 		if(this.session.id) tmp.sessid = this.session.id;
 		
 		this.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
