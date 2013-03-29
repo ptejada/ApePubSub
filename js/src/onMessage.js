@@ -103,10 +103,10 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case "SYNC":
-				//Event that synchronizes events accross multiple client instances
+				//Raw that synchronizes events accross multiple client instances
 				var user = this.user;
 				
-				pipe = pipe = this.pipes[args.chanid];
+				pipe = this.pipes[args.chanid];
 				
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
@@ -190,13 +190,13 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			default:
-				//trigger custom commands
+				//trigger custom raws
 				var info = new Array();
 				for(var i in args){
 					if(!args.hasOwnProperty(i)) continue;
 					info.push(args[i]);
 				}
-				this.trigger(raw, info);
+				this.trigger("raw"+raw, info);
 		}
 	}
 	
