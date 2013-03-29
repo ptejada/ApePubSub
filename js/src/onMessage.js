@@ -108,6 +108,10 @@ APS.prototype.onMessage = function(data){
 				
 				pipe = this.pipes[args.chanid];
 				
+				//Decode the message data string
+				if(args.event == "message")
+					args.data = decodeURIComponent(args.data);
+				
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
 			break;
@@ -124,6 +128,10 @@ APS.prototype.onMessage = function(data){
 				if(pipe.pubid == user.pubid){
 					pipe = this.user;
 				}
+				
+				//Decode the message data string
+				if(args.event == "message")
+					args.data = decodeURIComponent(args.data);
 				
 				//Trigger event on target
 				pipe.trigger(args.event, [args.data, user, pipe]);

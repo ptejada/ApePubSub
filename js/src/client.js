@@ -355,6 +355,7 @@ APS.prototype.pub = function(channel, data, sync, callback){
 	
 	if(pipe){
 		var $event = typeof data == "string" ? "message" : "data";
+		if($event == "message") data = encodeURIComponent(data);
 		pipe.send($event, data, sync, callback);
 	}else{
 		this.log("NO Channel " + channel);
