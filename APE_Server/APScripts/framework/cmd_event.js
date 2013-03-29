@@ -3,9 +3,13 @@
  */
 Ape.registerCmd("event", true, function(params, info) {
 	
-	var pipe = Ape.getPipe(params.pipe);
+	if(params.multi){
+		var recipient = Ape.getChannelByPubid(params.pipe);
+	}else{
+		var recipient = Ape.getUserByPubid(params.pipe);
+	}
 	
-	if(pipe){
+	if(recipient){
 		
 		if(!!params.sync){
 			info.sendResponse("SYNC", {
@@ -17,7 +21,7 @@ Ape.registerCmd("event", true, function(params, info) {
 		
 		delete params.sync;
 		
-		pipe.sendRaw("EVENT", params, {from: info.user.pipe});
+		recipient.sendEvent(params, {from: info.user.pipe});
 	}
 	
 	return 1;

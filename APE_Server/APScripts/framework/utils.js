@@ -43,6 +43,14 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
 	return this.pipe.toObject().properties;
 }
 
+Ape.user.sendEvent = Ape.subuser.sendEvent = Ape.channel.sendEvent = function(bodyParams, options){
+	if(typeof options == "object"){
+		this.pipe.sendRaw("EVENT", bodyParams, options);
+	}else{
+		this.pipe.sendRaw("EVENT", bodyParams);
+	}
+}
+
 Ape.getUserByName = function(name){
 	name = name.toLowerCase();
 	return userlist[name]
