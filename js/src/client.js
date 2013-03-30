@@ -234,9 +234,9 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		if(pipe) {
 			tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid;
 			if(this.getPipe(tmp.params.pipe) instanceof APS.channel){
-				//tmp.params.multi = true;
+				tmp.params.multi = true;
 			}else{
-				//tmp.params.multi = false;
+				tmp.params.multi = false;
 			}
 		}
 		if(this.session.id) tmp.sessid = this.session.id;
