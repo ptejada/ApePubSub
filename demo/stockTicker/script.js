@@ -90,7 +90,7 @@ $(document).ready(function(){
 	
 	//APS events
 	client.on({
-		stockUpdate: stock.update,
+		rawStockUpdate: stock.update,
 		ready: function(){
 			if(stock.tray.lenght > 4)
 				stock.addInput.prop("disabled", false);
