@@ -13,7 +13,7 @@ APS.prototype.onMessage = function(data){
 		}
 	}
 		
-	var raw, args, pipe, check = true;
+	var raw, args, pipe, isIdent = false, check = true;
 	
 	for(var i in data){
 		if(!data.hasOwnProperty(i)) continue;
@@ -35,6 +35,7 @@ APS.prototype.onMessage = function(data){
 			break;
 			case 'IDENT':
 				check = false;
+				isIdent = true; //Flag to trigger the restore method
 				
 				var user = new APS.cUser(args.user, this);
 				this.pipes[user.pubid] = user;
@@ -45,18 +46,6 @@ APS.prototype.onMessage = function(data){
 					this.trigger('ready');
 				
 				this.session.save();
-				
-			break;
-			case 'RESTORED':
-				if(this.state == 1){
-					check = false;
-					return;
-				};
-				check = true;
-				//Session restored completed
-				this.state = 1;
-				if(this.trigger('restored') !== false)
-					this.trigger('ready');
 				
 			break;
 			case 'CHANNEL':
@@ -208,7 +197,23 @@ APS.prototype.onMessage = function(data){
 		}
 	}
 	
-	if(check && this.transport.id == 0 && this.transport.state == 1){
+	/*
+	 * Handle The Session restored
+	 * callback event triggers
+	 */
+	if(isIdent && this.state != 1){
+		check = true;
+		
+		//Session restored completed
+		this.state = 1;
+		if(this.trigger('restored') !== false)
+			this.trigger('ready');
+	}
+	
+	/*
+	 * Conditionally called the check() method for the long polling method
+	 */
+	if(this.transport.id == 0 && check && this.transport.state == 1){
 		this.check();
 	}
 }
