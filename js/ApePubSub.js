@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2013-03-23 @ 05:44
+ * Built on 2013-03-30 @ 06:56
  */
 
 /*
@@ -60,7 +60,7 @@ function APS( server, events, options ){
 		addFrequency: true
 	}
 	this.identifier = "APS";
-	this.version = '1.5.2';
+	this.version = '1.5.4';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -165,6 +165,9 @@ APS.prototype.connect = function(args){
 		this.transport = new APS.transport(fserver, cb, this);
 	}
 	
+	//Attach version of client framework
+	args.version = this.version;
+	
 	//Send seleced command and arguments
 	this.sendCmd(cmd, args);
 	
@@ -175,7 +178,8 @@ APS.prototype.connect = function(args){
  * Attempts to reconnect to the server
  */
 APS.prototype.reconnect = function(){
-	if(this.state > 0 && this.transport > 0) return this.log("Client already connected!");
+	if(this.state > 0 && this.transport.state > 0)
+		return this.log("Client already connected!");
 	//Clear channels stack
 	this.channels = {};
 	this.connect();
@@ -278,7 +282,14 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		}
 		
 		if(args) tmp.params = args;
-		if(pipe) tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid;
+		if(pipe) {
+			tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid;
+			if(this.getPipe(tmp.params.pipe) instanceof APS.channel){
+				tmp.params.multi = true;
+			}else{
+				tmp.params.multi = false;
+			}
+		}
 		if(this.session.id) tmp.sessid = this.session.id;
 		
 		this.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
@@ -402,6 +413,7 @@ APS.prototype.pub = function(channel, data, sync, callback){
 	
 	if(pipe){
 		var $event = typeof data == "string" ? "message" : "data";
+		if($event == "message") data = encodeURIComponent(data);
 		pipe.send($event, data, sync, callback);
 	}else{
 		this.log("NO Channel " + channel);
@@ -493,18 +505,18 @@ APS.prototype.onMessage = function(data){
 		}
 	}
 		
-	var cmd, args, pipe, check = true;
+	var raw, args, pipe, isIdent = false, check = true;
 	
 	for(var i in data){
 		if(!data.hasOwnProperty(i)) continue;
 		
-		cmd = data[i].raw;
+		raw = data[i].raw;
 		args = data[i].data;
 		pipe = null;
 		
-		this.log('>>>> ', cmd , " <<<< ", args);
+		this.log('>>>> ', raw , " <<<< ", args);
 		
-		switch(cmd){
+		switch(raw){
 			case 'LOGIN':
 				check = false;
 				
@@ -515,6 +527,7 @@ APS.prototype.onMessage = function(data){
 			break;
 			case 'IDENT':
 				check = false;
+				isIdent = true; //Flag to trigger the restore method
 				
 				var user = new APS.cUser(args.user, this);
 				this.pipes[user.pubid] = user;
@@ -525,18 +538,6 @@ APS.prototype.onMessage = function(data){
 					this.trigger('ready');
 				
 				this.session.save();
-				
-			break;
-			case 'RESTORED':
-				if(this.state == 1){
-					check = false;
-					return;
-				};
-				check = true;
-				//Session restored completed
-				this.state = 1;
-				if(this.trigger('restored') !== false)
-					this.trigger('ready');
 				
 			break;
 			case 'CHANNEL':
@@ -583,10 +584,14 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case "SYNC":
-				//Event that synchronizes events accross multiple client instances
+				//Raw that synchronizes events accross multiple client instances
 				var user = this.user;
 				
-				pipe = pipe = this.pipes[args.chanid];
+				pipe = this.pipes[args.chanid];
+				
+				//Decode the message data string
+				if(args.event == "message")
+					args.data = decodeURIComponent(args.data);
 				
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
@@ -604,6 +609,10 @@ APS.prototype.onMessage = function(data){
 				if(pipe.pubid == user.pubid){
 					pipe = this.user;
 				}
+				
+				//Decode the message data string
+				if(args.event == "message")
+					args.data = decodeURIComponent(args.data);
 				
 				//Trigger event on target
 				pipe.trigger(args.event, [args.data, user, pipe]);
@@ -670,17 +679,33 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			default:
-				//trigger custom commands
+				//trigger custom raws
 				var info = new Array();
 				for(var i in args){
 					if(!args.hasOwnProperty(i)) continue;
 					info.push(args[i]);
 				}
-				this.trigger(cmd, info);
+				this.trigger("raw"+raw, info);
 		}
 	}
 	
-	if(check && this.transport.id == 0 && this.transport.state == 1){
+	/*
+	 * Handle The Session restored
+	 * callback event triggers
+	 */
+	if(isIdent && this.state != 1){
+		check = true;
+		
+		//Session restored completed
+		this.state = 1;
+		if(this.trigger('restored') !== false)
+			this.trigger('ready');
+	}
+	
+	/*
+	 * Conditionally called the check() method for the long polling method
+	 */
+	if(this.transport.id == 0 && check && this.transport.state == 1){
 		this.check();
 	}
 }
