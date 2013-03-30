@@ -22,7 +22,10 @@ Ape.registerCmd("event", true, function(params, info) {
 		delete params.sync;
 		
 		recipient.sendEvent(params, {from: info.user.pipe});
+		
+		return 1;
 	}
 	
-	return 1;
+	return ["425", "UNKNOWN_RECIPIENT"];
+	
 });
