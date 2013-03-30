@@ -117,6 +117,9 @@ APS.prototype.connect = function(args){
 		this.transport = new APS.transport(fserver, cb, this);
 	}
 	
+	//Attach version of client framework
+	args.version = this.version;
+	
 	//Send seleced command and arguments
 	this.sendCmd(cmd, args);
 	
