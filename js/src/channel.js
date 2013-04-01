@@ -23,6 +23,9 @@ APS.channel = function(pipe, client) {
 		this.log("Unsubscribed");
 		
 		delete client.channels[this.name];
+	
+		//Delete the Event Queue in case the channel is created again
+		delete client.eQueue[this.name];
 	}
 	
 	if(this.name.indexOf("*") !== 0){

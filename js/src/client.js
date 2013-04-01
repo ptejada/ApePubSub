@@ -421,9 +421,6 @@ APS.prototype.onChannel = function(channel, Events, fn){
 APS.prototype.unSub = function(channel){
 	if(channel == "") return;
 	this.getChannel(channel).leave();
-	
-	//Delete the Event Queue in case the channel is created again
-	delete this.eQueue[channel];
 }
 
 /*
