@@ -101,7 +101,13 @@ APS.prototype.onMessage = function(data){
 				if(args.event == "message")
 					args.data = decodeURIComponent(args.data);
 				
-				pipe.trigger(args.event, [args.data, user, pipe]);
+				if(pipe instanceof APS.user){
+					user.trigger(args.event, [args.data, user, pipe]);
+				}else{
+					pipe.trigger(args.event, [args.data, user, pipe]);
+				}
+				
+				
 				
 			break;
 			case "EVENT":
