@@ -7,6 +7,7 @@ $(document).ready(function(){
 	
 	//Enable debug output to browser console
 	client.option.debug = true;
+	client.option.session = false;
 	
 	/*
 	 * Add global events which will apply to all channels 
