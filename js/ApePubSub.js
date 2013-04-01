@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2013-03-30 @ 06:56
+ * Built on 2013-04-01 @ 04:12
  */
 
 /*
@@ -60,7 +60,7 @@ function APS( server, events, options ){
 		addFrequency: true
 	}
 	this.identifier = "APS";
-	this.version = '1.5.4';
+	this.version = '1.5.5';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -469,9 +469,6 @@ APS.prototype.onChannel = function(channel, Events, fn){
 APS.prototype.unSub = function(channel){
 	if(channel == "") return;
 	this.getChannel(channel).leave();
-	
-	//Delete the Event Queue in case the channel is created again
-	delete this.eQueue[channel];
 }
 
 /*
@@ -593,7 +590,13 @@ APS.prototype.onMessage = function(data){
 				if(args.event == "message")
 					args.data = decodeURIComponent(args.data);
 				
-				pipe.trigger(args.event, [args.data, user, pipe]);
+				if(pipe instanceof APS.user){
+					user.trigger(args.event, [args.data, user, pipe]);
+				}else{
+					pipe.trigger(args.event, [args.data, user, pipe]);
+				}
+				
+				
 				
 			break;
 			case "EVENT":
@@ -965,6 +968,9 @@ APS.channel = function(pipe, client) {
 		this.log("Unsubscribed");
 		
 		delete client.channels[this.name];
+	
+		//Delete the Event Queue in case the channel is created again
+		delete client.eQueue[this.name];
 	}
 	
 	if(this.name.indexOf("*") !== 0){

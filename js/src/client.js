@@ -12,7 +12,7 @@ function APS( server, events, options ){
 		addFrequency: true
 	}
 	this.identifier = "APS";
-	this.version = '1.5.4';
+	this.version = '1.5.5';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
