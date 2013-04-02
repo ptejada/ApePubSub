@@ -170,7 +170,6 @@ $(document).ready(function(){
 	});
 	
 	$("#chatList").on("click", ".closeBnt", function(e){
-		console.log(this);
 		$(this).parent().slideUp("fast", function(){
 			$(this).remove();
 		});
