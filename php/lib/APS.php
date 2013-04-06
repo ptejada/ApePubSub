@@ -40,11 +40,6 @@
 				"sessid"	=> $this->data->sessid
 			);
 			
-			$inline['params']['to'] = $this->data->params->pipe;
-			
-			if(property_exists($this->data->params, "sync"))
-				$inline['params']['sync'] = $this->data->params->sync;
-			
 			$this->cmd = json_encode(array($inline));
 			
 			/*
