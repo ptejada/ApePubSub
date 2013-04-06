@@ -6,7 +6,7 @@ Ape.addEvent('adduser', function(user) {
 	
 	if(typeof name == "string"){
 		name = name.toLowerCase();
-		userlist[name] = user;
+		Ape.userlist[name] = user;
 	}
 });
 
@@ -15,7 +15,7 @@ Ape.addEvent('deluser', function(user) {
 	
 	if(typeof name == "string"){
 		name = name.toLowerCase();
-		delete userlist[name];
+		delete Ape.userlist[name];
 	}
 });
 

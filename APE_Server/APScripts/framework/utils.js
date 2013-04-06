@@ -1,7 +1,7 @@
 /*
- * Global variables
+ * Initialize Userlist
  */
-var userlist = {};
+Ape.userlist = {};
 
 /*
  * Enchance Ape.log function
@@ -53,7 +53,7 @@ Ape.user.sendEvent = Ape.subuser.sendEvent = Ape.channel.sendEvent = function(bo
 
 Ape.getUserByName = function(name){
 	name = name.toLowerCase();
-	return userlist[name]
+	return Ape.userlist[name] || false;
 }
 
 /*

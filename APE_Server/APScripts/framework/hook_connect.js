@@ -10,7 +10,7 @@ Ape.registerHookCmd("connect", function(params, cmd){
 			//Check for valid name
 			if(user.name.length > APS.option.userNameMaxLength || APS.option.userNameRegex.test(user.name)) return ["006", "BAD_NAME"];
 			//Check if name is unique
-			if(typeof userlist[user.name.toLowerCase()] == "object") return ["007", "NAME_USED"];
+			if(Ape.getUserByName(user.name)) return ["007", "NAME_USED"];
 		}
 		
 		for(var index in user){
