@@ -18,7 +18,7 @@
 			 * You may parse or edit the the event data itself
 			 * For example below a PHP tag will be appended to message to indicate that it was parsed by PHP
 			 */
-			$c->eventData .= "<spam style='background: #ccc; color: red; font-size: 0.45em; float: right; padding: 4px;'>[PHP]</span> ";
+			$c->eventData .= "<span style='background: #ccc; color: red; font-size: 0.45em; float: right; padding: 4px;'>[PHP]</span> ";
 			/*
 			 * You can go as far as overwriting the event name itselft
 			 */
