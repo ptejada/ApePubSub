@@ -165,6 +165,9 @@ APS.prototype.onMessage = function(data){
 				pipe.trigger('left', [user, pipe]);
 				
 			break;
+			case 'CLOSE':
+				check = false
+			break;
 			case 'ERR' :
 				check = false;
 				var info = [args.code, args.value, args];
