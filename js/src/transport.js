@@ -67,7 +67,7 @@ APS.transport = function(server, callback, client){
 /*
  * Websocket Transport
  */
-APS.transport.wb = function(server, callback, client){
+APS.transport.ws = APS.transport.wb = function(server, callback, client){
 	if('WebSocket' in window){
 		this.id = 6;
 		this.loop = setInterval(client.check.bind(client,true), 40000);

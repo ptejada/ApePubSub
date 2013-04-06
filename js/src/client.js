@@ -5,7 +5,7 @@ function APS( server, events, options ){
 		session: true,
 		connectionArgs: {},
 		server: server,
-		transport: ["wb", "lp"],
+		transport: ["ws", "lp"],
 		//transport: "lp",	//Should be the default transport option for APE Server v1.1.1
 		secure: false,
 		eventPush: false,
