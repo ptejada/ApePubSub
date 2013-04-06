@@ -3,11 +3,11 @@
  */
 Ape.registerCmd("event", true, function(params, info) {
 	
-	if(params.multi){
-		var recipient = Ape.getChannelByPubid(params.pipe);
-	}else{
-		var recipient = Ape.getUserByPubid(params.pipe);
-	}
+	var recipient = Ape.getChannelByPubid(params.pipe);
+	
+	//Try if the recipient is an user
+	if(!recipient)
+		recipient = Ape.getUserByPubid(params.pipe);
 	
 	if(recipient){
 		
