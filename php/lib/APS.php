@@ -36,21 +36,21 @@
 		private function push(){
 			$inline = array(
 				"cmd" 		=> "eventpush",
-				"params"	=> array(
-						"data"	=> array(
-							"event" => $this->data->params->event, 
-							"data" => $this->data->params->data,
-							),
-						"to"		=> $this->data->params->pipe,
-						"from"		=> $this->from,
-						"sessid"	=> $this->data->sessid
-				)
+				"params"	=> (array)$this->data->params,
+				"sessid"	=> $this->data->sessid
 			);
+			
+			$inline['params']['to'] = $this->data->params->pipe;
 			
 			if(property_exists($this->data->params, "sync"))
 				$inline['params']['sync'] = $this->data->params->sync;
 			
 			$this->cmd = json_encode(array($inline));
+			
+			/*
+			$this->response = $this->cmd;
+			return $this->respond();
+			*/
 			$this->postToAPE();
 			
 			return $this;
