@@ -183,9 +183,10 @@ APS.prototype.on = function(ev, fn){
 	}else if(typeof ev == "object"){
 		Events = ev;
 	}else{
-		return this;
+		this.log("Wrong parameters passed to on() method");
+		return false;
 	}
-
+	
 	for(var e in Events){
 		if(!Events.hasOwnProperty(e)) continue;
 		var fn = Events[e];
@@ -248,7 +249,8 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 			data = JSON.stringify([tmp]);
 		}catch(e){
 			this.log(e);
-			this.log(data);
+			this.log("Data Could not be strigify:", data);
+			this.quit();
 		}
 		
 		//Send command
@@ -333,6 +335,8 @@ APS.prototype.sub = function(channel, Events, callback){
 			channel = channel.toLowerCase();
 			if(typeof this.channels[channel] != "object"){
 				this.sendCmd('JOIN', {'channels': channel});
+			}else{
+				this.log("User already subscribed to [" + channel + "]");
 			}
 		}else{
 			//Multi Channel
@@ -386,8 +390,7 @@ APS.prototype.onChannel = function(channel, Events, fn){
 	channel = channel.toLowerCase();
 	
 	if(channel in this.channels){
-		this.channels[channel].on(Events, fn);
-		return true;
+		return this.channels[channel].on(Events, fn);
 	}
 		
 	if(typeof Events == "object"){
