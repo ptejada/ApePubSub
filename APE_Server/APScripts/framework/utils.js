@@ -1,7 +1,8 @@
 /*
- * Initialize Userlist
+ * Initialize Ape variables
  */
 Ape.userlist = {};
+Ape.channelEvents = {};
 
 /*
  * Enchance Ape.log function
@@ -17,7 +18,7 @@ Ape.log = function(data){
 		default:
 			Apelog(data);
 	}
-	Apelog("\n\r");
+	//Apelog("\r");
 }
 
 /*
@@ -51,11 +52,74 @@ Ape.user.sendEvent = Ape.subuser.sendEvent = Ape.channel.sendEvent = function(bo
 	}
 }
 
+/*
+ * New Ape method: get username by name
+ * 
+ */
 Ape.getUserByName = function(name){
 	name = name.toLowerCase();
 	return Ape.userlist[name] || false;
 }
 
+/*
+ * New Ape method: listen to events by channel
+ */
+Ape.onChannel = function(chanName, Events, handler){
+	if(typeof Events == "object"){
+		//add events to queue
+		if(typeof this.channelEvents[chanName] != "object")
+			this.channelEvents[chanName] = {};
+		
+		for(var $event in Events){
+			$event = $event.toLowerCase();
+			if(typeof this.channelEvents[chanName][$event] != "object")
+				this.channelEvents[chanName][$event] = [];
+			
+			this.channelEvents[chanName][$event].push(Events[$event]);
+			Ape.log("	+ Adding [" +$event+ "] event handler to channel [" + chanName +"]");
+		}
+	}else{
+		var xnew = {};
+		xnew[Events] = handler;
+		this.onChannel(chanName,xnew);
+	}
+}
+/*
+ * New Ape method: trigger channel event
+ */
+Ape.triggerChannelEvent = function(channel, ev, args){
+	ev = ev.toLowerCase();
+	var name = channel.prop("name");
+	
+	if(!(args instanceof Array)) args = [args];
+	
+	//Trigger global all channel events
+	if("*" in this.channelEvents && ev in this.channelEvents["*"]){
+		for(var i in this.channelEvents["*"][ev]){
+			if(this.channelEvents["*"][ev][i].apply(channel, args) === false)
+				return false;
+		}
+	}
+	
+	//Trigger channel specific events
+	if(name in this.channelEvents && ev in this.channelEvents[name]){
+		for(var i in this.channelEvents[name][ev]){
+			if(this.channelEvents[name][ev][i].apply(channel, args) === false)
+				return false;
+		}
+	}
+	
+	return true;
+}
+/*
+ * test
+ */
+Ape.onChannel("*", {
+	message: function(params){
+		params.data += " [APS]";
+		return false;
+	}
+});
 /*
  * Official bind polyfill at developer.mozilla.org
  */ 

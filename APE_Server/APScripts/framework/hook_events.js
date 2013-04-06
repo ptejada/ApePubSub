@@ -25,15 +25,20 @@ Ape.addEvent('deluser', function(user) {
 Ape.addEvent("mkchan", function(channel) {
 	//Create users property	
 	channel.users = {};
+	Ape.triggerChannelEvent(channel, "create", [channel]);
 });
 
 Ape.addEvent("beforeJoin", function(user, channel) {
 	channel.users[user.prop("pubid")] = user;
 	
 	user.channels[channel.prop("name")] = channel;
+	
+	Ape.triggerChannelEvent(channel, "join", [user, channel]);
 });
 
 Ape.addEvent("left", function(user, channel) {
+	Ape.triggerChannelEvent(channel, "left", [user, channel]);
+	
 	delete channel.users[user.prop("pubid")];
 	delete user.channels[channel.prop("name")];
 });
