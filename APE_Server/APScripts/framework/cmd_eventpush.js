@@ -19,7 +19,7 @@ Ape.registerCmd("eventpush", true, function(params, info) {
 		}
 		
 		//Send Data to the Reccipient
-		recipient.sendEvent(params, {"from": info.user.pipe});
+		recipient.sendEvent(params.event, params.data, {"from": info.user.pipe});
 		
 		if(params.sync){
 			info.sendResponse("SYNC", {

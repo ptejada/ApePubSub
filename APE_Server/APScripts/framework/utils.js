@@ -44,7 +44,11 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
 	return this.pipe.toObject().properties;
 }
 
-Ape.user.sendEvent = Ape.subuser.sendEvent = Ape.channel.sendEvent = function(bodyParams, options){
+Ape.user.sendEvent = Ape.subuser.sendEvent = Ape.channel.sendEvent = function($event, $data, options){
+	var bodyParams = {
+		event: $event,
+		data: $data
+	}
 	if(typeof options == "object"){
 		this.pipe.sendRaw("EVENT", bodyParams, options);
 	}else{
@@ -111,15 +115,6 @@ Ape.triggerChannelEvent = function(channel, ev, args){
 	
 	return true;
 }
-/*
- * test
- */
-Ape.onChannel("*", {
-	message: function(params){
-		params.data += " [APS]";
-		return false;
-	}
-});
 /*
  * Official bind polyfill at developer.mozilla.org
  */ 

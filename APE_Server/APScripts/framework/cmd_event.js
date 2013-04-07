@@ -29,7 +29,7 @@ Ape.registerCmd("event", true, function(params, info) {
 		
 		delete params.sync;
 		
-		recipient.sendEvent(params, {from: info.user.pipe});
+		recipient.sendEvent(params.event, params.data, {from: info.user.pipe});
 		
 		return 1;
 	}
