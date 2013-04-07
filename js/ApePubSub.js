@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2013-04-01 @ 04:12
+ * Built on 2013-04-07 @ 04:50
  */
 
 /*
@@ -53,14 +53,14 @@ function APS( server, events, options ){
 		session: true,
 		connectionArgs: {},
 		server: server,
-		transport: ["wb", "lp"],
+		transport: ["ws", "lp"],
 		//transport: "lp",	//Should be the default transport option for APE Server v1.1.1
 		secure: false,
 		eventPush: false,
 		addFrequency: true
 	}
 	this.identifier = "APS";
-	this.version = '1.5.5';
+	this.version = '1.5.6';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -231,9 +231,10 @@ APS.prototype.on = function(ev, fn){
 	}else if(typeof ev == "object"){
 		Events = ev;
 	}else{
-		return this;
+		this.log("Wrong parameters passed to on() method");
+		return false;
 	}
-
+	
 	for(var e in Events){
 		if(!Events.hasOwnProperty(e)) continue;
 		var fn = Events[e];
@@ -284,11 +285,6 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		if(args) tmp.params = args;
 		if(pipe) {
 			tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid;
-			if(this.getPipe(tmp.params.pipe) instanceof APS.channel){
-				tmp.params.multi = true;
-			}else{
-				tmp.params.multi = false;
-			}
 		}
 		if(this.session.id) tmp.sessid = this.session.id;
 		
@@ -301,7 +297,8 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 			data = JSON.stringify([tmp]);
 		}catch(e){
 			this.log(e);
-			this.log(data);
+			this.log("Data Could not be strigify:", data);
+			this.quit();
 		}
 		
 		//Send command
@@ -386,6 +383,8 @@ APS.prototype.sub = function(channel, Events, callback){
 			channel = channel.toLowerCase();
 			if(typeof this.channels[channel] != "object"){
 				this.sendCmd('JOIN', {'channels': channel});
+			}else{
+				this.log("User already subscribed to [" + channel + "]");
 			}
 		}else{
 			//Multi Channel
@@ -439,8 +438,7 @@ APS.prototype.onChannel = function(channel, Events, fn){
 	channel = channel.toLowerCase();
 	
 	if(channel in this.channels){
-		this.channels[channel].on(Events, fn);
-		return true;
+		return this.channels[channel].on(Events, fn);
 	}
 		
 	if(typeof Events == "object"){
@@ -485,7 +483,6 @@ if(navigator.appName != "Microsoft Internet Explorer"){
 	};
 
 }
-
 
 APS.prototype.onMessage = function(data){
 	try { 
@@ -654,6 +651,9 @@ APS.prototype.onMessage = function(data){
 				pipe.trigger('left', [user, pipe]);
 				
 			break;
+			case 'CLOSE':
+				check = false
+			break;
 			case 'ERR' :
 				check = false;
 				var info = [args.code, args.value, args];
@@ -771,7 +771,7 @@ APS.transport = function(server, callback, client){
 		}
 		this.send = function(str, cb, data){
 			if(data.cmd == "Event"){
-				this.request(client.option.eventPush, "cmd="+str+"&from="+client.user.pubid, requestCallback);
+				this.request(client.option.eventPush, "cmd="+str, requestCallback);
 				return "pushed";
 			}else{
 				realSend.apply(this, [str, cb]);
@@ -783,7 +783,7 @@ APS.transport = function(server, callback, client){
 /*
  * Websocket Transport
  */
-APS.transport.wb = function(server, callback, client){
+APS.transport.ws = APS.transport.wb = function(server, callback, client){
 	if('WebSocket' in window){
 		this.id = 6;
 		this.loop = setInterval(client.check.bind(client,true), 40000);
