@@ -22,6 +22,9 @@ Ape.addEvent('deluser', function(user) {
 /*
  * Global server wide channel's users counter
  */
+Ape.addEvent("rmchan", function(channel) {	
+	Ape.triggerChannelEvent(channel, "destroy", [channel]);
+});
 Ape.addEvent("mkchan", function(channel) {
 	//Create users property	
 	channel.users = {};
