@@ -26,7 +26,6 @@
 			if($this->data->cmd == "Event"){
 				$this->event =& $this->data->params->event;
 				$this->eventData =& $this->data->params->data;
-				$this->from = $_REQUEST['from'];
 			}else{
 				//CMD/Event not yet supported
 				$this->error("003", "BAD_CMD");
@@ -42,10 +41,6 @@
 			
 			$this->cmd = json_encode(array($inline));
 			
-			/*
-			$this->response = $this->cmd;
-			return $this->respond();
-			*/
 			$this->postToAPE();
 			
 			return $this;

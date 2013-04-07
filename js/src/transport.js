@@ -55,7 +55,7 @@ APS.transport = function(server, callback, client){
 		}
 		this.send = function(str, cb, data){
 			if(data.cmd == "Event"){
-				this.request(client.option.eventPush, "cmd="+str+"&from="+client.user.pubid, requestCallback);
+				this.request(client.option.eventPush, "cmd="+str, requestCallback);
 				return "pushed";
 			}else{
 				realSend.apply(this, [str, cb]);
