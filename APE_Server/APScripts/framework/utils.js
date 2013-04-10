@@ -33,12 +33,21 @@ var clearInterval = Ape.clearInterval;
  * Built-in object modifications
  */
 Ape.user.prop = Ape.channel.prop = function(index, value){
-	if(typeof index == 'string' && typeof value != 'undefined'){
-		return this.setProperty(index, value);
-	}
-	
-	if(typeof index == 'string' && typeof value == 'undefined'){
-		return this.getProperty(index) || false;
+	if(typeof index != 'undefined'){
+		if(typeof index == "object"){
+			for(var i in index){
+				this.setProperty(i, index[i]);
+			}
+		}else if(typeof value != 'undefined'){
+			this.setProperty(index, value);
+		}else{
+			return this.getProperty(index) || false;
+		}
+		
+		var rev = this.getProperty("_rev");
+		rev = parseInt(rev) || 0;
+		rev++;
+		return this.setProperty("_rev", rev);
 	}
 	
 	return this.pipe.toObject().properties;

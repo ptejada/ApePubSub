@@ -13,9 +13,7 @@ Ape.registerHookCmd("connect", function(params, cmd){
 			if(Ape.getUserByName(user.name)) return ["007", "NAME_USED"];
 		}
 		
-		for(var index in user){
-			cmd.user.prop(index, user[index]);
-		}
+		cmd.user.prop(user);
 	}
 	
 	return 1;

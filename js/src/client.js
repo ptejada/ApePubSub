@@ -9,7 +9,8 @@ function APS( server, events, options ){
 		//transport: "lp",	//Should be the default transport option for APE Server v1.1.1
 		secure: false,
 		eventPush: false,
-		addFrequency: true
+		addFrequency: true,
+		enableLiveObject: true
 	}
 	this.identifier = "APS";
 	this.version = '1.5.6';

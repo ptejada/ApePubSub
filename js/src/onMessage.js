@@ -63,6 +63,9 @@ APS.prototype.onMessage = function(data){
 						if(!user){
 							this.pipes[u[i].pubid] = new APS.user(u[i], this);
 							user = this.pipes[u[i].pubid];
+						}else{
+							if(this.option.enableLiveObject)
+								user.update(u[i].properties);
 						}
 						
 						user.channels[pipe.name] = pipe;
@@ -107,8 +110,6 @@ APS.prototype.onMessage = function(data){
 					pipe.trigger(args.event, [args.data, user, pipe]);
 				}
 				
-				
-				
 			break;
 			case "EVENT":
 				var user = this.pipes[args.from.pubid];
@@ -131,6 +132,12 @@ APS.prototype.onMessage = function(data){
 				//Trigger event on target
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
+				//Update the pipe and user objects
+				if(this.option.enableLiveObject){
+					user.update(args.from.properties);
+					pipe.update(args.pipe.properties);
+				}
+				
 			break;
 			case 'JOIN':
 				var user = this.pipes[args.user.pubid];
@@ -139,6 +146,10 @@ APS.prototype.onMessage = function(data){
 				if(!user){
 					this.pipes[args.user.pubid] = new APS.user(args.user, this);
 					user = this.pipes[args.user.pubid];
+				}else{
+					//Update user object if exists
+					if(this.option.enableLiveObject)
+						user.update(args.user.properties)
 				}
 				
 				//Add user's own pipe to channels list
@@ -147,10 +158,11 @@ APS.prototype.onMessage = function(data){
 				//Add user to channel list
 				pipe.addUser(user);
 				
-				//Update channel
-				pipe.update(args.pipe.properties);
-				
 				pipe.trigger('join', [user, pipe]);
+				
+				//Update pipe channel object
+				if(this.option.enableLiveObject)
+					pipe.update(args.pipe.properties);
 				
 			break;
 			case 'LEFT':
@@ -159,11 +171,16 @@ APS.prototype.onMessage = function(data){
 				
 				delete pipe.users[args.user.pubid];
 				
-				//Update channel
-				pipe.update(args.pipe.properties);
+				//Update pipe channel object
+				if(this.option.enableLiveObject)
+					pipe.update(args.pipe.properties);
 				
 				pipe.trigger('left', [user, pipe]);
 				
+			break;
+			case "SELFUPDATE":
+				if(this.option.enableLiveObject)
+					this.user.update(args.user);
 			break;
 			case 'CLOSE':
 				check = false

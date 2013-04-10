@@ -13,8 +13,14 @@ APS.user = function(pipe, client){
 	this.send = APS.prototype.send.bind(client, this.pubid);
 	
 	this.update = function(o){
-		for(var i in o){
-			if(this[i] != o[i]) this[i] = o[i];
+		if(o._rev > this._rev){
+			for(var i in o){
+				if(this[i] != o[i]){
+					this[i] = o[i];
+					client.trigger("property"+i+"Update", [o[i], this]);
+					client.trigger("propertyUpdate",[i, o[i], this]);
+				}
+			}
 		}
 	}
 }
@@ -28,9 +34,27 @@ APS.cUser = function(pipe, client){
 	}
 	
 	this.update = function(o){
-		for(var i in o){
-			if(this[i] != o[i]) this[i] = o[i];
+		if(o._rev > this._rev){
+			for(var i in o){
+				if(this[i] != o[i]){
+					this[i] = o[i];
+					this.trigger("property"+i+"Update",[o[i], this]);
+					this.trigger("propertyUpdate",[i, o[i], this]);
+				}
+			}
 		}
+	}
+	
+	this.change = function(name, value){
+		if(typeof name == "object"){
+			var data = name;
+		}else{
+			var data = {};
+			data[name] = value;
+		}
+		
+		this.update(data);
+		this._client.sendCmd("propUpdate", data);
 	}
 	
 	this._events = {};

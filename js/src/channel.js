@@ -10,8 +10,14 @@ APS.channel = function(pipe, client) {
 	
 	
 	this.update = function(o){
-		for(var i in o){
-			if(this[i] != o[i]) this[i] = o[i];
+		if(o._rev > this._rev){
+			for(var i in o){
+				if(this[i] != o[i]){
+					this[i] = o[i];
+					this.trigger("property"+i+"Update",[o[i], this]);
+					this.trigger("propertyUpdate",[i, o[i], this]);
+				}
+			}
 		}
 	}
 	
