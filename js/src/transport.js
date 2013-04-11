@@ -3,19 +3,32 @@ APS.transport = function(server, callback, client){
 	this.stack = [];
 	this.callback = callback;
 	
-	//Fire transport
 	var trans = client.option.transport;
 	var args = Array.prototype.slice.call(arguments);
+	
+	/*
+	 * Choosing the right transport according to the option
+	 */
 	if(typeof trans == "object"){
+		/*
+		 * Loop through the array of given objects 
+		 * and use the first compatible one
+		 * if a transport is not compatible it should return false
+		 */
 		for(var t in trans){
 			var ret = APS.transport[trans[t]].apply(this, args);
 			if(ret != false) break;
 		}
 	}else if(typeof trans == "string"){
+		/*
+		 * Use the specify transport explicitly
+		 */
 		APS.transport[trans].apply(this, args);
 	}
 	
-	//Ajax request functions for eventPush
+	/*
+	 * Ajax request function for the eventPush feature
+	 */
 	function getRequest() {
 		if('XMLHttpRequest' in window) return XMLHttpRequest;
 		if('ActiveXObject' in window) {
@@ -33,20 +46,29 @@ APS.transport = function(server, callback, client){
 		return false;
 	}
 	
-	var req = new getRequest();
+	var ajaxObject = new getRequest();
 	
-	req = new req();
-	
+	/*
+	 * Request object to make a simple ajax request
+	 * Used internally for eventPush HTTP requests
+	 */
 	this.request = function(addr, data, callback){
-		req.onreadystatechange = function(){
-			if(this.readyState == 4)
-				callback(this.responseText);
-		};
-		req.open('POST', addr, true);
-		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-		req.send(data);
+		var request = new ajaxObject();
+		
+		request.addEventListener("load", function(){
+			callback(this.responseText);
+		}, false);
+		
+		request.open('POST', addr, true);
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+		request.send(data);
 	}
 	
+	/*
+	 * If eventPush is enabled replace the transport send() method
+	 * The new send method will send all Event commands to the specified
+	 * URL and others request/commands to the original transport send() method
+	 */
 	if(!!client.option.eventPush){
 		var realSend = this.send.bind(this);
 		
@@ -176,6 +198,11 @@ APS.transport.lp = function(server, callback, client){
 	
 	this.close = function(){
 		clearTimeout(client.poller);
+		/*
+		 * The line below is suppose to delete the iframe use by the transport if it the trasnport
+		 * is closed. In the client.connect() method is configured so the initial frame can be
+		 * reused in case of reconnect
+		 */
 		//frame.parentElement.removeChild(frame);
 		client.state = 0;
 	}
