@@ -1,0 +1,52 @@
+#wrap {
+	width: 700px;
+	margin: 0 auto;
+}
+#chatTemplate {
+	display: none
+}
+#chatList .feed {
+	margin-left: 30px;
+	margin-bottom: 10px;
+}
+.headers > h3 {
+	background-color: #00529B;
+	color: #FFFFFF;
+	text-align: center;
+}
+.closeBnt {
+	float: right;
+	color: #fff;
+	font-weight: bold;
+	background: none;
+}
+.grid {
+	display: inline-block;
+	vertical-align: top;
+}
+.col-a.grid {
+	width: 30%
+}
+.col-b.grid {
+	width: 69%
+}
+.error {
+	color: #f00;
+}
+.errorTray {
+	margin-bottom: 10px;
+}
+.user {
+	position: relative;
+	min-height: 30px;
+}
+.user:hover {
+	background-color: #ddd; 
+}
+.user-avatar {
+	vertical-align: middle;
+	padding-right: 5px;
+}
+.user .chatWithUser {
+	float: right;
+}
