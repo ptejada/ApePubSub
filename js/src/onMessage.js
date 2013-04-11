@@ -64,7 +64,7 @@ APS.prototype.onMessage = function(data){
 							this.pipes[u[i].pubid] = new APS.user(u[i], this);
 							user = this.pipes[u[i].pubid];
 						}else{
-							if(this.option.enableLiveObject)
+							if(this.option.autoUpdate)
 								user.update(u[i].properties);
 						}
 						
@@ -133,7 +133,7 @@ APS.prototype.onMessage = function(data){
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
 				//Update the pipe and user objects
-				if(this.option.enableLiveObject){
+				if(this.option.autoUpdate){
 					user.update(args.from.properties);
 					pipe.update(args.pipe.properties);
 				}
@@ -148,7 +148,7 @@ APS.prototype.onMessage = function(data){
 					user = this.pipes[args.user.pubid];
 				}else{
 					//Update user object if exists
-					if(this.option.enableLiveObject)
+					if(this.option.autoUpdate)
 						user.update(args.user.properties)
 				}
 				
@@ -161,7 +161,7 @@ APS.prototype.onMessage = function(data){
 				pipe.trigger('join', [user, pipe]);
 				
 				//Update pipe channel object
-				if(this.option.enableLiveObject)
+				if(this.option.autoUpdate)
 					pipe.update(args.pipe.properties);
 				
 			break;
@@ -172,14 +172,14 @@ APS.prototype.onMessage = function(data){
 				delete pipe.users[args.user.pubid];
 				
 				//Update pipe channel object
-				if(this.option.enableLiveObject)
+				if(this.option.autoUpdate)
 					pipe.update(args.pipe.properties);
 				
 				pipe.trigger('left', [user, pipe]);
 				
 			break;
 			case "SELFUPDATE":
-				if(this.option.enableLiveObject)
+				if(this.option.autoUpdate)
 					this.user.update(args.user);
 			break;
 			case 'CLOSE':

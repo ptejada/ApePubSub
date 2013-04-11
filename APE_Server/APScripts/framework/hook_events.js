@@ -28,6 +28,9 @@ Ape.addEvent("rmchan", function(channel) {
 Ape.addEvent("mkchan", function(channel) {
 	//Create users property	
 	channel.users = {};
+	//Initiate the revision number
+	channel.setProperty("_rev", 1);
+	//Trigger the channel create event
 	Ape.triggerChannelEvent(channel, "create", [channel]);
 });
 

@@ -13,6 +13,7 @@ Ape.registerHookCmd("connect", function(params, cmd){
 			if(Ape.getUserByName(user.name)) return ["007", "NAME_USED"];
 		}
 		
+		//Add public user properties
 		cmd.user.prop(user);
 	}
 	

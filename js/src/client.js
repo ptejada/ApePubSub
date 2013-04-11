@@ -10,7 +10,7 @@ function APS( server, events, options ){
 		secure: false,
 		eventPush: false,
 		addFrequency: true,
-		enableLiveObject: true
+		autoUpdate: true
 	}
 	this.identifier = "APS";
 	this.version = '1.5.6';

@@ -44,6 +44,7 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
 			return this.getProperty(index) || false;
 		}
 		
+		//Increment the revision number
 		var rev = this.getProperty("_rev");
 		rev = parseInt(rev) || 0;
 		rev++;

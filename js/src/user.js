@@ -52,7 +52,7 @@ APS.cUser = function(pipe, client){
 			var data = {};
 			data[name] = value;
 		}
-		
+		//NOTE: data has no revision number thus update will fail
 		this.update(data);
 		this._client.sendCmd("propUpdate", data);
 	}
