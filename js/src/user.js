@@ -17,8 +17,8 @@ APS.user = function(pipe, client){
 			for(var i in o){
 				if(this[i] != o[i]){
 					this[i] = o[i];
-					client.trigger("property"+i+"Update", [o[i], this]);
-					client.trigger("propertyUpdate",[i, o[i], this]);
+					client.trigger("user"+i+"Update", [o[i], this]);
+					client.trigger("userUpdate",[i, o[i], this]);
 				}
 			}
 		}
@@ -38,8 +38,8 @@ APS.cUser = function(pipe, client){
 			for(var i in o){
 				if(this[i] != o[i]){
 					this[i] = o[i];
-					this.trigger("property"+i+"Update",[o[i], this]);
-					this.trigger("propertyUpdate",[i, o[i], this]);
+					this.trigger("user"+i+"Update",[o[i], this]);
+					this.trigger("userUpdate",[i, o[i], this]);
 				}
 			}
 		}
