@@ -1,3 +1,16 @@
+/*
+ * Prototype in the session object
+ * The object current multiple cookies
+ * handlers to save session related data
+ * as well as other persisten information
+ * require by the framework.
+ * 
+ * The session object currently uses cookies
+ * to store the requiered information but in
+ * the future i would like to implment the 
+ * SessionStorage API with a fallback to 
+ * cookies.
+ */
 APS.prototype.session = {
 	id: "",
 	chl: {},

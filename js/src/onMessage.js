@@ -1,3 +1,10 @@
+/*
+ * The function parses all incoming information from the server.
+ * Is the magical function, it takes the raw information 
+ * and convert into usefull dynamic data and objects. It is
+ * also resposible for triggering most of the events in the 
+ * framework
+ */
 APS.prototype.onMessage = function(data){
 	try { 
 		data = JSON.parse(data)
@@ -12,22 +19,33 @@ APS.prototype.onMessage = function(data){
 			return this.transport.close();
 		}
 	}
-		
+	
+	//Initiante variables to be used in the loop below
 	var raw, args, pipe, isIdent = false, check = true;
 	
 	for(var i in data){
 		if(!data.hasOwnProperty(i)) continue;
 		
+		//Assign RAW paramenters to the variable for easy access
 		raw = data[i].raw;
 		args = data[i].data;
 		pipe = null;
 		
+		//Log the name of the incoming RAW
 		this.log('>>>> ', raw , " <<<< ", args);
 		
+		/*
+		 * Filter the actions to be taking according to the 
+		 * type of RAW recived
+		 */
 		switch(raw){
 			case 'LOGIN':
 				check = false;
 				
+				/*
+				 * User has logged in the server
+				 * Store its session ID
+				 */
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
 				this.trigger("login", [args.sessid]);
@@ -35,13 +53,23 @@ APS.prototype.onMessage = function(data){
 			break;
 			case 'IDENT':
 				check = false;
-				isIdent = true; //Flag to trigger the restore method
+				isIdent = true; //Flag to trigger the restored event
 				
+				/*
+				 * Following the LOGIN raw this raw brings the user
+				 * object and all its properties
+				 * 
+				 * Inittiate and store the current user object
+				 */
 				var user = new APS.cUser(args.user, this);
 				this.pipes[user.pubid] = user;
 				
 				this.user = user;
 				
+				/*
+				 * Trigger the ready event only if the state of the
+				 * client is 1 -> connected
+				 */
 				if(this.state == 1)
 					this.trigger('ready');
 				
@@ -55,28 +83,41 @@ APS.prototype.onMessage = function(data){
 				
 				var u = args.users;
 				
+				/*
+				 * Below, the user objects of the channels subscribers
+				 * get intiated and stored in the channel object, as
+				 * well as in the client general pipes array
+				 */
 				if(!!u){
 					var user;
 					//import users from channel to client if any
 					for(var i = 0; i < u.length; i++){
 						user = this.pipes[u[i].pubid]
 						if(!user){
+							/*
+							 * User object does not exists in the client
+							 * Initiate user object and store it
+							 */
 							this.pipes[u[i].pubid] = new APS.user(u[i], this);
 							user = this.pipes[u[i].pubid];
 						}else{
+							/*
+							 * User object exists
+							 * Update object if autoUpdate is enabled
+							 */
 							if(this.option.autoUpdate)
 								user.update(u[i].properties);
 						}
 						
 						user.channels[pipe.name] = pipe;
-						pipe.users[user.pubid] = user;
+						pipe.addUser(user);
 						
 						//Add user's own pipe to channels list
 						user.channels[user.pubid] = user;
 					}
 				}
 				
-				//Add events from queue
+				//Add events to channel from queue
 				var chanName = pipe.name.toLowerCase();
 				if(typeof this.eQueue[chanName] == "object"){
 					var queue = this.eQueue[chanName];
@@ -95,7 +136,9 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case "SYNC":
-				//Raw that synchronizes events accross multiple client instances
+				/*
+				 * Synchronizes events accross multiple client instances
+				 */
 				var user = this.user;
 				
 				pipe = this.pipes[args.chanid];
@@ -112,6 +155,9 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case "EVENT":
+				/*
+				 * Parses and triggers an incoming Event
+				 */
 				var user = this.pipes[args.from.pubid];
 				
 				if(typeof user == "undefined" && !!args.from){
@@ -140,14 +186,26 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case 'JOIN':
+				/*
+				 * A new user has join a channel
+				 * Parse the raw and trigger the correspoding
+				 * events
+				 */
 				var user = this.pipes[args.user.pubid];
 				pipe = this.pipes[args.pipe.pubid];
 				
 				if(!user){
+					/*
+					 * User is not in the client yet
+					 * Initiate and store its object
+					 */
 					this.pipes[args.user.pubid] = new APS.user(args.user, this);
 					user = this.pipes[args.user.pubid];
 				}else{
-					//Update user object if exists
+					/*
+					 * User already in client, use existing object
+					 * Update object if autoUpdate is enabled
+					 */
 					if(this.option.autoUpdate)
 						user.update(args.user.properties)
 				}
@@ -166,6 +224,13 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case 'LEFT':
+				/*
+				 * A user as left a channel
+				 * Parse event to trigger the corresponding events
+				 * and delete the user refereces from channel but
+				 * keep user object in the client in case is being 
+				 * use by another channel
+				 */
 				pipe = this.pipes[args.pipe.pubid];
 				var user = this.pipes[args.user.pubid];
 				
@@ -179,13 +244,27 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case "SELFUPDATE":
+				/*
+				 * Update the current user object properties as 
+				 * per its state in the server. Only will work
+				 * if autoUpdate is enabled
+				 */
 				if(this.option.autoUpdate)
 					this.user.update(args.user);
 			break;
 			case 'CLOSE':
+				/*
+				 * Required by the longPolling protocol to avoid
+				 * a racing effect with AJax requests
+				 */
 				check = false
 			break;
 			case 'ERR' :
+				/*
+				 * Parses default server errors,
+				 * Handle them and trigger the API
+				 * frindly events
+				 */
 				check = false;
 				var info = [args.code, args.value, args];
 				
