@@ -77,6 +77,7 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case 'CHANNEL':
+				//The pipr is the channel object
 				pipe = new APS.channel(args.pipe, this);
 				this.pipes[pipe.pubid] = pipe;
 				this.channels[pipe.name] = pipe;
@@ -92,28 +93,7 @@ APS.prototype.onMessage = function(data){
 					var user;
 					//import users from channel to client if any
 					for(var i = 0; i < u.length; i++){
-						user = this.pipes[u[i].pubid]
-						if(!user){
-							/*
-							 * User object does not exists in the client
-							 * Initiate user object and store it
-							 */
-							this.pipes[u[i].pubid] = new APS.user(u[i], this);
-							user = this.pipes[u[i].pubid];
-						}else{
-							/*
-							 * User object exists
-							 * Update object if autoUpdate is enabled
-							 */
-							if(this.option.autoUpdate)
-								user.update(u[i].properties);
-						}
-						
-						user.channels[pipe.name] = pipe;
-						pipe.addUser(user);
-						
-						//Add user's own pipe to channels list
-						user.channels[user.pubid] = user;
+						user = pipe.addUser(u[i]);
 					}
 				}
 				
@@ -191,27 +171,9 @@ APS.prototype.onMessage = function(data){
 				 * Parse the raw and trigger the correspoding
 				 * events
 				 */
-				var user = this.pipes[args.user.pubid];
+				//pipe is the channel object
 				pipe = this.pipes[args.pipe.pubid];
-				
-				if(!user){
-					/*
-					 * User is not in the client yet
-					 * Initiate and store its object
-					 */
-					this.pipes[args.user.pubid] = new APS.user(args.user, this);
-					user = this.pipes[args.user.pubid];
-				}else{
-					/*
-					 * User already in client, use existing object
-					 * Update object if autoUpdate is enabled
-					 */
-					if(this.option.autoUpdate)
-						user.update(args.user.properties)
-				}
-				
-				//Add user's own pipe to channels list
-				user.channels[args.user.pubid] = user;
+				var user = pipe.addUser(args.user);
 				
 				//Add user to channel list
 				pipe.addUser(user);

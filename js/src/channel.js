@@ -65,7 +65,31 @@ APS.channel = function(pipe, client) {
 		//Methods and prop for interactive channels
 		this.users = {};
 		this.addUser = function(u){
-			this.users[u.pubid] = u;
+			var user = client.getPipe[u.pubid];
+			if(!user){
+				/*
+				 * User object does not exists in the client
+				 * Initiate user object and store it
+				 */
+				client.pipes[u.pubid] = new APS.user(u, client);
+				user = client.pipes[u.pubid];
+				
+				//Add user's own pipe to channels list
+				user.channels[user.pubid] = user;
+			}else{
+				/*
+				 * User object exists
+				 * Update object if autoUpdate is enabled
+				 */
+				if(client.option.autoUpdate)
+					user.update(u.properties);
+			}
+			
+			//Add channel reference to the user
+			user.channels[this.name] = this;
+			
+			this.users[u.pubid] = user;
+			return user;
 		}
 		this.send = APS.prototype.send.bind(client, this.pubid);
 		this.pub = client.pub.bind(client, this.name);
