@@ -1,4 +1,4 @@
-Ape.registerHookCmd("connect", function(params, cmd){
+Ape.registerHookCmd("CONNECT", function(params, cmd){
 	//IMPORTANT! create channels property
 	cmd.user.channels = {};
 	
