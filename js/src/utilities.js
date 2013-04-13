@@ -1,7 +1,7 @@
 /*
  * Generates a random string
  *  - First paramater(integer) determines the length
- *  - Second parameter(string) a string of alternative keys to use
+ *  - Second parameter(string) an optional string of alternative keys to use
  */
 function randomString(l, keys){
 	var chars = keys || "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";

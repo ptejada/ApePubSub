@@ -1,3 +1,12 @@
+/**
+ * The client constructor
+ * 
+ * @param (string) server The APE Server Url including port number
+ * @param (object) events Event handlers to be added to the client   
+ * @param (object) options Options to configure the client
+ * 
+ * @return An APS or client instance   
+ */
 function APS( server, events, options ){
 	this.option = {
 		'poll': 25000,
@@ -54,8 +63,12 @@ function APS( server, events, options ){
 	return this;
 }
 
-/*
+/**
  * Handles the initial connection to the server
+ * 
+ * @param (object) args Arguments to send with the initial connect request
+ * 
+ * @return The client reference or false if the connection request has been canceled
  */
 APS.prototype.connect = function(args){
 	var fserver = this.option.server;
@@ -138,8 +151,13 @@ APS.prototype.reconnect = function(){
 	this.connect();
 }
 
-/*
+/**
  * Fires events on object's _events stack
+ * 
+ * @param (string) ev Name of the event to trigger, not case sensitive
+ * @param (array) args An array of arguments to passed to the event handler function
+ * 
+ * @return (bool) False if any of the event handlers explicitly returns false, otherwise true
  */
 APS.prototype.trigger = function(ev, args){
 	ev = ev.toLowerCase();
@@ -173,8 +191,13 @@ APS.prototype.trigger = function(ev, args){
 	return true;
 }
 
-/*
+/**
  * Use to handles events on all object
+ * 
+ * @param (string) ev Name of the event handler to add, not case sensitive
+ * @param (function) fn Function to handle the event
+ * 
+ * @return (bool|object) False if wrong parameters are passed, otherwise the client or parent object reference
  */
 APS.prototype.on = function(ev, fn){
 	var Events = [];
@@ -200,8 +223,8 @@ APS.prototype.on = function(ev, fn){
 	return this;
 }
 
-/*
- * Get any object by its unique pubid
+/**
+ * Get any object by its unique pubid, user or channel
  */
 APS.prototype.getPipe = function(user){
 	if(typeof user == 'string'){
@@ -211,8 +234,23 @@ APS.prototype.getPipe = function(user){
 	}
 }
 
-/*
+/**
  * Sends an event throught a pipe/user/channel
+ * This function is not usefull in this context
+ * Its real use is when bound to a user or channel
+ * objects.
+ * 
+ * Although it could be usefull if a developer has
+ * its own way of getting a user's or channels's pubid
+ * who object does not resides in the local client
+ * 
+ * @param (object|string) pipe The pubid string or pipe object of user or channel
+ * @param (string) $event The name of the event to send
+ * @param (object|string|array) data The data to send with the event
+ * @param (bool) sync Weather to sync event accoss the user's session or not
+ * @param (function) callback Function to after the event has been sent 
+ * 
+ * @return (object) client or parent object reference
  */
 APS.prototype.send = function(pipe, $event, data, sync, callback){
 	this.sendCmd("Event", {
@@ -220,10 +258,19 @@ APS.prototype.send = function(pipe, $event, data, sync, callback){
 		data: data,
 		sync: sync
 	}, pipe, callback);
+	
+	return this;
 }
 
-/*
+/**
  * Internal method to wrap events and send them as commands to the server
+ * 
+ * @param (string) cmd Name of command in the server which will handle the request
+ * @param (object|string|array) args The data to send with the command
+ * @param (object|string) pipe The pubid string or pipe object of user or channel
+ * @param (function) callback Function to after the event has been sent 
+ * 
+ * @return (object) client reference
  */
 APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 	var specialCmd = {CONNECT: 0, RESTORE:0};
@@ -266,7 +313,7 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 	return this;
 }
 
-/*
+/**
  * Polls the server for information when using the Long Polling transport
  */
 APS.prototype.poll = function(){
@@ -276,7 +323,7 @@ APS.prototype.poll = function(){
 	}
 }
 
-/*
+/**
  * Sends a check command to the server
  */
 APS.prototype.check = function(force){
@@ -286,8 +333,9 @@ APS.prototype.check = function(force){
 	}
 }
 
-/*
+/**
  * Sends the QUIT command to the server and completely destroys the client instance
+ * and session
  */
 APS.prototype.quit = function(){
 	this.sendCmd('QUIT');
@@ -298,8 +346,14 @@ APS.prototype.quit = function(){
 	this.state = 0;
 }
 
-/*
+/**
  * Subscribe to a channel
+ * 
+ * @param (string) channel Name of the channel to subscribe to
+ * @param (object) Events List of events to add to the channel
+ * @param (function) callback Function to be called when a user successfuly subscribes to the channel
+ * 
+ * @return (object) client reference
  */
 APS.prototype.sub = function(channel, Events, callback){
 	//Handle the events
@@ -372,8 +426,10 @@ APS.prototype.pub = function(channel, data, sync, callback){
 	}
 };
 
-/*
+/**
  * Get a channel object by its name
+ * 
+ * @param (string) channel Name of the channel
  */
 APS.prototype.getChannel = function(channel){
 	channel = channel.toLowerCase();
@@ -385,7 +441,7 @@ APS.prototype.getChannel = function(channel){
 }
 
 /*
- * Add events to a channel, even is user has not subscribed to it yet
+ * Add events to a channel, even if the user has not subscribed to it yet
  */
 APS.prototype.onChannel = function(channel, Events, fn){
 	channel = channel.toLowerCase();
@@ -414,8 +470,10 @@ APS.prototype.onChannel = function(channel, Events, fn){
 	}
 }
 
-/*
+/**
  * Unsubscribe from a channel
+ * 
+ * @param (string) channel Name of the channel to unsubscribe
  */
 APS.prototype.unSub = function(channel){
 	if(channel == "") return;
