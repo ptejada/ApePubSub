@@ -81,15 +81,16 @@ Ape.getUserByName = function(name){
 Ape.onChannel = function(chanName, Events, handler){
 	if(typeof Events == "object"){
 		//add events to queue
-		if(typeof this.channelEvents[chanName] != "object")
+		if(!(chanName in this.channelEvents))
 			this.channelEvents[chanName] = {};
 		
 		for(var $event in Events){
+			handler = Events[$event];
 			$event = $event.toLowerCase();
-			if(typeof this.channelEvents[chanName][$event] != "object")
+			if(!($event in this.channelEvents[chanName]))
 				this.channelEvents[chanName][$event] = [];
 			
-			this.channelEvents[chanName][$event].push(Events[$event]);
+			this.channelEvents[chanName][$event].push(handler);
 			Ape.log("	+ Adding [" +$event+ "] event handler to channel [" + chanName +"]");
 		}
 	}else{
