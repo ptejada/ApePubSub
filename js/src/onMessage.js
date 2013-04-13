@@ -165,6 +165,9 @@ APS.prototype.onMessage = function(data){
 				}
 				
 			break;
+			case "NOJOIN":
+				this.trigger("notjoined", [args])
+			break;
 			case 'JOIN':
 				/*
 				 * A new user has join a channel
