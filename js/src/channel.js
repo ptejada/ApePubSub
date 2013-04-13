@@ -28,6 +28,7 @@ APS.channel = function(pipe, client) {
 	 * property changes 
 	 */
 	this.update = function(o){
+		o._rev = parseInt(o._rev);
 		if(o._rev > this._rev){
 			for(var i in o){
 				if(this[i] != o[i]){

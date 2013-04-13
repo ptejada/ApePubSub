@@ -142,7 +142,8 @@ APS.prototype.onMessage = function(data){
 				
 				if(typeof user == "undefined" && !!args.from){
 					//Create user it doesn't exists
-					user = client.pipe[args.from.pubid] = new APS.user(args.from)
+					client.pipe[args.from.pubid] = new APS.user(args.from, client);
+					user = client.pipe[args.from.pubid];
 				}
 				
 				pipe = this.pipes[args.pipe.pubid];
@@ -161,7 +162,8 @@ APS.prototype.onMessage = function(data){
 				//Update the pipe and user objects
 				if(this.option.autoUpdate){
 					user.update(args.from.properties);
-					pipe.update(args.pipe.properties);
+					if(pipe.pubid != user.pubid)
+						pipe.update(args.pipe.properties);
 				}
 				
 			break;
@@ -176,10 +178,8 @@ APS.prototype.onMessage = function(data){
 				 */
 				//pipe is the channel object
 				pipe = this.pipes[args.pipe.pubid];
-				var user = pipe.addUser(args.user);
-				
 				//Add user to channel list
-				pipe.addUser(user);
+				var user = pipe.addUser(args.user);
 				
 				pipe.trigger('join', [user, pipe]);
 				
