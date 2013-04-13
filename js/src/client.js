@@ -389,7 +389,7 @@ APS.prototype.sub = function(channel, Events, callback){
 			//Single Channel
 			channel = channel.toLowerCase();
 			if(typeof this.channels[channel] != "object"){
-				this.sendCmd('JOIN', {'channels': channel});
+				this.sendCmd('JOIN', {'channels': [channel]});
 			}else{
 				this.log("User already subscribed to [" + channel + "]");
 			}
