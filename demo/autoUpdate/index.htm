@@ -17,33 +17,31 @@
 	
 	<body>
 		<div id="wrap">
-			<form id="userPicker">
-				My name is 
-				<input type="text" name="username">
-				
-				<button type="submit">Join The List</button>
-				<div class="errorTray"></div>
-			</form>
+			<p>
+				I am user <u><strong class="myName">_</strong></u>
+			</p>
 			
 			<hr>
 			
 			<div class="headers">
-				<h3 class="grid col-a">User List</h3>
-				<h3 class="grid col-b">Chat List</h3>
+				<h3 class="grid col-a">My Properties</h3>
+				<h3 class="grid col-b">Others Public Properties</h3>
 			</div>
 			<div>
-				<div id="userList" class="grid col-a"></div>
-				<div id="chatList" class="grid col-b"></div>		
+				<div id="myProps" class="grid col-a">
+					<div id="myUser"></div>
+					<hr>
+					<form id="newPropertyAdder">
+						<label>name:</label>
+						<input type="text" name="name" />
+						<label>value:</label>
+						<input type="text" name="value" />
+						<button>Add New Property</button>
+					</form>
+				</div>
+				<div id="othersProps" class="grid col-b"></div>		
 			</div>
 			
-			<div id="chatTemplate" class="feed">
-				<button class="closeBnt">X</button>
-				<h1>Chat | <img class="user-avatar"><i class="name"></i></h1>
-				<div class="feed-body"></div>
-				<form class="feed-send">
-					<input type="text" name="message" /><input type="submit" value="Send" />
-				</form>
-			</div>
 		</div>
 		
 		
