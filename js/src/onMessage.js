@@ -134,6 +134,21 @@ APS.prototype.onMessage = function(data){
 				}
 				
 			break;
+			case "EVENT-X":
+				/*
+				 * Handle events without a sender, recipient and sender
+				 * will be same in this case of events
+				 */
+				pipe = this.pipes[args.pipe.pubid];
+				
+				//Trigger event on target
+				pipe.trigger(args.event, [args.data, pipe, pipe]);
+				
+				//Update the pipe
+				if(this.option.autoUpdate)
+					pipe.update(args.pipe.properties);
+				
+			break;
 			case "EVENT":
 				/*
 				 * Parses and triggers an incoming Event

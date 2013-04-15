@@ -54,15 +54,20 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
 	return this.pipe.toObject().properties;
 }
 
-Ape.user.sendEvent = Ape.subuser.sendEvent = Ape.channel.sendEvent = function($event, $data, options){
-	var bodyParams = {
-		event: $event,
-		data: $data
-	}
-	if(typeof options == "object"){
+Ape.user.sendEvent = Ape.channel.sendEvent = function($event, $data, options){
+	if(!!options && "from" in options){
+		var bodyParams = {
+			event: $event,
+			data: $data
+		}
 		this.pipe.sendRaw("EVENT", bodyParams, options);
 	}else{
-		this.pipe.sendRaw("EVENT", bodyParams);
+		var bodyParams = {
+			event: $event,
+			data: $data,
+			pipe: this.pipe.toObject()
+		}		
+		this.pipe.sendRaw("EVENT-X", bodyParams);
 	}
 }
 
