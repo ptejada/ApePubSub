@@ -1,12 +1,13 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2013-04-07 @ 04:50
+ * Built on 2013-04-15 @ 02:04
  */
 
 /*
  * Generates a random string
  *  - First paramater(integer) determines the length
+ *  - Second parameter(string) an optional string of alternative keys to use
  */
 function randomString(l, keys){
 	var chars = keys || "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
@@ -46,6 +47,15 @@ if(!Function.prototype.bind){
 	};
 }
 
+/**
+ * The client constructor
+ * 
+ * @param (string) server The APE Server Url including port number
+ * @param (object) events Event handlers to be added to the client   
+ * @param (object) options Options to configure the client
+ * 
+ * @return An APS or client instance   
+ */
 function APS( server, events, options ){
 	this.option = {
 		'poll': 25000,
@@ -57,7 +67,8 @@ function APS( server, events, options ){
 		//transport: "lp",	//Should be the default transport option for APE Server v1.1.1
 		secure: false,
 		eventPush: false,
-		addFrequency: true
+		addFrequency: true,
+		autoUpdate: true
 	}
 	this.identifier = "APS";
 	this.version = '1.5.6';
@@ -101,8 +112,12 @@ function APS( server, events, options ){
 	return this;
 }
 
-/*
+/**
  * Handles the initial connection to the server
+ * 
+ * @param (object) args Arguments to send with the initial connect request
+ * 
+ * @return The client reference or false if the connection request has been canceled
  */
 APS.prototype.connect = function(args){
 	var fserver = this.option.server;
@@ -185,8 +200,13 @@ APS.prototype.reconnect = function(){
 	this.connect();
 }
 
-/*
+/**
  * Fires events on object's _events stack
+ * 
+ * @param (string) ev Name of the event to trigger, not case sensitive
+ * @param (array) args An array of arguments to passed to the event handler function
+ * 
+ * @return (bool) False if any of the event handlers explicitly returns false, otherwise true
  */
 APS.prototype.trigger = function(ev, args){
 	ev = ev.toLowerCase();
@@ -220,8 +240,13 @@ APS.prototype.trigger = function(ev, args){
 	return true;
 }
 
-/*
+/**
  * Use to handles events on all object
+ * 
+ * @param (string) ev Name of the event handler to add, not case sensitive
+ * @param (function) fn Function to handle the event
+ * 
+ * @return (bool|object) False if wrong parameters are passed, otherwise the client or parent object reference
  */
 APS.prototype.on = function(ev, fn){
 	var Events = [];
@@ -247,8 +272,8 @@ APS.prototype.on = function(ev, fn){
 	return this;
 }
 
-/*
- * Get any object by its unique pubid
+/**
+ * Get any object by its unique pubid, user or channel
  */
 APS.prototype.getPipe = function(user){
 	if(typeof user == 'string'){
@@ -258,8 +283,23 @@ APS.prototype.getPipe = function(user){
 	}
 }
 
-/*
+/**
  * Sends an event throught a pipe/user/channel
+ * This function is not usefull in this context
+ * Its real use is when bound to a user or channel
+ * objects.
+ * 
+ * Although it could be usefull if a developer has
+ * its own way of getting a user's or channels's pubid
+ * who object does not resides in the local client
+ * 
+ * @param (object|string) pipe The pubid string or pipe object of user or channel
+ * @param (string) $event The name of the event to send
+ * @param (object|string|array) data The data to send with the event
+ * @param (bool) sync Weather to sync event accoss the user's session or not
+ * @param (function) callback Function to after the event has been sent 
+ * 
+ * @return (object) client or parent object reference
  */
 APS.prototype.send = function(pipe, $event, data, sync, callback){
 	this.sendCmd("Event", {
@@ -267,10 +307,19 @@ APS.prototype.send = function(pipe, $event, data, sync, callback){
 		data: data,
 		sync: sync
 	}, pipe, callback);
+	
+	return this;
 }
 
-/*
+/**
  * Internal method to wrap events and send them as commands to the server
+ * 
+ * @param (string) cmd Name of command in the server which will handle the request
+ * @param (object|string|array) args The data to send with the command
+ * @param (object|string) pipe The pubid string or pipe object of user or channel
+ * @param (function) callback Function to after the event has been sent 
+ * 
+ * @return (object) client reference
  */
 APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 	var specialCmd = {CONNECT: 0, RESTORE:0};
@@ -313,7 +362,7 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 	return this;
 }
 
-/*
+/**
  * Polls the server for information when using the Long Polling transport
  */
 APS.prototype.poll = function(){
@@ -323,7 +372,7 @@ APS.prototype.poll = function(){
 	}
 }
 
-/*
+/**
  * Sends a check command to the server
  */
 APS.prototype.check = function(force){
@@ -333,8 +382,9 @@ APS.prototype.check = function(force){
 	}
 }
 
-/*
+/**
  * Sends the QUIT command to the server and completely destroys the client instance
+ * and session
  */
 APS.prototype.quit = function(){
 	this.sendCmd('QUIT');
@@ -345,8 +395,14 @@ APS.prototype.quit = function(){
 	this.state = 0;
 }
 
-/*
+/**
  * Subscribe to a channel
+ * 
+ * @param (string) channel Name of the channel to subscribe to
+ * @param (object) Events List of events to add to the channel
+ * @param (function) callback Function to be called when a user successfuly subscribes to the channel
+ * 
+ * @return (object) client reference
  */
 APS.prototype.sub = function(channel, Events, callback){
 	//Handle the events
@@ -382,7 +438,7 @@ APS.prototype.sub = function(channel, Events, callback){
 			//Single Channel
 			channel = channel.toLowerCase();
 			if(typeof this.channels[channel] != "object"){
-				this.sendCmd('JOIN', {'channels': channel});
+				this.sendCmd('JOIN', {'channels': [channel]});
 			}else{
 				this.log("User already subscribed to [" + channel + "]");
 			}
@@ -419,8 +475,10 @@ APS.prototype.pub = function(channel, data, sync, callback){
 	}
 };
 
-/*
+/**
  * Get a channel object by its name
+ * 
+ * @param (string) channel Name of the channel
  */
 APS.prototype.getChannel = function(channel){
 	channel = channel.toLowerCase();
@@ -432,7 +490,7 @@ APS.prototype.getChannel = function(channel){
 }
 
 /*
- * Add events to a channel, even is user has not subscribed to it yet
+ * Add events to a channel, even if the user has not subscribed to it yet
  */
 APS.prototype.onChannel = function(channel, Events, fn){
 	channel = channel.toLowerCase();
@@ -461,8 +519,10 @@ APS.prototype.onChannel = function(channel, Events, fn){
 	}
 }
 
-/*
+/**
  * Unsubscribe from a channel
+ * 
+ * @param (string) channel Name of the channel to unsubscribe
  */
 APS.prototype.unSub = function(channel){
 	if(channel == "") return;
@@ -484,6 +544,13 @@ if(navigator.appName != "Microsoft Internet Explorer"){
 
 }
 
+/*
+ * The function parses all incoming information from the server.
+ * Is the magical function, it takes the raw information 
+ * and convert into usefull dynamic data and objects. It is
+ * also resposible for triggering most of the events in the 
+ * framework
+ */
 APS.prototype.onMessage = function(data){
 	try { 
 		data = JSON.parse(data)
@@ -498,22 +565,33 @@ APS.prototype.onMessage = function(data){
 			return this.transport.close();
 		}
 	}
-		
+	
+	//Initiante variables to be used in the loop below
 	var raw, args, pipe, isIdent = false, check = true;
 	
 	for(var i in data){
 		if(!data.hasOwnProperty(i)) continue;
 		
+		//Assign RAW paramenters to the variable for easy access
 		raw = data[i].raw;
 		args = data[i].data;
 		pipe = null;
 		
+		//Log the name of the incoming RAW
 		this.log('>>>> ', raw , " <<<< ", args);
 		
+		/*
+		 * Filter the actions to be taking according to the 
+		 * type of RAW recived
+		 */
 		switch(raw){
 			case 'LOGIN':
 				check = false;
 				
+				/*
+				 * User has logged in the server
+				 * Store its session ID
+				 */
 				this.state = this.state == 0 ? 1 : this.state;
 				this.session.id = args.sessid;
 				this.trigger("login", [args.sessid]);
@@ -521,13 +599,23 @@ APS.prototype.onMessage = function(data){
 			break;
 			case 'IDENT':
 				check = false;
-				isIdent = true; //Flag to trigger the restore method
+				isIdent = true; //Flag to trigger the restored event
 				
+				/*
+				 * Following the LOGIN raw this raw brings the user
+				 * object and all its properties
+				 * 
+				 * Inittiate and store the current user object
+				 */
 				var user = new APS.cUser(args.user, this);
 				this.pipes[user.pubid] = user;
 				
 				this.user = user;
 				
+				/*
+				 * Trigger the ready event only if the state of the
+				 * client is 1 -> connected
+				 */
 				if(this.state == 1)
 					this.trigger('ready');
 				
@@ -535,31 +623,27 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case 'CHANNEL':
+				//The pipr is the channel object
 				pipe = new APS.channel(args.pipe, this);
 				this.pipes[pipe.pubid] = pipe;
 				this.channels[pipe.name] = pipe;
 				
 				var u = args.users;
 				
+				/*
+				 * Below, the user objects of the channels subscribers
+				 * get intiated and stored in the channel object, as
+				 * well as in the client general pipes array
+				 */
 				if(!!u){
 					var user;
 					//import users from channel to client if any
 					for(var i = 0; i < u.length; i++){
-						user = this.pipes[u[i].pubid]
-						if(!user){
-							this.pipes[u[i].pubid] = new APS.user(u[i], this);
-							user = this.pipes[u[i].pubid];
-						}
-						
-						user.channels[pipe.name] = pipe;
-						pipe.users[user.pubid] = user;
-						
-						//Add user's own pipe to channels list
-						user.channels[user.pubid] = user;
+						user = pipe.addUser(u[i]);
 					}
 				}
 				
-				//Add events from queue
+				//Add events to channel from queue
 				var chanName = pipe.name.toLowerCase();
 				if(typeof this.eQueue[chanName] == "object"){
 					var queue = this.eQueue[chanName];
@@ -578,7 +662,9 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case "SYNC":
-				//Raw that synchronizes events accross multiple client instances
+				/*
+				 * Synchronizes events accross multiple client instances
+				 */
 				var user = this.user;
 				
 				pipe = this.pipes[args.chanid];
@@ -593,15 +679,32 @@ APS.prototype.onMessage = function(data){
 					pipe.trigger(args.event, [args.data, user, pipe]);
 				}
 				
+			break;
+			case "EVENT-X":
+				/*
+				 * Handle events without a sender, recipient and sender
+				 * will be same in this case of events
+				 */
+				pipe = this.pipes[args.pipe.pubid];
 				
+				//Trigger event on target
+				pipe.trigger(args.event, [args.data, pipe, pipe]);
+				
+				//Update the pipe
+				if(this.option.autoUpdate)
+					pipe.update(args.pipe.properties);
 				
 			break;
 			case "EVENT":
+				/*
+				 * Parses and triggers an incoming Event
+				 */
 				var user = this.pipes[args.from.pubid];
 				
 				if(typeof user == "undefined" && !!args.from){
 					//Create user it doesn't exists
-					user = client.pipe[args.from.pubid] = new APS.user(args.from)
+					client.pipe[args.from.pubid] = new APS.user(args.from, client);
+					user = client.pipe[args.from.pubid];
 				}
 				
 				pipe = this.pipes[args.pipe.pubid];
@@ -617,44 +720,77 @@ APS.prototype.onMessage = function(data){
 				//Trigger event on target
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
-			break;
-			case 'JOIN':
-				var user = this.pipes[args.user.pubid];
-				pipe = this.pipes[args.pipe.pubid];
-				
-				if(!user){
-					this.pipes[args.user.pubid] = new APS.user(args.user, this);
-					user = this.pipes[args.user.pubid];
+				//Update the pipe and user objects
+				if(this.option.autoUpdate){
+					user.update(args.from.properties);
+					if(pipe.pubid != user.pubid)
+						pipe.update(args.pipe.properties);
 				}
 				
-				//Add user's own pipe to channels list
-				user.channels[args.user.pubid] = user;
-				
+			break;
+			case "NOJOIN":
+				this.trigger("notjoined", [args])
+			break;
+			case 'JOIN':
+				/*
+				 * A new user has join a channel
+				 * Parse the raw and trigger the correspoding
+				 * events
+				 */
+				//pipe is the channel object
+				pipe = this.pipes[args.pipe.pubid];
 				//Add user to channel list
-				pipe.addUser(user);
-				
-				//Update channel
-				pipe.update(args.pipe.properties);
+				var user = pipe.addUser(args.user);
 				
 				pipe.trigger('join', [user, pipe]);
 				
+				//Update pipe channel object
+				if(this.option.autoUpdate)
+					pipe.update(args.pipe.properties);
+				
 			break;
 			case 'LEFT':
+				/*
+				 * A user as left a channel
+				 * Parse event to trigger the corresponding events
+				 * and delete the user refereces from channel but
+				 * keep user object in the client in case is being 
+				 * use by another channel
+				 */
 				pipe = this.pipes[args.pipe.pubid];
 				var user = this.pipes[args.user.pubid];
 				
 				delete pipe.users[args.user.pubid];
 				
-				//Update channel
-				pipe.update(args.pipe.properties);
+				//Update pipe channel object
+				if(this.option.autoUpdate)
+					pipe.update(args.pipe.properties);
 				
 				pipe.trigger('left', [user, pipe]);
 				
 			break;
+			case "SELFUPDATE":
+				/*
+				 * Update the current user object properties as 
+				 * per its state in the server. Only will work
+				 * if autoUpdate is enabled
+				 */
+				if(this.option.autoUpdate)
+					this.user.update(args.user);
+			break;
 			case 'CLOSE':
+				/*
+				 * Required by the longPolling protocol to avoid
+				 * a racing effect with AJax requests
+				 */
 				check = false
 			break;
 			case 'ERR' :
+				/*
+				 * Parses default server errors,
+				 * Handle them and trigger the API
+				 * frindly events
+				 */
 				check = false;
 				var info = [args.code, args.value, args];
 				
@@ -719,19 +855,32 @@ APS.transport = function(server, callback, client){
 	this.stack = [];
 	this.callback = callback;
 	
-	//Fire transport
 	var trans = client.option.transport;
 	var args = Array.prototype.slice.call(arguments);
+	
+	/*
+	 * Choosing the right transport according to the option
+	 */
 	if(typeof trans == "object"){
+		/*
+		 * Loop through the array of given objects 
+		 * and use the first compatible one
+		 * if a transport is not compatible it should return false
+		 */
 		for(var t in trans){
 			var ret = APS.transport[trans[t]].apply(this, args);
 			if(ret != false) break;
 		}
 	}else if(typeof trans == "string"){
+		/*
+		 * Use the specify transport explicitly
+		 */
 		APS.transport[trans].apply(this, args);
 	}
 	
-	//Ajax request functions for eventPush
+	/*
+	 * Ajax request function for the eventPush feature
+	 */
 	function getRequest() {
 		if('XMLHttpRequest' in window) return XMLHttpRequest;
 		if('ActiveXObject' in window) {
@@ -749,20 +898,29 @@ APS.transport = function(server, callback, client){
 		return false;
 	}
 	
-	var req = new getRequest();
+	var ajaxObject = new getRequest();
 	
-	req = new req();
-	
+	/*
+	 * Request object to make a simple ajax request
+	 * Used internally for eventPush HTTP requests
+	 */
 	this.request = function(addr, data, callback){
-		req.onreadystatechange = function(){
-			if(this.readyState == 4)
-				callback(this.responseText);
-		};
-		req.open('POST', addr, true);
-		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-		req.send(data);
+		var request = new ajaxObject();
+		
+		request.addEventListener("load", function(){
+			callback(this.responseText);
+		}, false);
+		
+		request.open('POST', addr, true);
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+		request.send(data);
 	}
 	
+	/*
+	 * If eventPush is enabled replace the transport send() method
+	 * The new send method will send all Event commands to the specified
+	 * URL and others request/commands to the original transport send() method
+	 */
 	if(!!client.option.eventPush){
 		var realSend = this.send.bind(this);
 		
@@ -892,6 +1050,11 @@ APS.transport.lp = function(server, callback, client){
 	
 	this.close = function(){
 		clearTimeout(client.poller);
+		/*
+		 * The line below is suppose to delete the iframe use by the transport if it the trasnport
+		 * is closed. In the client.connect() method is configured so the initial frame can be
+		 * reused in case of reconnect
+		 */
 		//frame.parentElement.removeChild(frame);
 		client.state = 0;
 	}
@@ -901,94 +1064,334 @@ APS.transport.lp = function(server, callback, client){
  * User object constructor
  */
 APS.user = function(pipe, client){
+	Object.defineProperties(this, {
+	
+		/*
+		 * Update function to update properties object
+		 * This function is used internally to update objects
+		 * when the autoUpdate option is enabled. The function
+		 * checks for a revision number in the object. Properties
+		 * are only updated if they are differnt. This method triggers
+		 * properties specific events which can be ise observe/watch
+		 * property changes 
+		 */
+		update: {
+			value: function(o){
+				if(!!!o) return false;
+				o._rev = parseInt(o._rev);
+				if(o._rev > this._rev){
+					for(var i in o){
+						if(this[i] != o[i]){
+							this[i] = o[i];
+							client.trigger("user"+i+"Update",[o[i], this]);
+							client.trigger("userUpdate",[i, o[i], this]);
+						}
+					}
+				}
+			}
+		},
+		
+		/*
+		 * Add the more critical properties which other
+		 * methods and the framework itself depend on
+		 */
+		_rev: {
+			value: null,
+			configurable: true,
+			writable: true
+		},
+		channels: {
+			value: {},
+			writable: true
+		},
+		pubid: {
+			value: pipe.pubid
+		},
+		
+		/*
+		 * Bind event and logging related functions stragiht from the client,
+		 * effectively saving a whole lot of code :)
+		 */
+		pub: {
+			value: client.pub.bind(client, pipe.pubid)
+		},
+		send: {
+			value: client.send.bind(client, pipe.pubid)
+		}
+	});
+	
+	/*
+	 * Add all public properties to the root of the object
+	 * for easy access
+	 */
 	for(var i in pipe.properties){
 		this[i] = pipe.properties[i]
 	}
 	
-	this.pubid = pipe.pubid;
-	this.channels = {};
-	
-	this.pub = APS.prototype.pub.bind(client, this.pubid);
-	this.send = APS.prototype.send.bind(client, this.pubid);
-	
-	this.update = function(o){
-		for(var i in o){
-			if(this[i] != o[i]) this[i] = o[i];
-		}
-	}
 }
 
 /*
  * Current user object constructor
  */
 APS.cUser = function(pipe, client){
+	Object.defineProperties(this, {
+	
+		/*
+		 * Update function to update properties object
+		 * This function is used internally to update objects
+		 * when the autoUpdate option is enabled. The function
+		 * checks for a revision number in the object. Properties
+		 * are only updated if they are differnt. This method triggers
+		 * properties specific events which can be ise observe/watch
+		 * property changes 
+		 */
+		update: {
+			value: function(o){
+				if(!!!o) return false;
+				o._rev = parseInt(o._rev);
+				if(o._rev > this._rev){
+					for(var i in o){
+						if(this[i] != o[i]){
+							this[i] = o[i];
+							this.trigger("user"+i+"Update",[o[i], this]);
+							this.trigger("userUpdate",[i, o[i], this]);
+						}
+					}
+				}
+			}
+		},
+		
+		/*
+		 * Change or upadte a property in the object and send it to the
+		 * server for propagation. In order for this method to work 
+		 * properly the option autoUpdate should enable
+		 */
+		change: {
+			value: function(name, value){
+				if(typeof name == "object"){
+					var data = name;
+				}else{
+					var data = {};
+					data[name] = value;
+				}
+				//NOTE: data has no revision number thus update will fail
+				//this.update(data);
+				this._client.sendCmd("propUpdate", data);
+			}
+		},
+	
+	
+		/*
+		 * Add the more critical properties which other
+		 * methods and the framework itself depend on
+		 */
+		_rev: {
+			value: null,
+			configurable: true,
+			writable: true
+		},
+		_events: {
+			value: {},
+			writable: true
+		},
+		_client: {
+			value: client
+		},
+		pubid: {
+			value: pipe.pubid
+		},
+		channels: {
+			value: {},
+			writable: true
+		},
+		
+		/*
+		 * Bind event and logging related functions stragiht from the client,
+		 * effectively saving a whole lot of code :)
+		 */
+		on: {
+			value: client.on.bind(this)
+		},
+		trigger: {
+			value: client.trigger.bind(this)
+		},
+		log: {
+			value: client.log.bind(client, "[CurrentUser]")
+		}
+	});
+	
+	/*
+	 * Add all public properties to the root of the object
+	 * for easy access
+	 */
 	for(var i in pipe.properties){
 		this[i] = pipe.properties[i]
 	}
-	
-	this.update = function(o){
-		for(var i in o){
-			if(this[i] != o[i]) this[i] = o[i];
-		}
-	}
-	
-	this._events = {};
-	this._client = client;
-	this.pubid = pipe.pubid;
-	this.channels = {};
-	
-	this.on = client.on.bind(this);
-	this.trigger = client.trigger.bind(this);
-	this.log = client.log.bind(client, "[CurrentUser]");
 }
 
 
+/*
+ * Channel object construtor
+ */
 APS.channel = function(pipe, client) {
+	Object.defineProperties(this, {
 	
+		/*
+		 * Update function to update properties object
+		 * This function is used internally to update objects
+		 * when the autoUpdate option is enabled. The function
+		 * checks for a revision number in the object. Properties
+		 * are only updated if they are differnt. This method triggers
+		 * properties specific events which can be ise observe/watch
+		 * property changes 
+		 */
+		update: {
+			value: function(o){
+				if(!!!o) return false;
+				o._rev = parseInt(o._rev);
+				if(o._rev > this._rev){
+					for(var i in o){
+						if(this[i] != o[i]){
+							this[i] = o[i];
+							this.trigger("user"+i+"Update",[o[i], this]);
+							this.trigger("userUpdate",[i, o[i], this]);
+						}
+					}
+				}
+			}
+		},
+		
+		/*
+		 * The function makes a user exit/unsubsribe from a channel
+		 * no paramaters are required for this method
+		 */
+		leave: {
+			value: function(){
+				this.trigger("unsub", [client.user, this]);
+				
+				client.sendCmd('LEFT', {"channel": pipe.properties.name});
+				
+				this.log("Unsubscribed");
+				
+				delete client.channels[this.name];
+			
+				//Delete the Event Queue in case the channel is created again
+				delete client.eQueue[this.name];
+			}
+		},
+		
+		/*
+		 * Add the more critical properties which other
+		 * methods and the framework itself depend on
+		 */
+		_rev: {
+			value: null,
+			configurable: true,
+			writable: true
+		},
+		_events: {
+			value: {},
+			writable: true
+		},
+		_client: {
+			value: client
+		},
+		pubid: {
+			value: pipe.pubid
+		},
+		users: {
+			value: {},
+			writable: true
+		},
+		
+		/*
+		 * Bind event and logging related functions stragiht from the client,
+		 * effectively saving a whole lot of code :)
+		 */
+		on: {
+			value: client.on.bind(this)
+		},
+		trigger: {
+			value: client.trigger.bind(this)
+		},
+		log: {
+			value: client.log.bind(client, "[channel]", "["+pipe.properties.name+"]")
+		}
+	});
+	
+	/*
+	 * Add all public properties to the root of the object
+	 * for easy access
+	 */
 	for(var i in pipe.properties){
 		this[i] = pipe.properties[i]
 	}
 	
-	this._events = {};
-	this.pubid = pipe.pubid;
-	this._client = client;
-	
-	
-	this.update = function(o){
-		for(var i in o){
-			if(this[i] != o[i]) this[i] = o[i];
-		}
-	}
-	
-	this.leave = function(){
-		this.trigger("unsub", [client.user, this]);
-		
-		client.sendCmd('LEFT', {"channel": this.name});
-		
-		this.log("Unsubscribed");
-		
-		delete client.channels[this.name];
-	
-		//Delete the Event Queue in case the channel is created again
-		delete client.eQueue[this.name];
-	}
-	
+	/*
+	 * The following block filters some methods that only apply
+	 * to interactive channels. All channels are consider interactive
+	 * but the ones which name's starts with the asterisk(*) character
+	 */
 	if(this.name.indexOf("*") !== 0){
+		Object.defineProperties(this, {
 		//Methods and prop for interactive channels
-		this.users = {};
-		this.addUser = function(u){
-			this.users[u.pubid] = u;
+		users: {
+			value: {},
+			writable: true
+		},
+		addUser: {
+			value: function(u){
+				var user = client.getPipe(u.pubid);
+				if(!user){
+					/*
+					 * User object does not exists in the client
+					 * Initiate user object and store it
+					 */
+					client.pipes[u.pubid] = new APS.user(u, client);
+					user = client.pipes[u.pubid];
+					
+					//Add user's own pipe to channels list
+					user.channels[user.pubid] = user;
+				}else{
+					/*
+					 * User object exists
+					 * Update object if autoUpdate is enabled
+					 */
+					if(client.option.autoUpdate)
+						user.update(u.properties);
+				}
+				
+				//Add channel reference to the user
+				user.channels[this.name] = this;
+				
+				this.users[u.pubid] = user;
+				return user;
+			}
+		},
+		send: {
+			value: client.send.bind(client, this.pubid)
+		},
+		pub: {
+			value: client.pub.bind(client, this.name)
 		}
-		this.send = APS.prototype.send.bind(client, this.pubid);
-		this.pub = client.pub.bind(client, this.name);
-	}
+	})}
 	
-	this.on = client.on.bind(this);
-	this.trigger = client.trigger.bind(this);
-	this.log = client.log.bind(client, "[channel]", "["+this.name+"]");
 }
 
 
+/*
+ * Prototype in the session object
+ * The object current multiple cookies
+ * handlers to save session related data
+ * as well as other persisten information
+ * require by the framework.
+ * 
+ * The session object currently uses cookies
+ * to store the requiered information but in
+ * the future i would like to implment the 
+ * SessionStorage API with a fallback to 
+ * cookies.
+ */
 APS.prototype.session = {
 	id: "",
 	chl: {},
