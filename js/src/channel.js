@@ -82,7 +82,7 @@ APS.channel = function(pipe, client) {
 			value: client.trigger.bind(this)
 		},
 		log: {
-			value: client.log.bind(client, "[channel]", "["+this.name+"]")
+			value: client.log.bind(client, "[channel]", "["+pipe.properties.name+"]")
 		}
 	});
 	
@@ -108,7 +108,7 @@ APS.channel = function(pipe, client) {
 		},
 		addUser: {
 			value: function(u){
-				var user = client.getPipe[u.pubid];
+				var user = client.getPipe(u.pubid);
 				if(!user){
 					/*
 					 * User object does not exists in the client
