@@ -15,6 +15,7 @@ APS.user = function(pipe, client){
 		 */
 		update: {
 			value: function(o){
+				if(!!!o) return false;
 				o._rev = parseInt(o._rev);
 				if(o._rev > this._rev){
 					for(var i in o){
@@ -50,10 +51,10 @@ APS.user = function(pipe, client){
 		 * effectively saving a whole lot of code :)
 		 */
 		pub: {
-			value: client.pub.bind(client, this.pubid)
+			value: client.pub.bind(client, pipe.pubid)
 		},
-		aend: {
-			value: client.send.bind(client, this.pubid)
+		send: {
+			value: client.send.bind(client, pipe.pubid)
 		}
 	});
 	
@@ -84,6 +85,7 @@ APS.cUser = function(pipe, client){
 		 */
 		update: {
 			value: function(o){
+				if(!!!o) return false;
 				o._rev = parseInt(o._rev);
 				if(o._rev > this._rev){
 					for(var i in o){

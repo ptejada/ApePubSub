@@ -15,6 +15,7 @@ APS.channel = function(pipe, client) {
 		 */
 		update: {
 			value: function(o){
+				if(!!!o) return false;
 				o._rev = parseInt(o._rev);
 				if(o._rev > this._rev){
 					for(var i in o){
@@ -36,7 +37,7 @@ APS.channel = function(pipe, client) {
 			value: function(){
 				this.trigger("unsub", [client.user, this]);
 				
-				client.sendCmd('LEFT', {"channel": this.name});
+				client.sendCmd('LEFT', {"channel": pipe.properties.name});
 				
 				this.log("Unsubscribed");
 				
