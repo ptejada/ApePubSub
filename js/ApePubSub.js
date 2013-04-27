@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2013-04-15 @ 02:04
+ * Built on 2013-04-27 @ 04:56
  */
 
 /*
@@ -71,7 +71,7 @@ function APS( server, events, options ){
 		autoUpdate: true
 	}
 	this.identifier = "APS";
-	this.version = '1.5.6';
+	this.version = '1.5.7';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;

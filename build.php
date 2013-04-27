@@ -4,8 +4,6 @@
 	 * - Concat the dev files in one
 	 */
 	 
-	include "php/lib/jsmin.php";
-	 
 	$path = "js/src/";
 	$sufix = ".js";
 	$files = array("utilities","client", "onMessage", "transport", "user", "channel", "session");
@@ -15,13 +13,13 @@
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
  * Built on {$date}
- */\n\n"
+ */\n"
  ;
 	function build($list, $output){
 		global $path, $sufix, $pre;
 		
 		
-		$res = $pre;
+		$res = $pre . "\n";
 		foreach($list as $file){
 			$res .= file_get_contents($path . $file . $sufix);
 			$res .= "\n\n";
@@ -31,18 +29,30 @@
 		return $res;
 	}
 	
-	$min = JSMin::minify(build($files, "js/ApePubSub.js"));
-	file_put_contents("js/ApePubSub.min.js", str_replace("\n", "", $pre.$min));
+	$content = build($files, "js/ApePubSub.js");
 	
 	/*
-	 * Global API
+	 * Closure Compiler request
 	 */
-	/*
-	$files[] = "globals";
+	$cOption = array(
+		"js_code" 			=> $content,
+		"compilation_level" => "SIMPLE_OPTIMIZATIONS",
+		"output_format"		=> "text",
+		"output_info"		=> "compiled_code"
+	);
 	
-	$min = JSMin::minify(build($files, "js/ApePubSub.js"));
-	file_put_contents("js/ApePubSub.min.js", $min);
-	*/
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($cOption));
+	curl_setopt($ch, CURLOPT_URL, 'http://closure-compiler.appspot.com/compile');
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+		'Content-Type: application/x-www-form-urlencoded'
+	));
+	
+	$contentMin = curl_exec($ch);
+	file_put_contents("js/ApePubSub.min.js", $pre.$contentMin);
+	
 ?>
 <center>
 	<h1>Build Succeed!</h1>
