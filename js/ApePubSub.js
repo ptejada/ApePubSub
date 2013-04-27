@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2013-04-27 @ 05:45
+ * Built on 2013-04-27 @ 06:36
  */
 
 /*
@@ -71,7 +71,7 @@ function APS( server, events, options ){
 		autoUpdate: true
 	}
 	this.identifier = "APS";
-	this.version = '1.5.7';
+	this.version = '1.5.8';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -954,6 +954,12 @@ APS.transport.ws = APS.transport.wb = function(server, callback, client){
 			callback.onerror(e);
 			return false
 		}
+		
+		/*
+		 * Handle some browser which have the WebSocket constructor 
+		 * defined but has to actual WebSocket support
+		 */
+		if(ws.url === undefined) return false;
 		
 		this.send = function(str, cb){
 			if(this.state > 0) ws.send(str);
