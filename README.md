@@ -18,6 +18,17 @@ Checkout the [live demos](http://crusthq.com/script/ApePubSub/demo/), the demo s
 
 **NOTE:** when updating the framework make sure that you update the server scripts as well, you can tell if the server scripts need updating if the the folder **APE_Server** has been changed in the commit or recently.
 
+## Browser Support ##
+
+The framework is tested and developed in the following modern browers:
+
+ - Internet Explorer 9+
+ - Google Chrome
+ - Mozilla Firefox
+ 
+It should also work in other webkit and mobile browsers such as Opera, Safari, Safari Mobile and the stock Android Browser.
+Internet Explorer 8 and below is not supported.
+
 Feedback?
 -----------------------
 For reporting issues use the github [issues system](https://github.com/ptejada/ApePubSub/issues?state=open), is really good and organized :)

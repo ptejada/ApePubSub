@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2013-04-27 @ 05:04
+ * Built on 2013-04-27 @ 05:45
  */
 
 /*
@@ -944,7 +944,7 @@ APS.transport = function(server, callback, client){
 APS.transport.ws = APS.transport.wb = function(server, callback, client){
 	if('WebSocket' in window){
 		this.id = 6;
-		this.loop = setInterval(client.check.bind(client,true), 40000);
+		this.loop = setInterval(client.check.bind(client,true), 30000);
 		
 		var protocol = !!client.option.secure ? "wss" : "ws";
 		
