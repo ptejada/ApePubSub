@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2013-04-27 @ 04:56
+ * Built on 2013-04-27 @ 05:04
  */
 
 /*
@@ -1008,11 +1008,8 @@ APS.transport.lp = function(server, callback, client){
 	//Fixes cranky IE9
 	server = server.toLowerCase();
 	
-	with(frame.style){
-		position = 'absolute';
-		left = top = '-10px';
-		width = height = '1px';
-	}
+	frame.style.display = "none";
+	
 	document.body.appendChild(frame);
 	
 	frame.setAttribute('src', protocol + "://" + server + '/?[{"cmd":"frame","params": {"origin":"'+origin+'"}}]');

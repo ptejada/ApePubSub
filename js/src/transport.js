@@ -156,11 +156,8 @@ APS.transport.lp = function(server, callback, client){
 	//Fixes cranky IE9
 	server = server.toLowerCase();
 	
-	with(frame.style){
-		position = 'absolute';
-		left = top = '-10px';
-		width = height = '1px';
-	}
+	frame.style.display = "none";
+	
 	document.body.appendChild(frame);
 	
 	frame.setAttribute('src', protocol + "://" + server + '/?[{"cmd":"frame","params": {"origin":"'+origin+'"}}]');
