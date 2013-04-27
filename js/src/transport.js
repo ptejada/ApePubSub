@@ -103,6 +103,12 @@ APS.transport.ws = APS.transport.wb = function(server, callback, client){
 			return false
 		}
 		
+		/*
+		 * Handle some browser which have the WebSocket constructor 
+		 * defined but has to actual WebSocket support
+		 */
+		if(ws.url === undefined) return false;
+		
 		this.send = function(str, cb){
 			if(this.state > 0) ws.send(str);
 			else this.stack.push(str);
