@@ -1,7 +1,7 @@
 /*
  * Initialize and configure the client object
  */
-var client = new APS("ape.crusthq.com:45138", false, {
+var client = new APS("ape.ptejada.com:45138", false, {
 	debug: true,
 	session: true
 });

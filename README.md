@@ -12,7 +12,7 @@ The client framework is based on @paraboul's next generation [APE_JSF](https://g
 
 See what is new in the [Changelog](https://github.com/ptejada/ApePubSub/wiki/Changelog)
 
-Checkout the [live demos](http://crusthq.com/script/ApePubSub/demo/), the demo sources can be found [here](https://github.com/ptejada/ApePubSub/tree/master/demo)
+Checkout the [live demos](http://ptejada.com/script/ApePubSub/demo/), the demo sources can be found [here](https://github.com/ptejada/ApePubSub/tree/master/demo)
 
 ### For more information check the [wiki](https://github.com/ptejada/ApePubSub/wiki)
 

@@ -4,7 +4,7 @@
 var inst = new APS.cookie("PHPSESSID").value;
 inst = inst.substring(11,15) + ".";
 
-var client = new APS(inst + "ape.crusthq.com:45138", false, {
+var client = new APS(inst + "ape.ptejada.com:45138", false, {
 	debug: true,
 	session: true,
 	eventPush: "ps/push.php"

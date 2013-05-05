@@ -1,6 +1,2 @@
+/.idea
 /demo/PHPapp/core/config.php
-/.settings
-/.project
-*.class
-*.pyc
-*.pyo

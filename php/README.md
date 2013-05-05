@@ -2,7 +2,7 @@
 
 APS() constructor takes two parameters, the first parameter is the APE server domain
 ```
-$aps = new APS("ape.crusthq.com:45138");
+$aps = new APS("ape.ptejada.com:45138");
 ```
 On the object construction by default the indexe `cmd` in the global `$_REQUEST` array is automatically parsed to gather event information. If you are using the eventPush feature on the APS javascript client you should not worried about this, since this data is automatically sent by the framework. Otherwise you can disable this behavior by passing **false** in the second paramater of the constructor.
 
@@ -29,7 +29,7 @@ All this properties are editables and will take effect if updated prior to calli
 
 ### Examples
 
-For a live example check the live [eventPush demo](http://crusthq.com/script/ApePubSub/demo/eventPush/), you can take a closer look in the [source code](https://github.com/ptejada/ApePubSub/blob/master/demo/eventPush/). The more complex demo [PHPapp](http://crusthq.com/script/ApePubSub/demo/PHPapp/) uses this class as well for eventPush, [source code](https://github.com/ptejada/ApePubSub/blob/master/demo/PHPapp/).
+For a live example check the live [eventPush demo](http://ptejada.com/script/ApePubSub/demo/eventPush/), you can take a closer look in the [source code](https://github.com/ptejada/ApePubSub/blob/master/demo/eventPush/). The more complex demo [PHPapp](http://ptejada.com/script/ApePubSub/demo/PHPapp/) uses this class as well for eventPush, [source code](https://github.com/ptejada/ApePubSub/blob/master/demo/PHPapp/).
 
 Below is a simple script that would only route the events if the user signed in according to your user authetication system
 
@@ -37,7 +37,7 @@ Below is a simple script that would only route the events if the user signed in 
 <?php
 	include("lib/APS.php");
 	
-	$aps = new APS("ape.crusthq.com:45138");
+	$aps = new APS("ape.ptejada.com:45138");
 	
 	if(!isUserAuthenticated()) $aps->error("302", "You must login first");
 	

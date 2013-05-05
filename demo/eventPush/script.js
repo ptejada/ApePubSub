@@ -1,6 +1,6 @@
 $(document).ready(function(){
 	//Create a new APS client
-	var client = new APS("ape.crusthq.com:45138");
+	var client = new APS("ape.ptejada.com:45138");
 	
 	window.client = client;
 	

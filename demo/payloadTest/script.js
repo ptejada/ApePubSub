@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	var client = new APS("ape.crusthq.com:45138", null, {
+	var client = new APS("ape.ptejada.com:45138", null, {
 		debug: false,
 		transport: (window.location.hash).substring(1) || ["ws","lp"],
 		session: false

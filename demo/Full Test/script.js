@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	var server = "ape.crusthq.com:45138";
+	var server = "ape.ptejada.com:45138";
 	
 	addLine("You must enter a server address or leave it blank to the default server.");
 	addLine("<form>APE Server: <input type='text' value='' placeholder="+server+"></form>");

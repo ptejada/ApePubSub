@@ -7,7 +7,7 @@
  
 $(document).ready(function(){
 	//Instantiate APE Client
-	window.client = new APS("ape.crusthq.com:45138", null, {
+	window.client = new APS("ape.ptejada.com:45138", null, {
 		//transport: "lp",
 		debug: true
 	});
