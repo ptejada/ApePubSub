@@ -1,106 +1,144 @@
 /**
- * @author Pablo
+ * StockBridge is constructor that serves as
+ * link between the view and the data relieved from APE
+ *
+ * Skip to end of the file to see APS event bindings
+ * @author Pablo Tejada
  */
- 
+var StockBridge = function() {
+	var self = this;
+
+	//Variables
+	this.tray = $("#stock-list"),		//Element for stock list
+	this.tpl = $("#stock-list").find(".stock:first").clone(),	//Stock stream Template
+	this.adder = $("#stockAdder"),	//Element - Button to add new Stock
+	this.newName = $("#newStockName"),
+	this.visual = {},					//Store Graph values
+	this.maxStream = 5,
+
+	this.update = function(data){
+		var name = data.name;
+		var value = data.value;
+		var direction = data.direction;
+		var change = data.change;
+
+		var obj = $("#stock-"+name);
+		if(obj.length == 0){
+			//Creates a new stock stream element for the DOM
+			obj = self.tpl.clone();
+			obj.attr('id', "stock-"+name);
+			obj.find(".stock-name").html(name);
+			//Inject the element to the DOM
+			obj.prependTo(self.tray);
+
+			//Creates visual entry for the stock stream
+			if(!(name in self.visual))
+				self.visual[name] = [];
+		}
+
+		//Update stock visual array
+		self.visual[name].push(value);
+
+		//Limit stock visual array to 30 entries
+		if(self.visual[name].length > 30) self.visual[name].splice(0,1);
+
+		//Generates stock line graph
+		obj.find(".stock-visual").sparkline(self.visual[name], {
+			height: 72,
+			width: self.visual[name].length * 0.7 +"em"
+		});
+
+		//Update the document with new data
+		obj.find(".stock-value").html(value);
+		obj.find(".stock-change").html(change);
+
+		//Handles the stock value color, red OR green
+		if(value < 0){
+			obj.find(".stock-value:not('.red')").addClass('red');
+		}else{
+			obj.find(".stock-value.red").removeClass('red');
+		}
+
+		//Handles the stock direction(arrow) up(green)/down(red)
+		if(direction == "up"){
+			obj.find(".stock-direction-down").attr("class","stock-direction-up").html("▲");
+		}else{
+			obj.find(".stock-direction-up").attr("class","stock-direction-down").html("▼");
+		}
+	}
+
+	//Add a new stock stream
+	this.add = function(e){
+		e.preventDefault();
+
+		var count = Object.keys(self.visual).length;
+		if(count >= self.maxStream){
+			self.adder.find("input, button").prop("disabled", true);
+			self.adder.append("<small class='red'>Max stream count</small>");
+		}else{
+			try{
+				client.getChannel("StockTicker")
+					.send("add",{
+						name: self.newName.val()
+					});
+			} catch (e){
+				console.log(e);
+				//window.location.reload();
+			}
+			self.newName.val(randomString(5))
+		}
+
+	}
+		
+}//END of stock Object/////////////////////////////////////
 
 
- 
+/*
+ * Start of objects initializations and event bindings
+ */
 $(document).ready(function(){
 	//Instantiate APE Client
-	window.client = new APS("ape.ptejada.com:45138", null, {
+	//window.client = new APS("ape.ptejada.com:45138", null, {
+	window.client = new APS("ape.ptejada.com:53630", null, {
 		//transport: "lp",
-		debug: true
+		debug: true,
+		session: false
 	});
-	
+
 	client.identifier = "ST";
-	
-	var stock = {
-		//Variables
-		tray: $("#stock-list"),		//Element for stock list
-		tpl: $("#stock-list").find(".stock:first").clone(),	//Stock stream Template
-		addInput: $("#add-stock"),	//Element - Button to add new Stock
-		visual: [],					//Store Graph values
-		
-		update: function(value, direction, change, chanName){
-			chanName = chanName.substring(1);
-			var obj = $("#"+chanName);
-			if(obj.length == 0){
-				//Creates a new stock stream element for the DOM
-				obj = stock.tpl.clone();
-				obj.attr('id', chanName);
-				obj.find(".stock-name").html(chanName);
-				//Inject the element to the DOM
-				obj.prependTo(stock.tray);
-				
-				//Creates visual entry for the stock stream
-				stock.visual[chanName] = [];
-			}
-			
-			//Convert Values from string to integers	
-			value = parseFloat(value).toFixed(2);
-			change = parseFloat(change).toFixed(2);
-			
-			//Update stock visual array
-			stock.visual[chanName].push(value);
-			
-			//Limit stock visual array to 30 entries
-			if(stock.visual[chanName].length > 30) stock.visual[chanName].splice(0,1);
-			
-			//Generates stock line graph
-			obj.find(".stock-visual").sparkline(stock.visual[chanName], {
-				height: 72, 
-				width: stock.visual[chanName].length * 0.7 +"em" 
-			});
-			
-			//Update the document with new data
-			obj.find(".stock-value").html(value);
-			obj.find(".stock-change").html(change);
-			
-			//Handles the stock value color, red OR green
-			if(value < 0){
-				obj.find(".stock-value:not('.red')").addClass('red');
-			}else{
-				obj.find(".stock-value.red").removeClass('red');
-			}
-			
-			//Handles the stock direction(arrow) up(green)/down(red)
-			if(direction == "up"){
-				obj.find(".stock-direction-down").attr("class","stock-direction-up").html("▲");
-			}else{
-				obj.find(".stock-direction-up").attr("class","stock-direction-down").html("▼");				
-			}
-		},
-		
-		//Add a new stock stream
-		add: function(){
-			var count = Object.keys(client.channels).length;
-			if(count > 4){
-				stock.addInput.prop("disabled", true)
-			}else{
-				client.sub("*stock"+randomString(5));
-			}
-		}
-		
-	}//END of stock Object
-	/////////////////////////////////////
-	
-	
+
+	var stock = new StockBridge();
+
 	//Connect/Restore
-	client.connect();
-	
-	//APS events
-	client.on({
-		rawStockUpdate: stock.update,
-		ready: function(){
-			if(stock.tray.lenght > 4)
-				stock.addInput.prop("disabled", false);
+	client.sub("StockTicker",{
+		update: function(data, user, channel){
+			stock.update(data);
+		},
+		joined: function(){
+			client.user.on("StockHistory", function(data){
+				for(var name in data.history){
+					var value = data.history[name].pop();
+					stock.visual[name] = data.history[name];
+					stock.update({
+						name: name,
+						direction: "up",
+						change: Math.random().toFixed(2),
+						value: value
+					})
+				}
+			})
 		}
 	})
-	
+
 	//Clear the stock Template
 	stock.tray.empty();
+
+	stock.newName.val(randomString(5))
+
+	//Bind Add stock form
+	stock.adder.on("submit", stock.add.bind(stock));
+
+	//Activate buttons
+	stock.adder.find("input, button").prop("disabled", false);
+})
 	
-	//Bind Add stock button input
-	stock.addInput.click(stock.add.bind(stock));
-	
-});

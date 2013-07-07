@@ -4,9 +4,8 @@
 	font-size: 1.4em;
 	margin: 0 auto;
 }
-#add-stock {
+#stockAdder * {
 	font-size: 1.4em;
-	display: block;
 }
 
 #stock-list {
