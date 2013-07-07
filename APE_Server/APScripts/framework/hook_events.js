@@ -34,7 +34,7 @@ Ape.addEvent("mkchan", function(channel) {
 	Ape.triggerChannelEvent(channel, "create", [channel]);
 });
 
-Ape.addEvent("beforeJoin", function(user, channel) {
+Ape.addEvent("join", function(user, channel) {
 	channel.users[user.prop("pubid")] = user;
 	
 	user.channels[channel.prop("name")] = channel;
