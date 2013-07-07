@@ -1,15 +1,15 @@
 /*
  * The function parses all incoming information from the server.
  * Is the magical function, it takes the raw information 
- * and convert into usefull dynamic data and objects. It is
- * also resposible for triggering most of the events in the 
+ * and convert into useful dynamic data and objects. It is
+ * also responsible for triggering most of the events in the
  * framework
  */
 APS.prototype.onMessage = function(data){
 	try { 
 		data = JSON.parse(data)
 	}catch(e){
-		//Temporary FIX for malformed JSON with scaped single quotes 
+		//Temporary FIX for malformed JSON with escape single quotes
 		data = data.replace(/\\'/g, "'");
 		try {
 			data = JSON.parse(data);
@@ -20,7 +20,7 @@ APS.prototype.onMessage = function(data){
 		}
 	}
 	
-	//Initiante variables to be used in the loop below
+	//Initiate variables to be used in the loop below
 	var raw, args, pipe, isIdent = false, check = true;
 	
 	for(var i in data){
@@ -61,7 +61,7 @@ APS.prototype.onMessage = function(data){
 				 * 
 				 * Initiate and store the current user object
 				 */
-				var user = new APS.cUser(args.user, this);
+				var user = new APS.CUser(args.user, this);
 				this.pipes[user.pubid] = user;
 				
 				this.user = user;
@@ -77,8 +77,8 @@ APS.prototype.onMessage = function(data){
 				
 			break;
 			case 'CHANNEL':
-				//The pipr is the channel object
-				pipe = new APS.channel(args.pipe, this);
+				//The pipe is the channel object
+				pipe = new APS.Channel(args.pipe, this);
 				this.pipes[pipe.pubid] = pipe;
 				this.channels[pipe.name] = pipe;
 				
@@ -86,7 +86,7 @@ APS.prototype.onMessage = function(data){
 				
 				/*
 				 * Below, the user objects of the channels subscribers
-				 * get intiated and stored in the channel object, as
+				 * get initiated and stored in the channel object, as
 				 * well as in the client general pipes array
 				 */
 				if(!!u){
@@ -127,7 +127,7 @@ APS.prototype.onMessage = function(data){
 				if(args.event == "message")
 					args.data = decodeURIComponent(args.data);
 				
-				if(pipe instanceof APS.user){
+				if(pipe instanceof APS.User){
 					user.trigger(args.event, [args.data, user, pipe]);
 				}else{
 					pipe.trigger(args.event, [args.data, user, pipe]);
@@ -157,7 +157,7 @@ APS.prototype.onMessage = function(data){
 				
 				if(typeof user == "undefined" && !!args.from){
 					//Create user it doesn't exists
-					client.pipe[args.from.pubid] = new APS.user(args.from, client);
+					client.pipe[args.from.pubid] = new APS.User(args.from, client);
 					user = client.pipe[args.from.pubid];
 				}
 				
@@ -188,7 +188,7 @@ APS.prototype.onMessage = function(data){
 			case 'JOIN':
 				/*
 				 * A new user has join a channel
-				 * Parse the raw and trigger the correspoding
+				 * Parse the raw and trigger the corresponding
 				 * events
 				 */
 				//pipe is the channel object
@@ -207,7 +207,7 @@ APS.prototype.onMessage = function(data){
 				/*
 				 * A user as left a channel
 				 * Parse event to trigger the corresponding events
-				 * and delete the user refereces from channel but
+				 * and delete the user references from channel but
 				 * keep user object in the client in case is being 
 				 * use by another channel
 				 */
@@ -243,7 +243,7 @@ APS.prototype.onMessage = function(data){
 				/*
 				 * Parses default server errors,
 				 * Handle them and trigger the API
-				 * frindly events
+				 * friendly events
 				 */
 				check = false;
 				var info = [args.code, args.value, args];

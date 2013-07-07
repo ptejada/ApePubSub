@@ -1,6 +1,6 @@
 /*
  * Generates a random string
- *  - First paramater(integer) determines the length
+ *  - First parameter(integer) determines the length
  *  - Second parameter(string) an optional string of alternative keys to use
  */
 function randomString(l, keys){

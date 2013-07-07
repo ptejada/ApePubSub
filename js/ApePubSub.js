@@ -607,7 +607,7 @@ APS.prototype.onMessage = function(data){
 				 * 
 				 * Inittiate and store the current user object
 				 */
-				var user = new APS.cUser(args.user, this);
+				var user = new APS.CUser(args.user, this);
 				this.pipes[user.pubid] = user;
 				
 				this.user = user;
@@ -673,7 +673,7 @@ APS.prototype.onMessage = function(data){
 				if(args.event == "message")
 					args.data = decodeURIComponent(args.data);
 				
-				if(pipe instanceof APS.user){
+				if(pipe instanceof APS.User){
 					user.trigger(args.event, [args.data, user, pipe]);
 				}else{
 					pipe.trigger(args.event, [args.data, user, pipe]);
@@ -703,7 +703,7 @@ APS.prototype.onMessage = function(data){
 				
 				if(typeof user == "undefined" && !!args.from){
 					//Create user it doesn't exists
-					client.pipe[args.from.pubid] = new APS.user(args.from, client);
+					client.pipe[args.from.pubid] = new APS.User(args.from, client);
 					user = client.pipe[args.from.pubid];
 				}
 				
@@ -1066,7 +1066,7 @@ APS.transport.lp = function(server, callback, client){
 /*
  * User object constructor
  */
-APS.user = function(pipe, client){
+APS.User = function(pipe, client){
 	Object.defineProperties(this, {
 	
 		/*
@@ -1136,7 +1136,7 @@ APS.user = function(pipe, client){
 /*
  * Current user object constructor
  */
-APS.cUser = function(pipe, client){
+APS.CUser = function(pipe, client){
 	Object.defineProperties(this, {
 	
 		/*
@@ -1350,7 +1350,7 @@ APS.channel = function(pipe, client) {
 					 * User object does not exists in the client
 					 * Initiate user object and store it
 					 */
-					client.pipes[u.pubid] = new APS.user(u, client);
+					client.pipes[u.pubid] = new APS.User(u, client);
 					user = client.pipes[u.pubid];
 					
 					//Add user's own pipe to channels list

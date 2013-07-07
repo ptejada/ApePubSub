@@ -1,7 +1,7 @@
 /*
  * User object constructor
  */
-APS.user = function(pipe, client){
+APS.User = function(pipe, client){
 	Object.defineProperties(this, {
 	
 		/*
@@ -9,7 +9,7 @@ APS.user = function(pipe, client){
 		 * This function is used internally to update objects
 		 * when the autoUpdate option is enabled. The function
 		 * checks for a revision number in the object. Properties
-		 * are only updated if they are differnt. This method triggers
+		 * are only updated if they are different. This method triggers
 		 * properties specific events which can be ise observe/watch
 		 * property changes 
 		 */
@@ -47,7 +47,7 @@ APS.user = function(pipe, client){
 		},
 		
 		/*
-		 * Bind event and logging related functions stragiht from the client,
+		 * Bind event and logging related functions straight from the client,
 		 * effectively saving a whole lot of code :)
 		 */
 		pub: {
@@ -71,7 +71,7 @@ APS.user = function(pipe, client){
 /*
  * Current user object constructor
  */
-APS.cUser = function(pipe, client){
+APS.CUser = function(pipe, client){
 	Object.defineProperties(this, {
 	
 		/*
@@ -79,7 +79,7 @@ APS.cUser = function(pipe, client){
 		 * This function is used internally to update objects
 		 * when the autoUpdate option is enabled. The function
 		 * checks for a revision number in the object. Properties
-		 * are only updated if they are differnt. This method triggers
+		 * are only updated if they are different. This method triggers
 		 * properties specific events which can be ise observe/watch
 		 * property changes 
 		 */
@@ -100,7 +100,7 @@ APS.cUser = function(pipe, client){
 		},
 		
 		/*
-		 * Change or upadte a property in the object and send it to the
+		 * Change or update a property in the object and send it to the
 		 * server for propagation. In order for this method to work 
 		 * properly the option autoUpdate should enable
 		 */
@@ -144,7 +144,7 @@ APS.cUser = function(pipe, client){
 		},
 		
 		/*
-		 * Bind event and logging related functions stragiht from the client,
+		 * Bind event and logging related functions straight from the client,
 		 * effectively saving a whole lot of code :)
 		 */
 		on: {

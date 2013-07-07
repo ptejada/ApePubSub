@@ -1,7 +1,7 @@
 /*
- * Channel object construtor
+ * Channel object constructor
  */
-APS.channel = function(pipe, client) {
+APS.Channel = function(pipe, client) {
 	Object.defineProperties(this, {
 	
 		/*
@@ -9,7 +9,7 @@ APS.channel = function(pipe, client) {
 		 * This function is used internally to update objects
 		 * when the autoUpdate option is enabled. The function
 		 * checks for a revision number in the object. Properties
-		 * are only updated if they are differnt. This method triggers
+		 * are only updated if they are different. This method triggers
 		 * properties specific events which can be ise observe/watch
 		 * property changes 
 		 */
@@ -31,7 +31,7 @@ APS.channel = function(pipe, client) {
 		
 		/*
 		 * The function makes a user exit/unsubsribe from a channel
-		 * no paramaters are required for this method
+		 * no parameters are required for this method
 		 */
 		leave: {
 			value: function(){
@@ -115,7 +115,7 @@ APS.channel = function(pipe, client) {
 					 * User object does not exists in the client
 					 * Initiate user object and store it
 					 */
-					client.pipes[u.pubid] = new APS.user(u, client);
+					client.pipes[u.pubid] = new APS.User(u, client);
 					user = client.pipes[u.pubid];
 					
 					//Add user's own pipe to channels list

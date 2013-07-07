@@ -101,7 +101,7 @@ $(document).ready(function(){
 	//window.client = new APS("ape.ptejada.com:45138", null, {
 	window.client = new APS("ape.ptejada.com:53630", null, {
 		//transport: "lp",
-		debug: true,
+		debug: false,
 		session: false
 	});
 

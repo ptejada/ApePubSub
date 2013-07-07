@@ -1,11 +1,12 @@
 /**
  * The client constructor
  * 
- * @param (string) server The APE Server Url including port number
- * @param (object) events Event handlers to be added to the client   
- * @param (object) options Options to configure the client
- * 
- * @return An APS or client instance   
+ * @param server The APE Server Url including port number
+ * @param events Event handlers to be added to the client
+ * @param options Options to configure the client
+ *
+ * @returns {*} An APS client instance
+ * @constructor
  */
 function APS( server, events, options ){
 	this.option = {
@@ -22,7 +23,7 @@ function APS( server, events, options ){
 		autoUpdate: true
 	}
 	this.identifier = "APS";
-	this.version = '1.5.8';
+	this.version = '1.5.9';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -66,9 +67,9 @@ function APS( server, events, options ){
 /**
  * Handles the initial connection to the server
  * 
- * @param (object) args Arguments to send with the initial connect request
+ * @param args Arguments to send with the initial connect request
  * 
- * @return The client reference or false if the connection request has been canceled
+ * @return bool The client reference or false if the connection request has been canceled
  */
 APS.prototype.connect = function(args){
 	var fserver = this.option.server;
@@ -122,13 +123,13 @@ APS.prototype.connect = function(args){
 	//Handle transport
 	if(!!this.transport){
 		if(this.transport.state == 0){
-			this.transport = new APS.transport(fserver, cb, this);
+			this.transport = new APS.Transport(fserver, cb, this);
 		}else{
 			//Use current active transport
 			
 		}
 	}else{
-		this.transport = new APS.transport(fserver, cb, this);
+		this.transport = new APS.Transport(fserver, cb, this);
 	}
 	
 	//Attach version of client framework
@@ -154,10 +155,10 @@ APS.prototype.reconnect = function(){
 /**
  * Fires events on object's _events stack
  * 
- * @param (string) ev Name of the event to trigger, not case sensitive
- * @param (array) args An array of arguments to passed to the event handler function
+ * @param ev Name of the event to trigger, not case sensitive
+ * @param args An array of arguments to passed to the event handler function
  * 
- * @return (bool) False if any of the event handlers explicitly returns false, otherwise true
+ * @return bool False if any of the event handlers explicitly returns false, otherwise true
  */
 APS.prototype.trigger = function(ev, args){
 	ev = ev.toLowerCase();
@@ -194,10 +195,10 @@ APS.prototype.trigger = function(ev, args){
 /**
  * Use to handles events on all object
  * 
- * @param (string) ev Name of the event handler to add, not case sensitive
- * @param (function) fn Function to handle the event
+ * @param ev Name of the event handler to add, not case sensitive
+ * @param fn Function to handle the event
  * 
- * @return (bool|object) False if wrong parameters are passed, otherwise the client or parent object reference
+ * @return bool|object False if wrong parameters are passed, otherwise the client or parent object reference
  */
 APS.prototype.on = function(ev, fn){
 	var Events = [];
@@ -235,20 +236,20 @@ APS.prototype.getPipe = function(user){
 }
 
 /**
- * Sends an event throught a pipe/user/channel
- * This function is not usefull in this context
+ * Sends an event through a pipe/user/channel
+ * This function is not useful in this context
  * Its real use is when bound to a user or channel
  * objects.
  * 
- * Although it could be usefull if a developer has
+ * Although it could be useful if a developer has
  * its own way of getting a user's or channels's pubid
  * who object does not resides in the local client
  * 
- * @param (object|string) pipe The pubid string or pipe object of user or channel
- * @param (string) $event The name of the event to send
- * @param (object|string|array) data The data to send with the event
- * @param (bool) sync Weather to sync event accoss the user's session or not
- * @param (function) callback Function to after the event has been sent 
+ * @param pipe The pubid string or pipe object of user or channel
+ * @param $event The name of the event to send
+ * @param data The data to send with the event
+ * @param sync Weather to sync event across the user's session or not
+ * @param callback Function to after the event has been sent
  * 
  * @return (object) client or parent object reference
  */
@@ -265,10 +266,10 @@ APS.prototype.send = function(pipe, $event, data, sync, callback){
 /**
  * Internal method to wrap events and send them as commands to the server
  * 
- * @param (string) cmd Name of command in the server which will handle the request
- * @param (object|string|array) args The data to send with the command
- * @param (object|string) pipe The pubid string or pipe object of user or channel
- * @param (function) callback Function to after the event has been sent 
+ * @param cmd Name of command in the server which will handle the request
+ * @param args The data to send with the command
+ * @param pipe The pubid string or pipe object of user or channel
+ * @param callback Function to after the event has been sent
  * 
  * @return (object) client reference
  */
@@ -349,9 +350,9 @@ APS.prototype.quit = function(){
 /**
  * Subscribe to a channel
  * 
- * @param (string) channel Name of the channel to subscribe to
- * @param (object) Events List of events to add to the channel
- * @param (function) callback Function to be called when a user successfuly subscribes to the channel
+ * @param channel Name of the channel to subscribe to
+ * @param Events List of events to add to the channel
+ * @param callback Function to be called when a user successfuly subscribes to the channel
  * 
  * @return (object) client reference
  */
@@ -429,7 +430,7 @@ APS.prototype.pub = function(channel, data, sync, callback){
 /**
  * Get a channel object by its name
  * 
- * @param (string) channel Name of the channel
+ * @param channel Name of the channel
  */
 APS.prototype.getChannel = function(channel){
 	channel = channel.toLowerCase();
@@ -473,7 +474,7 @@ APS.prototype.onChannel = function(channel, Events, fn){
 /**
  * Unsubscribe from a channel
  * 
- * @param (string) channel Name of the channel to unsubscribe
+ * @param channel Name of the channel to unsubscribe
  */
 APS.prototype.unSub = function(channel){
 	if(channel == "") return;

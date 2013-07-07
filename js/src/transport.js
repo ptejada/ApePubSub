@@ -1,4 +1,4 @@
-APS.transport = function(server, callback, client){
+APS.Transport = function(server, callback, client){
 	this.state = 0;//0 = Not initialized, 1 = Initialized and ready to exchange data, 2 = Request is running
 	this.stack = [];
 	this.callback = callback;
@@ -16,14 +16,14 @@ APS.transport = function(server, callback, client){
 		 * if a transport is not compatible it should return false
 		 */
 		for(var t in trans){
-			var ret = APS.transport[trans[t]].apply(this, args);
+			var ret = APS.Transport[trans[t]].apply(this, args);
 			if(ret != false) break;
 		}
 	}else if(typeof trans == "string"){
 		/*
 		 * Use the specify transport explicitly
 		 */
-		APS.transport[trans].apply(this, args);
+		APS.Transport[trans].apply(this, args);
 	}
 	
 	/*
@@ -89,7 +89,7 @@ APS.transport = function(server, callback, client){
 /*
  * Websocket Transport
  */
-APS.transport.ws = APS.transport.wb = function(server, callback, client){
+APS.Transport.ws = APS.Transport.wb = function(server, callback, client){
 	if('WebSocket' in window){
 		this.id = 6;
 		this.loop = setInterval(client.check.bind(client,true), 30000);
@@ -154,7 +154,7 @@ APS.transport.ws = APS.transport.wb = function(server, callback, client){
 /*
  * Long Polling Transport
  */
-APS.transport.lp = function(server, callback, client){
+APS.Transport.lp = function(server, callback, client){
 	this.id = 0;
 	var frame = document.createElement('iframe');
 	var protocol = !!client.option.secure ? "https" : "http";

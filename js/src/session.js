@@ -2,12 +2,12 @@
  * Prototype in the session object
  * The object current multiple cookies
  * handlers to save session related data
- * as well as other persisten information
+ * as well as other persistent information
  * require by the framework.
  * 
  * The session object currently uses cookies
- * to store the requiered information but in
- * the future i would like to implment the 
+ * to store the required information but in
+ * the future i would like to implement the
  * SessionStorage API with a fallback to 
  * cookies.
  */
@@ -23,7 +23,6 @@ APS.prototype.session = {
 		if(!this._client.option.session) return;
 		
 		var pubid = this._client.user.pubid;
-		var client = this._client;
 		
 		this.cookie.change(this.id + ":" + pubid);
 		this.saveChl();
@@ -83,7 +82,7 @@ APS.prototype.session = {
 }
 
 /*
- * the cookie object consructor
+ * the cookie object constructor
  */
 APS.cookie = function(name,value,days){
 	this.change = function(value,days){
