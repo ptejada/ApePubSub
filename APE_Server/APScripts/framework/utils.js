@@ -8,7 +8,6 @@ Ape.channelEvents = {};
  * Enchance Ape.log function
  */
 Apelog = Ape.log;
-
 Ape.log = function(data){
 	switch(typeof data){
 		case "object":
@@ -20,7 +19,6 @@ Ape.log = function(data){
 	}
 	//Apelog("\r");
 }
-
 /*
  * Globalize Some Ape methods
  */
@@ -85,17 +83,20 @@ Ape.getUserByName = function(name){
  */
 Ape.onChannel = function(chanName, Events, handler){
 	if(typeof Events == "object"){
+		//Normalize
+		chanName = chanName.toLowerCase();
+
 		//add events to queue
-		if(!(chanName in this.channelEvents))
+		if(!(chanName in Ape.channelEvents))
 			this.channelEvents[chanName] = {};
-		
+
 		for(var $event in Events){
 			handler = Events[$event];
 			$event = $event.toLowerCase();
-			if(!($event in this.channelEvents[chanName]))
-				this.channelEvents[chanName][$event] = [];
+			if(!($event in Ape.channelEvents[chanName]))
+				Ape.channelEvents[chanName][$event] = [];
 			
-			this.channelEvents[chanName][$event].push(handler);
+			Ape.channelEvents[chanName][$event].push(handler);
 			Ape.log("	+ Adding [" +$event+ "] event handler to channel [" + chanName +"]");
 		}
 	}else{
@@ -108,23 +109,24 @@ Ape.onChannel = function(chanName, Events, handler){
  * New Ape method: trigger channel event
  */
 Ape.triggerChannelEvent = function(channel, ev, args){
+	//Normalize
 	ev = ev.toLowerCase();
-	var name = channel.prop("name");
+	var name = channel.prop("name").toLowerCase();
 	
 	if(!(args instanceof Array)) args = [args];
 	
 	//Trigger global all channel events
-	if("*" in this.channelEvents && ev in this.channelEvents["*"]){
-		for(var i in this.channelEvents["*"][ev]){
-			if(this.channelEvents["*"][ev][i].apply(channel, args) === false)
+	if("*" in Ape.channelEvents && ev in Ape.channelEvents["*"]){
+		for(var i in Ape.channelEvents["*"][ev]){
+			if(Ape.channelEvents["*"][ev][i].apply(channel, args) === false)
 				return false;
 		}
 	}
 	
 	//Trigger channel specific events
-	if(name in this.channelEvents && ev in this.channelEvents[name]){
-		for(var i in this.channelEvents[name][ev]){
-			if(this.channelEvents[name][ev][i].apply(channel, args) === false)
+	if(name in Ape.channelEvents && ev in Ape.channelEvents[name]){
+		for(var i in Ape.channelEvents[name][ev]){
+			if(Ape.channelEvents[name][ev][i].apply(channel, args) === false)
 				return false;
 		}
 	}

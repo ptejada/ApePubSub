@@ -59,7 +59,7 @@ APS.prototype.onMessage = function(data){
 				 * Following the LOGIN raw this raw brings the user
 				 * object and all its properties
 				 * 
-				 * Inittiate and store the current user object
+				 * Initiate and store the current user object
 				 */
 				var user = new APS.cUser(args.user, this);
 				this.pipes[user.pubid] = user;
@@ -98,9 +98,9 @@ APS.prototype.onMessage = function(data){
 				}
 				
 				//Add events to channel from queue
-				var chanName = pipe.name.toLowerCase();
-				if(typeof this.eQueue[chanName] == "object"){
-					var queue = this.eQueue[chanName];
+				var name = pipe.name.toLowerCase();
+				if(typeof this.eQueue[name] == "object"){
+					var queue = this.eQueue[name];
 					var ev, fn;
 					for(var i in queue){
 						if(!queue.hasOwnProperty(i)) continue;
@@ -117,7 +117,7 @@ APS.prototype.onMessage = function(data){
 			break;
 			case "SYNC":
 				/*
-				 * Synchronizes events accross multiple client instances
+				 * Synchronizes events across multiple client instances
 				 */
 				var user = this.user;
 				
@@ -273,7 +273,7 @@ APS.prototype.onMessage = function(data){
 			break;
 			default:
 				//trigger custom raws
-				var info = new Array();
+				var info = [];
 				for(var i in args){
 					if(!args.hasOwnProperty(i)) continue;
 					info.push(args[i]);
