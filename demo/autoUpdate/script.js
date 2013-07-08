@@ -36,13 +36,13 @@ $(document).ready(function(){
 			var ref = box.find(".prop-"+prop);
 			
 			if(ref.length > 0){
-				ref.text(value);
+				ref.html(value);
 			}else{
 				var dl = box.find("dl");
 				
-				$("<dt>").text(prop).appendTo(dl);
+				$("<dt>").html(prop).appendTo(dl);
 				$("<dd>").addClass("prop-"+prop)
-					.text(value).appendTo(dl);
+					.html(value).appendTo(dl);
 				
 				ref = box.find(".prop-"+prop);
 			}
@@ -58,21 +58,21 @@ $(document).ready(function(){
 		
 		box.prop("id", "u-" + user.name)
 		
-		$("<h4>").text(user.name)
+		$("<h4>").html(user.name)
 			.appendTo(box)
 		
 		var dl = $("<dl>");
 		
-		$("<dt>").text("revision #").appendTo(dl);
+		$("<dt>").html("revision #").appendTo(dl);
 		$("<dd>").addClass("prop-_rev")
 			.data("fixed", true)
-			.text(user._rev).appendTo(dl);
+			.html(user._rev).appendTo(dl);
 		
 		for(var i in user){
 			
-			$("<dt>").text(i).appendTo(dl);
+			$("<dt>").html(i).appendTo(dl);
 			$("<dd>").addClass("prop-"+i)
-				.text(user[i]).appendTo(dl);
+				.html(user[i]).appendTo(dl);
 		}
 		
 		dl.find(".prop-name")
@@ -99,7 +99,7 @@ $(document).ready(function(){
 			 * Send any message to instantly
 			 * propagate the property changes
 			 */ 
-			client.pub("propShowcase", "*");
+			//client.pub("propShowcase", "*");
 			
 			name.val("");
 			value.val("");
@@ -107,15 +107,17 @@ $(document).ready(function(){
 			alert("Property name has invalid characters!");
 		}
 	})
-	
-	$("#myUser").on("click", "dd", function(){
+
+	var myUser = $("#myUser");
+
+	myUser.on("click", "dd", function(){
 		var fixed = $(this).data("fixed");
 		
 		if(!fixed){
 			var input = $("<input type='text'>")
-				.data("prop", $(this).prev().text());
+				.data("prop", $(this).prev().html());
 			
-			var value = $(this).text();
+			var value = $(this).html();
 			
 			$(this).html(input)
 				.addClass("updating")
@@ -126,32 +128,29 @@ $(document).ready(function(){
 			
 		}
 	})
-	
-	$("#myUser").on("change", "input", function(){	
+
+	myUser.on("change", "input", function(){
 		var value = $(this).val();
+		var prop = $(this).data("prop");
+
 		$(this).parent().data("fixed", false)
 			.removeClass("updating")
-		
-		client.user.change($(this).data("prop"), value);
-		
-		/*
-		 * Send any message to instantly
-		 * propagate the property changes
-		 */ 
-		client.pub("propShowcase", "*");
+
+		if(typeof prop != "undefined")
+			client.user.change($(this).data("prop"), value);
 	})
-	
-	$("#myUser").on("blur", "input", function(){
+
+	myUser.on("blur", "input", function(){
 		$(this).parent().data("fixed", false)
 			.removeClass("updating")
 		
 		var value = $(this).val();
 		
-		$(this).parent().text(value);
+		$(this).parent().html(value);
 	})
 	
 	client.sub("propShowcase", null, function(){
-		$(".myName").text(client.user.name);
+		$(".myName").html(client.user.name);
 		for(var id in this.users){
 			//skip current user
 			if(client.user.pubid == id){

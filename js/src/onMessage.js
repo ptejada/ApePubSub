@@ -144,10 +144,6 @@ APS.prototype.onMessage = function(data){
 				//Trigger event on target
 				pipe.trigger(args.event, [args.data, pipe, pipe]);
 				
-				//Update the pipe
-				if(this.option.autoUpdate)
-					pipe.update(args.pipe.properties);
-				
 			break;
 			case "EVENT":
 				/*
@@ -174,13 +170,6 @@ APS.prototype.onMessage = function(data){
 				//Trigger event on target
 				pipe.trigger(args.event, [args.data, user, pipe]);
 				
-				//Update the pipe and user objects
-				if(this.option.autoUpdate){
-					user.update(args.from.properties);
-					if(pipe.pubid != user.pubid)
-						pipe.update(args.pipe.properties);
-				}
-				
 			break;
 			case "NOJOIN":
 				this.trigger("notjoined", [args])
@@ -198,10 +187,6 @@ APS.prototype.onMessage = function(data){
 				
 				pipe.trigger('join', [user, pipe]);
 				
-				//Update pipe channel object
-				if(this.option.autoUpdate)
-					pipe.update(args.pipe.properties);
-				
 			break;
 			case 'LEFT':
 				/*
@@ -216,21 +201,16 @@ APS.prototype.onMessage = function(data){
 				
 				delete pipe.users[args.user.pubid];
 				
-				//Update pipe channel object
-				if(this.option.autoUpdate)
-					pipe.update(args.pipe.properties);
-				
 				pipe.trigger('left', [user, pipe]);
 				
 			break;
-			case "SELFUPDATE":
-				/*
-				 * Update the current user object properties as 
-				 * per its state in the server. Only will work
-				 * if autoUpdate is enabled
-				 */
-				if(this.option.autoUpdate)
-					this.user.update(args.user);
+			case "UPDATE":
+
+				if(this.option.autoUpdate){
+					var pipe = this.pipes[args.pipe.pubid];
+					pipe.update(args.pipe.properties);
+				}
+
 			break;
 			case 'CLOSE':
 				/*

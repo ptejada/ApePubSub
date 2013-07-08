@@ -17,7 +17,6 @@ Ape.log = function(data){
 		default:
 			Apelog(data);
 	}
-	//Apelog("\r");
 }
 /*
  * Globalize Some Ape methods
@@ -50,6 +49,27 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
 	}
 	
 	return this.pipe.toObject().properties;
+}
+
+Ape.user.change = Ape.channel.change = function(index, value){
+	if(!!index && !!value){
+		this.prop(index, value);
+		var obj = this.pipe.toObject();
+		if(obj.casttype == "uni"){
+			for(var name in this.channels){
+				var channel = this.channels[name];
+				channel.pipe.sendRaw("UPDATE", {
+					pipe: obj
+				});
+			}
+		}else{
+			this.pipe.sendRaw("UPDATE", {
+				pipe: obj
+			})
+		}
+	}else{
+		return false;
+	}
 }
 
 Ape.user.sendEvent = Ape.channel.sendEvent = function($event, $data, options){

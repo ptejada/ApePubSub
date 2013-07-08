@@ -14,10 +14,13 @@ APS.User = function(pipe, client){
 		 * property changes 
 		 */
 		update: {
-			value: function(o){
+			value: function(o, force){
 				if(!!!o) return false;
-				o._rev = parseInt(o._rev);
-				if(o._rev > this._rev){
+
+				if(!!!force)
+					o._rev = parseInt(o._rev);
+
+				if(o._rev > this._rev || !!force){
 					for(var i in o){
 						if(this[i] != o[i]){
 							this[i] = o[i];
@@ -84,10 +87,13 @@ APS.CUser = function(pipe, client){
 		 * property changes 
 		 */
 		update: {
-			value: function(o){
+			value: function(o, force){
 				if(!!!o) return false;
-				o._rev = parseInt(o._rev);
-				if(o._rev > this._rev){
+
+				if(!!!force)
+					o._rev = parseInt(o._rev);
+
+				if(o._rev > this._rev || !!force){
 					for(var i in o){
 						if(this[i] != o[i]){
 							this[i] = o[i];
@@ -113,8 +119,8 @@ APS.CUser = function(pipe, client){
 					data[name] = value;
 				}
 				//NOTE: data has no revision number thus update will fail
-				//this.update(data);
-				this._client.sendCmd("propUpdate", data);
+				this.update(data,true);
+				this._client.sendCmd("userPropUpdate", data);
 			}
 		},
 	
