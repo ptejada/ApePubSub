@@ -98,7 +98,7 @@ var StockBridge = function() {
  */
 $(document).ready(function(){
 	//Instantiate APE Client
-	window.client = new APS("ape.ptejada.com:45138", null, {
+	window.client = new APS("ape.ptejada.com", null, {
 		//transport: "lp",
 		debug: false,
 		session: false

@@ -1,6 +1,6 @@
 $(document).ready(function(){
 	//Create a new APS client
-	var client = new APS("ape.ptejada.com:45138");
+	var client = new APS("ape.ptejada.com");
 	
 	//Makes the client object global for debugging
 	window.client = client;
