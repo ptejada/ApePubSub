@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Single Channel | Demo</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="cache-control" content="no-cache" />
+		<!-- Load Style -->
+		<link rel="stylesheet" href="../style.css" type="text/css" />
+		<!--	
+		<script type="text/javascript" src="http://getfirebug.com/firebug-lite.js#saveCookies=false"></script>
+		  -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<script type="text/javaScript" src="script.js"></script>
+	</head>
+ 
+	<body>
+		<div id="wrap">
+			<p>
+				You are <strong id="username"></strong>
+			</p>
+			<div id="feed-music" class="feed">
+				<h1>Music Feed</h1>
+				<div class="feed-body"></div>
+				<form class="feed-send">
+					<input type="text" name="message" width="80%" /><input type="submit" value="Send" width="20%" />
+					<input type="hidden" name="channel" value="music" />
+					
+				</form>
+			</div>
+		</div>
+		
+		<!-- Load APS Client -->
+		<script type="text/javaScript" src="../../js/src/utilities.js"></script>
+		<script type="text/javaScript" src="../../js/src/client.js"></script>
+		<script type="text/javaScript" src="../../js/src/onMessage.js"></script>
+		<script type="text/javaScript" src="../../js/src/transport.js"></script>
+		<script type="text/javaScript" src="../../js/src/channel.js"></script>
+		<script type="text/javaScript" src="../../js/src/user.js"></script>
+		<script type="text/javaScript" src="../../js/src/session.js"></script>
+		
+		<!-- Load PubSub Dev Files 
+		<script type="text/javaScript" src="../../js/src/globals.js"></script>
+		-->
+		
+		<!-- Load Config Files 
+		<script type="text/javaScript" src="../config.js"></script>
+		-->
+	</body>
+</html>
