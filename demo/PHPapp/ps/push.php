@@ -5,7 +5,7 @@
 	 * The JS APS client framework sends an ajax request with two request parameters 'cmd' and 'from'
 	 * Both parameters are parsed upon constructing the object below.
 	 */
-	$c = new APS("ape.ptejada.com");
+	$c = new APS(ServerDomain);
 	
 	/*
 	 * This option toggles whether to use HTTPs or HTTP

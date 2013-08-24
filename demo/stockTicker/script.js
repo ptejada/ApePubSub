@@ -98,13 +98,16 @@ var StockBridge = function() {
  */
 $(document).ready(function(){
 	//Instantiate APE Client
-	window.client = new APS("ape.ptejada.com", null, {
+	var client = new APS(ServerDomain, null, {
 		//transport: "lp",
-		debug: false,
-		session: false
+		debug: EnableDebug,
+		session: EnableSession
 	});
 
 	client.identifier = "ST";
+
+	if(EnableDebug)
+		window.client = client;
 
 	var stock = new StockBridge();
 

@@ -1,9 +1,9 @@
 /*
  * Initialize and configure the client object
  */
-var client = new APS("ape.ptejada.com", false, {
-	debug: true,
-	session: true
+var client = new APS(ServerDomain, false, {
+	debug: EnableDebug,
+	session: EnableSession
 });
 
 client.identifier = "fullChat";

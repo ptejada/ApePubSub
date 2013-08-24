@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	var server = "ape.ptejada.com";
+	var server = ServerDomain;
 	
 	addLine("You must enter a server address or leave it blank to the default server.");
 	addLine("<form>APE Server: <input type='text' value='' placeholder="+server+"></form>");
@@ -32,8 +32,8 @@ function start(server){
 	
 	window.chanName = "test_" + randomString(4).toLowerCase();
 	window.client = new APS(server);
-	client.option.session = false;
-	
+	client.option.session = EnableSession;
+
 	var bot = {};
 	
 	var Events = {

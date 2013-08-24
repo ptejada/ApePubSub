@@ -1,10 +1,11 @@
 $(document).ready(function(){
 	//Create a new APS client
-	var client = new APS("ape.ptejada.com");
+	var client = new APS(ServerDomain);
 	
-	window.client = client;
+	if(EnableDebug)
+		window.client = client;
 	
-	client.option.debug = true;
+	client.option.debug = EnableDebug;
 	
 	/*
 	 * Enables pushing events to a script which then should relay the message to the APE server

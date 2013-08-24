@@ -1,13 +1,15 @@
 $(document).ready(function(){
 	//Create a new APS client
-	var client = new APS("ape.ptejada.com");
+	var client = new APS(ServerDomain);
 	
 	//Makes the client object global for debugging
-	window.client = client;
-	
+	if(EnableDebug)
+		window.client = client;
+
+
 	//Enable debug output to browser console
-	client.option.debug = true;
-	client.option.session = false;
+	client.option.debug = EnableDebug;
+	client.option.session = EnableSession;
 	
 	/*
 	 * Add global events which will apply to all channels 

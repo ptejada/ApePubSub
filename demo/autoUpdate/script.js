@@ -1,10 +1,11 @@
 $(document).ready(function(){
-	var client = new APS("ape.ptejada.com");
+	var client = new APS(ServerDomain);
 	
 	//Makes the client object global for debugging
-	window.client = client;
+	if(EnableDebug)
+		window.client = client;
 	
-	client.option.debug = true;
+	client.option.debug = EnableDebug;
 	client.option.session = true;
 	
 	client.user = {

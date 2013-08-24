@@ -4,7 +4,10 @@
 		<title>Full Test | Demo</title>
 		<meta http-equiv="cache-control" content="no-cache" />
 		<link rel="stylesheet" href="../style.css" type="text/css" />
-		
+
+
+		<script type="text/javaScript" src="../global.js"></script>
+
 		<script type="text/javaScript" src="../../js/src/utilities.js"></script>
 		<script type="text/javaScript" src="../../js/src/client.js"></script>
 		<script type="text/javaScript" src="../../js/src/onMessage.js"></script>
@@ -21,8 +24,8 @@
 			
 			client.user.bot = "yes";
 			client.identifier = "BOT";
-			client.option.session = false;
-			client.option.debug = true;
+			client.option.session = EnableSession;
+			client.option.debug = EnableDebug;
 			
 			
 			client.log(parent.client.option.server);

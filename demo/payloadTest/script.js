@@ -1,11 +1,12 @@
 $(document).ready(function(){
-	var client = new APS("ape.ptejada.com", null, {
-		debug: false,
+	var client = new APS(ServerDomain, null, {
+		debug: EnableDebug,
 		transport: (window.location.hash).substring(1) || ["ws","lp"],
-		session: false
+		session: EnableSession
 	});
 	
-	window.client = client;
+	if(EnableDebug)
+		window.client = client;
 	
 	var chan = randomString(8);
 	window.sendPayload = function(times){
