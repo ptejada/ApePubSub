@@ -43,7 +43,7 @@ function start(server){
 			addLine("Subscribed to channel <u>" + channel.name +"</u>");
 			//5
 			addLine("Waiting for <u>bot</u> nodes...");
-			$("<iframe/>").attr("src", "./bot.htm").attr("id","bot")
+			$("<iframe/>").attr("src", "./bot.html").attr("id","bot")
 				.css("display","none").appendTo("body");
 		},
 		join: function(user, channel){
