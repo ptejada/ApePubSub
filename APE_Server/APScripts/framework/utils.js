@@ -8,6 +8,10 @@ Ape.channelEvents = {};
  * Enhance Ape.log function
  */
 Apelog = Ape.log;
+/**
+ * Log data to the console
+ * @param data The data to log
+ */
 Ape.log = function(data){
 	switch(typeof data){
 		case "object":
@@ -100,8 +104,21 @@ var setInterval = Ape.setInterval;
 var clearTimeout = Ape.clearTimeout;
 var clearInterval = Ape.clearInterval;
 
-/*
- * Built-in object modifications
+/**
+ * Property Setter and Getter
+ *
+ * To get a property: obj.prop( propName );
+ * To set a property: obj.prop( propName, propValue);
+ * To set multiple properties at once:
+ *      obj.prop({
+ *          propName1: propValue1,
+ *          propName2: propValue2,
+ *          ...
+ *      });
+ *
+ * @param (int|string) index The named key of the property
+ * @param (mixed) value The new value of the property
+ * @return {*}
  */
 Ape.user.prop = Ape.channel.prop = function(index, value){
 	if(typeof index != 'undefined'){
@@ -125,7 +142,22 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
 	return this.pipe.toObject().properties;
 }
 
-Ape.user.change = Ape.channel.change = function(index, value){
+/**
+ * Property Setter which propagates property changes
+ *
+ * To change a property: obj.update( propName, propValue);
+ * To set multiple properties at once:
+ *      obj.update({
+ *          propName1: propValue1,
+ *          propName2: propValue2,
+ *          ...
+ *      });
+ *
+ * @param {int|string} index The named key of the property
+ * @param {*} value The new value of the property
+ * @return {*}
+ */
+Ape.user.update = Ape.channel.update = function(index, value){
 	if(!!index && !!value){
 		this.prop(index, value);
 		var obj = this.pipe.toObject();
@@ -146,6 +178,15 @@ Ape.user.change = Ape.channel.change = function(index, value){
 	}
 }
 
+/**
+ * Send an event to the object, user|channel
+ *
+ * @param {string}$event The name of the event to send
+ * @param {*}$data The data to send with the event
+ * @param {object}options The event options: {from: pipe, restrict: user|subuser}
+ *
+ * @type {Function}
+ */
 Ape.user.sendEvent = Ape.channel.sendEvent = function($event, $data, options){
 	if(!!options && "from" in options){
 		var bodyParams = {
@@ -163,17 +204,36 @@ Ape.user.sendEvent = Ape.channel.sendEvent = function($event, $data, options){
 	}
 }
 
-/*
- * New Ape method: get username by name
- * 
+/**
+ * Get user object by username
+ *
+ * @param name The name of the user
+ * @returns {*|boolean}
  */
 Ape.getUserByName = function(name){
 	name = name.toLowerCase();
 	return Ape.userlist[name] || false;
 }
 
-/*
- * New Ape method: listen to events by channel
+/**
+ * Register channel event handler
+ *
+ * To register one event handler:
+ *      Ape.onChannel( channelName, eventName, eventHandler);
+ *
+ * To register multiple event handlers:
+ *      Ape.onChannel( channelName, {
+ *          eventName1: eventHandler1,
+ *          eventName2: eventHandler2,
+ *          ...
+ *      });
+ *
+ * To register an event handler that will apply to all channels:
+ *      Ape.onChannel( "*" , eventName, eventHandler );
+ *
+ * @param {string}chanName Name of the channel to register the event handler to
+ * @param {object|string}Events The event name
+ * @param {function}handler The callback function to run everything the event occurs
  */
 Ape.onChannel = function(chanName, Events, handler){
 	if(typeof Events == "object"){
@@ -199,8 +259,14 @@ Ape.onChannel = function(chanName, Events, handler){
 		this.onChannel(chanName,xnew);
 	}
 }
-/*
- * New Ape method: trigger channel event
+
+/**
+ * Trigger a channel event stack
+ *
+ * @param {string}channel The name of the channel
+ * @param {string}ev The event stack name
+ * @param {Array}args The arguments to pass to the event handlers
+ * @returns {boolean}
  */
 Ape.triggerChannelEvent = function(channel, ev, args){
 	//Normalize
@@ -227,6 +293,7 @@ Ape.triggerChannelEvent = function(channel, ev, args){
 	
 	return true;
 }
+
 /*
  * Official bind polyfill at developer.mozilla.org
  */ 
