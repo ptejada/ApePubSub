@@ -38,18 +38,43 @@ Ape.log = function(data){
 								result += "\n";
 								level--;
 								tab = true;
+							}else if(next == "}"){
+								result += "\n";
+								level--;
+								tab = true;
 							}
 							break;
+						case "[":
+							if(next != "]"){
+								result += "\n";
+								level++;
+								tab = true;
+							}
+							break;
+						case "]":
+							if(previous != "[" && next != ","){
+								result += "\n";
+								level--;
+								tab = true;
+							}else if(next == "]"){
+								result += "\n";
+								level--;
+								tab = true;
+							}
+							break;
+
 						case ",":
-							result += "\n";
-							tab = true;
+							if(next != "{"){
+								result += "\n";
+								tab = true;
+							}
 							break
 						case ":":
 							result += " ";
 							break;
 
 						default:
-							if(next == "}"){
+							if(next == "}" || next == "]"){
 								result += "\n";
 								level--;
 								tab = true;
