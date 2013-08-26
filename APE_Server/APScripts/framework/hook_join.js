@@ -7,7 +7,7 @@ Ape.registerHookCmd("JOIN", function(params, cmd){
 			if(!channel){
 				/*
 				 * Channel has not been created yet
-				 * create a dummy object to succesfully
+				 * create a dummy object to successful
 				 * trigger the beforejoin event
 				 */
 				channel = {
@@ -22,7 +22,7 @@ Ape.registerHookCmd("JOIN", function(params, cmd){
 			
 			if(res === false){
 				/*
-				 * An event handeler has determine user can't join the channel
+				 * An event handler has determine user can't join the channel
 				 * Let the client knows use can't one of the channels it requested
 				 */
 				cmd.sendResponse("NOJOIN", params);

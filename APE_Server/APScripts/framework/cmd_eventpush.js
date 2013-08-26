@@ -3,7 +3,7 @@
  */
 Ape.registerCmd("eventpush", true, function(params, info) {
 	var recipient = Ape.getChannelByPubid(params.pipe);
-	var isChan = true
+	var isChan = true;
 	
 	//Try if the recipient is an user
 	if(!recipient){
