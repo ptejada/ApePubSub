@@ -13,7 +13,7 @@ APS.User = function(pipe, client){
 		 * properties specific events which can be ise observe/watch
 		 * property changes 
 		 */
-		update: {
+		_update: {
 			value: function(o, force){
 				if(!!!o) return false;
 
@@ -86,7 +86,7 @@ APS.CUser = function(pipe, client){
 		 * properties specific events which can be ise observe/watch
 		 * property changes 
 		 */
-		update: {
+		_update: {
 			value: function(o, force){
 				if(!!!o) return false;
 
@@ -110,7 +110,7 @@ APS.CUser = function(pipe, client){
 		 * server for propagation. In order for this method to work 
 		 * properly the option autoUpdate should enable
 		 */
-		change: {
+		update: {
 			value: function(name, value){
 				if(typeof name == "object"){
 					var data = name;
@@ -119,7 +119,7 @@ APS.CUser = function(pipe, client){
 					data[name] = value;
 				}
 				//NOTE: data has no revision number thus update will fail
-				this.update(data,true);
+				this._update(data,true);
 				this._client.sendCmd("userPropUpdate", data);
 			}
 		},

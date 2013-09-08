@@ -208,7 +208,7 @@ APS.prototype.onMessage = function(data){
 
 				if(this.option.autoUpdate){
 					var pipe = this.pipes[args.pipe.pubid];
-					pipe.update(args.pipe.properties);
+					pipe._update(args.pipe.properties);
 				}
 
 			break;

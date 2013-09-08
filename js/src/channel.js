@@ -13,7 +13,7 @@ APS.Channel = function(pipe, client) {
 		 * properties specific events which can be ise observe/watch
 		 * property changes 
 		 */
-		update: {
+		_update: {
 			value: function(o){
 				if(!!!o) return false;
 				o._rev = parseInt(o._rev);
@@ -126,7 +126,7 @@ APS.Channel = function(pipe, client) {
 					 * Update object if autoUpdate is enabled
 					 */
 					if(client.option.autoUpdate)
-						user.update(u.properties);
+						user._update(u.properties);
 				}
 				
 				//Add channel reference to the user
