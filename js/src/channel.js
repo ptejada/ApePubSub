@@ -141,6 +141,9 @@ APS.Channel = function(pipe, client) {
 		},
 		pub: {
 			value: client.pub.bind(client, this.name)
+		},
+		publish: {
+		    value: client.pub.bind(client, this.name)
 		}
 	})}
 	

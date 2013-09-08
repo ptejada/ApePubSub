@@ -23,7 +23,7 @@ function APS( server, events, options ){
 		autoUpdate: true
 	}
 	this.identifier = "APS";
-	this.version = '1.6.0';
+	this.version = '1.6.1-dev';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -410,6 +410,7 @@ APS.prototype.sub = function(channel, Events, callback){
 
 	return this;
 }
+APS.prototype.subscribe = APS.prototype.sub;
 
 /*
  * Publish data/message in a channel or to a user
@@ -426,6 +427,7 @@ APS.prototype.pub = function(channel, data, sync, callback){
 		this.log("NO Channel " + channel);
 	}
 };
+APS.prototype.publish = APS.prototype.pub;
 
 /**
  * Get a channel object by its name
@@ -480,6 +482,7 @@ APS.prototype.unSub = function(channel){
 	if(channel == "") return;
 	this.getChannel(channel).leave();
 }
+APS.prototype.unSubscribe = APS.prototype.unSub;
 
 /*
  * Debug Function for Browsers console

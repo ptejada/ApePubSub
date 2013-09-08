@@ -56,6 +56,9 @@ APS.User = function(pipe, client){
 		pub: {
 			value: client.pub.bind(client, pipe.pubid)
 		},
+		publish: {
+			value: client.pub.bind(client, pipe.pubid)
+		},
 		send: {
 			value: client.send.bind(client, pipe.pubid)
 		}
