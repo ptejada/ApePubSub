@@ -1,62 +1,97 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Multi Channel | Demo</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<meta http-equiv="cache-control" content="no-cache" />
-		
-		<!-- Load Style -->
-		<link rel="stylesheet" href="../style.css" type="text/css" />
-		
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-		
-		<script type="text/javaScript" src="../global.js"></script>
-		<script type="text/javaScript" src="script.js"></script>
-	</head>
-	
-	<body>
-		<div id="wrap">
-			<p>
-				You are <strong id="username"></strong>
-			</p>
-			<p>
-				User can subscribe to multiples channels at the same time, each channel can have its own
-				independent event handlers.
-			</p>
-			<div id="feed-music" class="feed">
-				<h1>Music Feed</h1>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+	<title>Multi Channel | Demo</title>
+	<meta name="description" content="" />
+	<meta name="author" content="Pablo" />
+
+	<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../style.css" rel="stylesheet">
+</head>
+
+<body>
+<div id="wrap" class="container">
+	<nav class="navbar navbar-default" role="navigation">
+		<strong class="navbar-brand">Multi Channel | Demo</strong>
+		<a class="btn btn-default navbar-btn" href="../">
+			<span class="glyphicon glyphicon-arrow-left"></span> Back List
+		</a>
+	</nav>
+	<p>
+		You are <strong id="username"></strong>
+	</p>
+	<p>
+		User can subscribe to multiples channels at the same time, each channel can have its own independent event handlers.
+	</p>
+	<div class="row">
+		<div class="col-sm-6 col-md-4">
+			<div id="feed-music" class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title text-center">Music Chat</h2>
+				</div>
 				<div class="feed-body"></div>
 				<form class="feed-send">
-					<input type="text" name="message" /><input type="submit" value="Send" />
+					<div class="input-group">
+						<input type="text" name="message" class="form-control">
+						<span class="input-group-btn">
+							<button class="btn btn-primary" type="submit">Send</button>
+						</span>
+					</div>
 					<input type="hidden" name="channel" value="music" />
 				</form>
 			</div>
-			<div id="feed-games" class="feed">
-				<h1>Games Feed</h1>
+		</div>
+
+		<div class="col-sm-6 col-md-4">
+			<div id="feed-games" class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title text-center">Games Chat</h2>
+				</div>
 				<div class="feed-body"></div>
 				<form class="feed-send">
-					<input type="text" name="message" /><input type="submit" value="Send" />
+					<div class="input-group">
+						<input type="text" name="message" class="form-control">
+						<span class="input-group-btn">
+							<button class="btn btn-primary" type="submit">Send</button>
+						</span>
+					</div>
 					<input type="hidden" name="channel" value="games" />
 				</form>
 			</div>
-			<div id="feed-dance" class="feed">
-				<h1>Dance Feed</h1>
+		</div>
+
+		<div class="col-sm-6 col-md-4">
+			<div id="feed-dance" class="panel panel-default">
+				<div class="panel-heading">
+					<h2 class="panel-title text-center">Dance Chat</h2>
+				</div>
 				<div class="feed-body"></div>
 				<form class="feed-send">
-					<input type="text" name="message" /><input type="submit" value="Send" />
+					<div class="input-group">
+						<input type="text" name="message" class="form-control">
+						<span class="input-group-btn">
+							<button class="btn btn-primary" type="submit">Send</button>
+						</span>
+					</div>
 					<input type="hidden" name="channel" value="dance" />
 				</form>
 			</div>
 		</div>
-		
-		
-		<!-- Load ApePubSub dev File -->
-		<script type="text/javaScript" src="../../js/src/utilities.js"></script>
-		<script type="text/javaScript" src="../../js/src/client.js"></script>
-		<script type="text/javaScript" src="../../js/src/onMessage.js"></script>
-		<script type="text/javaScript" src="../../js/src/transport.js"></script>
-		<script type="text/javaScript" src="../../js/src/channel.js"></script>
-		<script type="text/javaScript" src="../../js/src/user.js"></script>
-		<script type="text/javaScript" src="../../js/src/session.js"></script>
-	</body>
+	</div>
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!-- Load APS Client -->
+<script type="text/javaScript" src="../../js/ApePubSub.min.js"></script>
+<!-- Load Demo globals -->
+<script type="text/javaScript" src="../global.js"></script>
+<!-- Load Demo Script -->
+<script type="text/javaScript" src="script.js"></script>
+</body>
 </html>

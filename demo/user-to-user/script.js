@@ -29,23 +29,22 @@ $(document).ready(function(){
 			})
 		},
 		error007: function(){
-			$("<div>").addClass("error")
+			$("<div>").addClass("alert alert-warning")
 				.html("The user name <b>" + this.user.name + "</b> is not available.")
 				.appendTo("#userPicker .errorTray");
 		},
 		
 		error006: function(){
-			$("<div>").addClass("error")
+			$("<div>").addClass("alert alert-warning")
 				.html("The user name <b>" + this.user.name + "</b> is not a valid name. It must be alphanumeric.")
 				.appendTo("#userPicker .errorTray");
 		},
 		
 		ready: function(){
-			$("#userPicker").html("You are: <b>" + this.user.name + "</b>   ");
-			$("<img>")
-				.addClass("user-avatar")
-				.prop("src", "http://www.gravatar.com/avatar/" + this.user.avatar + "?d=identicon&s=20")
-				.insertBefore($("#userPicker b"));
+			$("#userPicker").hide();
+
+			newUser(this.user)
+				.addClass("current").prependTo($("#userList"));
 			
 			this.user.on("message", function(message, from, channel){
 				newLine(message, from, from);
@@ -68,7 +67,7 @@ $(document).ready(function(){
 		var row = $("<div>");
 		
 		row.prop("id", "u-" + user.name)
-		row.addClass("user");
+		row.addClass("user row");
 		
 		$("<img>").addClass("user-avatar")
 			.prop("src", "http://www.gravatar.com/avatar/" + user.avatar + "?d=identicon&s=20")
@@ -77,13 +76,16 @@ $(document).ready(function(){
 		$("<strong>").text(user.name)
 			.addClass("user-name")
 			.appendTo(row);
-		
-		$("<button>").text("chat")
-			.addClass("chatWithUser")
+		//.glyphicon .glyphicon-edit
+		$("<button>").text("chat ")
+			.addClass("chatWithUser btn btn-default btn-xs")
 			.data("pubid", user.pubid)
+			.append("<span class=\"glyphicon glyphicon-edit\"></span>")
 			.appendTo(row);
 			
-		container.append(row);		
+		container.append(row);
+
+		return row;
 	}
 	
 	var newChat = function(data, line){
@@ -92,13 +94,14 @@ $(document).ready(function(){
 		
 		chat.prop("id", "c-"+data.name);
 		chat.find(".name").text(data.name);
-		chat.data("pubid", data.pubid);
-		chat.find(".user-avatar").prop("src", "http://www.gravatar.com/avatar/" + data.avatar + "?d=identicon&s=30");
+		chat.find(".feed-send").data("pubid", data.pubid);
+		chat.find(".user-avatar").prop("src", "http://www.gravatar.com/avatar/" + data.avatar + "?d=identicon&s=20");
 		
 		if(typeof line != "undefine")
 			chat.find(".feed-body").append(line).trigger("newLine");
 		
 		list.prepend(chat);
+		chat.find("input:first").prop("disabled", false).focus();
 	}
 	
 	var newLine = function(message, from, to){
@@ -156,8 +159,8 @@ $(document).ready(function(){
 		e.preventDefault();
 		
 		var formInput = $(this).find("[name='message']");
-		var pubid = $(this).parent().data("pubid");
-		
+		var pubid = $(this).data("pubid");
+
 		//Get the user object - the recipient
 		var recipient = client.getPipe(pubid);
 		
@@ -171,8 +174,8 @@ $(document).ready(function(){
 		return false;
 	});
 	
-	$("#chatList").on("click", ".closeBnt", function(e){
-		$(this).parent().slideUp("fast", function(){
+	$("#chatList").on("click", "button.close", function(e){
+		$(this).parents(".panel").first().parent().slideUp("fast", function(){
 			$(this).remove();
 		});
 	});

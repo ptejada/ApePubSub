@@ -4,16 +4,16 @@
 	font-size: 1.4em;
 	margin: 0 auto;
 }
-#stockAdder * {
-	font-size: 1.4em;
-}
 
 #stock-list {
-	padding: 1em;
+	padding: 0;
 }
 
 .stock {
 	padding: 0.5em;
+}
+.stock-lv1, .stock-lv2 {
+	font-size: 1.21em;
 }
 .stock-lv1 {
 	border: 2px #ccc solid;
@@ -29,6 +29,7 @@
 	border: 2px #ccc solid;
 	vertical-align: top;
 	display: inline-block;
+	width: 78%;
 }
 .stock-name {
 	display: block;

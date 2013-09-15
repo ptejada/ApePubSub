@@ -1,32 +1,22 @@
 #chat {
-	width: 650px;
+	max-width: 650px;
 	margin: 0 auto;
-	border: solid 2px #222222;
-}
-#chat > h1 {
-	background: #111;
-	color: #eee;
-	text-align: center;
-	margin: 0;
-	padding: 0.2em;
 }
 
 #chat-messages, #chat-userlist {
-	vertical-align: top;
-	display: inline-block;
-	height: 400px;
+	display: block;
 }
 #chat-messages {
-	width: 70%;
 	background: #fdfdfd;
 	position: relative;
 	overflow: auto;
+	height: 400px;
 }
 
 #chat-userlist {
-	width: 30%;
 	background: #f8f8f8;
 	overflow: auto;
+	height: 364px;
 }
 
 #chat-userlist > div {
@@ -50,7 +40,6 @@
 
 #chat-messages > div {
 	padding: 0.5em;
-	background: #fafafa;
 }
 #chat-messages > div:nth-child(odd) {
 	background: #efefef;
@@ -69,32 +58,19 @@
 }
 
 #chat-form {
-	width: 70%;
-	height: 100%;
-	display: inline-block;
-}
-#chat-form input[type="text"] {
-	width: 78.5%;
-}
-#chat-form input[type="submit"] {
-	width: 20%;
-}
-#chat-form input {
-	font-size: 1.5em;
-}
 
+}
 /*
  * 
  */
 
 #chat-messages .ask {
-	width: 90%;
 	position: absolute;
 	top: 0;
 	font-size: 1.3em;
 	padding: 5%;
 	text-align: center;
-	background: rgba(90, 90 , 90, 0.3);
+	background: rgba(185, 185, 185, 0.28);
 }
 
 #chat-messages .ask > strong {

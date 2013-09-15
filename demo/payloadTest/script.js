@@ -42,9 +42,5 @@ $(document).ready(function(){
 		window.location.hash = $(this).attr("href");
 		window.location.reload();
 	})
-	$(window.location.hash).css({
-		padding: "5px 8px",
-		background: "#000",
-		color: "#fff"
-	});
+	$(window.location.hash).parent().addClass("active");
 })

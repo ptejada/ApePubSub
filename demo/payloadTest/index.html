@@ -1,46 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script src="../global.js"></script>
-<script src="script.js"></script>
-<meta charset=utf-8 />
-<title>Payload | Demo</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+	<title>Payload | Demo</title>
+	<meta name="description" content="" />
+	<meta name="author" content="Pablo" />
+
+	<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../style.css" rel="stylesheet">
 </head>
 <body>
-	<p>
-		<strong>Choose Transport: </strong>
-		<a href="#lp" id="lp">LongPolling</a>
-		<a href="#ws" id="ws">WebSocket</a>
-	</p>
-	
-	<small><strong>*Note:</strong> Some browser do not support WebSocket transport</small>
-	<br>
-	
-	<p>Messages Sent: <b id="sent">0</b></p>
-	<p>Messages Recived: <b id="recieved">0</b></p>
-	<hr>
-	<form>
-		Messages to send: 
-		<select id="load">
-			<option value="3">3</option>
-			<option value="5">5</option>
-			<option value="9">9</option>
-			<option value="13">13</option>
-			<option value="16">16</option>
-			<option value="20">20</option>
-		</select>
-		
-		<button type="submit">Send Payload</button>
-	</form>
-	
-		<!-- Load APS Client -->
-		<script type="text/javaScript" src="../../js/src/utilities.js"></script>
-		<script type="text/javaScript" src="../../js/src/client.js"></script>
-		<script type="text/javaScript" src="../../js/src/onMessage.js"></script>
-		<script type="text/javaScript" src="../../js/src/transport.js"></script>
-		<script type="text/javaScript" src="../../js/src/channel.js"></script>
-		<script type="text/javaScript" src="../../js/src/user.js"></script>
-		<script type="text/javaScript" src="../../js/src/session.js"></script>
+	<div class="container">
+		<nav class="navbar navbar-default" role="navigation">
+			<strong class="navbar-brand">Payload | Demo</strong>
+			<a class="btn btn-default navbar-btn" href="../">
+				<span class="glyphicon glyphicon-arrow-left"></span> Back List
+			</a>
+		</nav>
+
+		<div class="row">
+			<div class="col-md-6 col-md-offset-1">
+				<ul class="nav nav-pills">
+					<li><strong style="padding: 10px 0; display: block">Choose Transport: </strong></li>
+					<li><a href="#lp" id="lp">LongPolling</a></li>
+					<li><a href="#ws" id="ws">WebSocket</a></li>
+				</ul>
+				<small><strong>*Note:</strong> Some browser do not support WebSocket transport</small>
+
+				<br>
+
+				<dl class="dl-horizontal">
+					<dt>Messages Sent: </dt>
+					<dd><b class="badge" id="sent">0</b></dd>
+
+					<dt>Messages Recived: </dt>
+					<dd><b class="badge" id="recieved">0</b></dd>
+				</dl>
+
+				<hr>
+				<form>
+					Messages to send:
+					<select id="load">
+						<option value="3">3</option>
+						<option value="5">5</option>
+						<option value="9">9</option>
+						<option value="13">13</option>
+						<option value="16">16</option>
+						<option value="20">20</option>
+					</select>
+
+					<button type="submit">Send Payload</button>
+				</form>
+			</div>
+		</div>
+
+	</div>
+
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+	<!-- Load APS Client -->
+	<script type="text/javaScript" src="../../js/ApePubSub.min.js"></script>
+	<!-- Load Demo globals -->
+	<script type="text/javaScript" src="../global.js"></script>
+	<!-- Load Demo Script -->
+	<script type="text/javaScript" src="script.js"></script>
 </body>
 </html>

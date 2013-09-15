@@ -2,52 +2,64 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-
-	<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
-	Remove this if you use the .htaccess -->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
 	<title>APE PubSub</title>
 	<meta name="description" content="" />
-	<meta name="generator" content="Studio 3 http://aptana.com/" />
 	<meta name="author" content="Pablo" />
 
 	<meta name="viewport" content="width=device-width; initial-scale=1.0" />
-
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-	<h1>APS(ApePubSub) Demos</h1>
-	<p style="font-size: 1.2em;">
-		<a href="singleChannel">Single Channel Sample</a>
-		<br><br>
-		<a href="eventPush">Single Channel Sample</a> ( eventPush version )
-		<br><br>
-		<a href="multiChannel">Multiple Channels Sample</a>
-		<br><br>
-		<a href="autoUpdate">Objects autoUpdate</a> - Showcases how public properties can be kept on sync
-		<br><br>
-		<a href="user-to-user">User to User chat</a> ( no dedicated channel per user )
-		<br><br>
-		<a href="stockTicker">Generic Stock Ticker</a>
-		<br><br>
-		<a href="PHPapp">PHP integrated app</a>
-		<br><br>
-		<a href="fullChat">Full Chat Application</a>
-		<br><br>
-		<a href="payloadTest">Payload Test</a>
-		<br><br>
-		<a href="Full Test">Framework Full Test</a>
-	</p>
-	<hr>
-	<p>
-		<b>NOTE:</b> This demos by default run in a public APE Server(ape.ptejada.com) for demontration
-		purposes only. In order to test this demos with your own server you must install the APS server framework on your APE server.
-		<a href="https://github.com/ptejada/ApePubSub/wiki/Installing-server-scripts">Installing the APS server framework.</a>
-	
-	<div>
+	<div class="container">
+		<h1>Ape<span style="color:#999">Pub</span>Sub( A<span style="color:#999">P</span>S ) Demos</h1>
+		<hr>
+		<div class="row">
+			<div class="col-sm-12">
+				<dl class="dl-horizontal">
+					<dt><a href="singleChannel">Single Channel</a></dt>
+					<dd>The user joins a simple text chat channel</dd>
+
+					<dt><a href="eventPush">Single Channel</a> (PHP)</dt>
+					<dd>The user joins a simple text chat channel but the messages sent are routed to a PHP script prior to been sent to the APE Server. This feature is call <a href="https://github.com/ptejada/ApePubSub/wiki/Routing-events-for-php-processing"><i>eventPush</i></a></dd>
+
+					<dt><a href="multiChannel">Multi-Channel</a></dt>
+					<dd>The user joins multiple simple text chat channels at once</dd>
+
+					<dt><a href="autoUpdate">Objects autoUpdate</a></dt>
+					<dd>Showcases how public user properties can be kept on sync across clients</dd>
+
+					<dt><a href="user-to-user">User to User</a></dt>
+					<dd>In this demo users communicate directly without a dedicated channel. Users initially join a channel for user listing purposes only but the actual text messages travel from user to user object not through a dedicated channel</dd>
+
+					<dt><a href="stockTicker">Stock Ticker</a></dt>
+					<dd>A Generic stock ticker that pushes random generated data to clients. The data is generated in custom server module</dd>
+
+					<dt><a href="PHPapp">PHP integrated</a></dt>
+					<dd>An application with a PHP user system which automatically log in users with their username into a chat</dd>
+
+					<dt><a href="fullChat">Full Chat</a></dt>
+					<dd>A chatting application which implements user listing, user icons and a user is typing indicator</dd>
+
+					<dt><a href="payloadTest">Payload Test</a></dt>
+					<dd>Test each transport performance by sending multiple parallel events at once, keeping a counter of sent and received events</dd>
+
+					<dt><a href="fullTest">Full Test</a></dt>
+					<dd>Mostly use during development to test various features of the framework and make sure they work as expected. An attempt to make a full framework unit test.</dd>
+				</dl>
+			</div>
+		</div>
+		<hr>
 		<p>
-		</p>
+			<b>NOTE:</b> This demos by default run in a public APE Server( <a href="http://ape.ptejada.com">ape.ptejada.com</a> ) for demonstration
+			purposes only. In order to test this demos with your own server installation you must install the APS server framework on your APE server.
+			<a href="https://github.com/ptejada/ApePubSub/wiki/Installing-server-scripts">Installing the APS server framework.</a>
 	</div>
+
+
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 </body>
 </html>

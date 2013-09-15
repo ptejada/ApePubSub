@@ -45,7 +45,7 @@ var StockBridge = function() {
 		//Generates stock line graph
 		obj.find(".stock-visual").sparkline(self.visual[name], {
 			height: 72,
-			width: self.visual[name].length * 0.7 +"em"
+			width: self.visual[name].length * 3.33 +"%"
 		});
 
 		//Update the document with new data

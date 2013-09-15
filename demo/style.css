@@ -1,8 +1,5 @@
 .feed {
-	width: 400px;
-	display: inline-block;
-	border: 2px solid #999;
-	background: #AAA;
+
 }
 
 .feed > h1 {
@@ -15,15 +12,18 @@
 .feed-body {
 	height: 200px;
 	overflow: auto;
-	font-size: 1.2em;
-	background: #eee;
+	font-size: 1.1em;
 }
 .feed-body > div {
 	padding: 0.5em;
 	background: #fafafa;
 }
+.feed-body > div > .label {
+	float: right;
+	font-size: 0.7em;
+}
 .feed-body > div:nth-child(odd) {
-	background: #efefef;
+	background: #FFFFFF;
 }
 .feed-body > div.bot {
 	background: #555;
@@ -33,23 +33,13 @@
 	padding: 0.2em;
 	border: solid 1px #777;	
 }
-.feed-send {
-	text-align: center;
-	width: 100%;
-}
 
-.feed-send input[type="text"] {
-	width: 78.5%;
-}
-.feed-send input[type="submit"] {
-	width: 20%;
-}
-.feed-send input {
-	font-size: 1.5em;
+nav > a.btn {
+	float: right;
 }
 
 #console {
-	width: 600px;
+	max-width: 600px;
 	padding: 10px;
 	background: #222;
 	color: #eee;
@@ -70,7 +60,6 @@
 #console form {
 	display: inline-block;
 	background: none;
-	width: 550px;
 }
 #console form input:focus {
 	outline: none;

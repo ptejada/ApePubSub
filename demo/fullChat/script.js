@@ -16,7 +16,7 @@ var channelName = "APS_chatter";
 client.on({
 	connect: function(){
 		if(!!!client.user.name){
-			//Prompt for username if trting to connect without one
+			//Prompt for username if trying to connect without one
 			askForUsername();
 			
 			//Pause connect to gather user information
@@ -27,6 +27,12 @@ client.on({
 	dead: function(){
 		//Refresh page
 		window.location.reload();
+	},
+
+	error007: function(){
+		//$("#chat .ask .").
+		//TODO: Handle the username is not available error
+		alert("Name is not available");
 	}
 });
 
@@ -46,7 +52,7 @@ client.onChannel(channelName, {
 		var chan = client.getChannel(channelName);
 		
 		//Enable chat form
-		$("#chat-form input").removeProp("disabled");
+		$("#chat-form input, #chat-form button").prop("disabled", false);
 		
 		//Add DOM event to send the typing event to server
 		formInput.one("keyup", function(e){
@@ -84,7 +90,7 @@ client.onChannel(channelName, {
 	left: removeUser,
 	
 	/*
-	 * A message has been revieved in the channel
+	 * A message has been reviewed in the channel
 	 */
 	message: function(message, from, channel){
 		addMessage(message, from);

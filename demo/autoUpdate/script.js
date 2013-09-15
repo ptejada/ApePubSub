@@ -6,7 +6,7 @@ $(document).ready(function(){
 		window.client = client;
 	
 	client.option.debug = EnableDebug;
-	client.option.session = true;
+	client.option.session = EnableSession;
 	
 	client.user = {
 		name: "User_"+randomString(5)
@@ -28,7 +28,7 @@ $(document).ready(function(){
 		},
 		
 		left: function(user, channel){
-			$("#u-" + user.name).fadeOut("fast", function(){
+			$("#u-" + user.name).parent().fadeOut("fast", function(){
 				$(this).remove();
 			})
 		},
@@ -55,12 +55,13 @@ $(document).ready(function(){
 	
 	var newUser = function(user, cont){
 		var container = cont || $("#othersProps");
-		var box = $("<div class='user'>");
+		var box = $("<div class='user panel panel-default'>");
 		
-		box.prop("id", "u-" + user.name)
-		
-		$("<h4>").html(user.name)
-			.appendTo(box)
+		box.prop("id", "u-" + user.name);
+
+		$('<div>').addClass('panel-heading').append(
+				$("<h4>").addClass('panel-title text-center').html(user.name)
+			).appendTo(box);
 		
 		var dl = $("<dl>");
 		
@@ -70,6 +71,7 @@ $(document).ready(function(){
 			.html(user._rev).appendTo(dl);
 		
 		for(var i in user){
+			if(i == 'name') continue;
 			
 			$("<dt>").html(i).appendTo(dl);
 			$("<dd>").addClass("prop-"+i)
@@ -77,12 +79,16 @@ $(document).ready(function(){
 		}
 		
 		dl.find(".prop-name")
-			.data("fixed", true)
+			.data("fixed", true);
+
+		$('<div>').addClass('panel-body')
+			.append(dl)
+			.appendTo(box);
 		
-		dl.appendTo(box);
-		
-		container.append(box);
-	}
+		container.append(
+			$('<div>').addClass('col-md-4 col-sm-6').append(box)
+		);
+	};
 	
 	$("#newPropertyAdder").on("submit", function(e){
 		e.preventDefault();
@@ -95,7 +101,7 @@ $(document).ready(function(){
 		}
 		
 		if(name.val().match(/^[0-9a-zA-Z_-]+$/)){
-			client.user.change(name.val(), value.val());
+			client.user.update(name.val(), value.val());
 			/*
 			 * Send any message to instantly
 			 * propagate the property changes
@@ -107,7 +113,7 @@ $(document).ready(function(){
 		}else{
 			alert("Property name has invalid characters!");
 		}
-	})
+	});
 
 	var myUser = $("#myUser");
 
@@ -138,7 +144,7 @@ $(document).ready(function(){
 			.removeClass("updating")
 
 		if(typeof prop != "undefined")
-			client.user.change($(this).data("prop"), value);
+			client.user.update($(this).data("prop"), value);
 	})
 
 	myUser.on("blur", "input", function(){
@@ -155,7 +161,8 @@ $(document).ready(function(){
 		for(var id in this.users){
 			//skip current user
 			if(client.user.pubid == id){
-				newUser(client.user, $("#myUser"));		
+				newUser(client.user, $("#myUser"));
+				$("#myUser > div").removeClass();
 			}else{
 				newUser(this.users[id]);				
 			}

@@ -5,7 +5,7 @@
 	 * The JS APS client framework sends an ajax request with two request parameters 'cmd' and 'from'
 	 * Both parameters are parsed upon constructing the object below.
 	 */
-	$c = new APS(ServerDomain);
+	$c = new APS("ape.ptejada.com");
 	
 	/*
 	 * This option toggles whether to use HTTPs or HTTP
@@ -18,7 +18,7 @@
 			 * You may parse or edit the the event data itself
 			 * For example below a PHP tag will be appended to message to indicate that it was parsed by PHP
 			 */
-			$c->eventData .= "<span style='background: #ccc; color: red; font-size: 0.45em; float: right; padding: 4px;'>[PHP]</span> ";
+			$c->eventData .= "<span class=\"label label-danger\">PHP</span>";
 			/*
 			 * You can go as far as overwriting the event name itselft
 			 */

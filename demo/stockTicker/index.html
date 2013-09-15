@@ -1,51 +1,64 @@
 ﻿<!DOCTYPE html>
 <html>
-	<head>
-		<title>Stock Ticker | Demo</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<meta http-equiv="cache-control" content="no-cache" />
-		<!-- Load Style -->
-		<link rel="stylesheet" href="../style.css" type="text/css" />
-		<link rel="stylesheet" href="stock.css" type="text/css" />
-		<!--	
-		<script type="text/javascript" src="http://getfirebug.com/firebug-lite.js#saveCookies=false"></script>
-		  -->
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-		<script type="text/javaScript" src="jquery.sparkline.min.js"></script>
-		<script type="text/javaScript" src="../global.js"></script>
-		<script type="text/javaScript" src="script.js"></script>
-	</head>
- 
-	<body>
-		<div id="tray">
-			<form id="stockAdder">
-				<button type="submit">Add Stock</button>
-				<input id="newStockName">
-			</form>
-			<hr>
-			<div id="stock-list">
-				<div class="stock">
-					<span class="stock-name">Stock</span>
-						<div class="stock-visual"></div> 
-					<div class="stock-lv1">
-						<span class="stock-value">100</span>
-						<div class="stock-lv2">
-							<span class="stock-direction-up">▲</span>
-							<span class="stock-change">10</span>
-						</div>
-					</div>
-				
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+	<title>Stock Ticker | Demo</title>
+	<meta name="description" content="" />
+	<meta name="author" content="Pablo" />
+
+	<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../style.css" rel="stylesheet">
+	<link rel="stylesheet" href="stock.css" type="text/css" />
+</head>
+<body>
+	<div class="container">
+		<nav class="navbar navbar-default" role="navigation">
+			<strong class="navbar-brand">Stock Ticker | Demo</strong>
+			<a class="btn btn-default navbar-btn" href="../">
+				<span class="glyphicon glyphicon-arrow-left"></span> Back List
+			</a>
+		</nav>
+		<div class="row">
+			<form id="stockAdder" class="col-md-3 col-sm-4">
+				<div class="input-group input-group-sm">
+					<span class="input-group-addon">Stock name </span>
+					<input type="text" name="newStockName" id="newStockName" class="form-control">
+					<span class="input-group-btn">
+						<button class="btn btn-primary" type="submit">Add</button>
+					</span>
 				</div>
+				<div class="errorTray"></div>
+			</form>
+		</div>
+		<hr>
+		<div id="stock-list">
+			<div class="stock">
+				<span class="stock-name">Stock</span>
+					<div class="stock-visual"></div>
+				<div class="stock-lv1">
+					<span class="stock-value">100</span>
+					<div class="stock-lv2">
+						<span class="stock-direction-up">▲</span>
+						<span class="stock-change">10</span>
+					</div>
+				</div>
+
 			</div>
 		</div>
-		
-		<!-- Load APS Client -->
-		<script type="text/javaScript" src="../../js/src/utilities.js"></script>
-		<script type="text/javaScript" src="../../js/src/client.js"></script>
-		<script type="text/javaScript" src="../../js/src/onMessage.js"></script>
-		<script type="text/javaScript" src="../../js/src/transport.js"></script>
-		<script type="text/javaScript" src="../../js/src/channel.js"></script>
-		<script type="text/javaScript" src="../../js/src/user.js"></script>
-		<script type="text/javaScript" src="../../js/src/session.js"></script>
-	</body>
+	</div>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<script type="text/javaScript" src="jquery.sparkline.min.js"></script>
+
+	<!-- Load APS Client -->
+	<script type="text/javaScript" src="../../js/ApePubSub.min.js"></script>
+	<!-- Load Demo globals -->
+	<script type="text/javaScript" src="../global.js"></script>
+	<!-- Load Demo Script -->
+	<script type="text/javaScript" src="script.js"></script>
+</body>
 </html>
