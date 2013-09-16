@@ -1,5 +1,5 @@
 <?php
-	//If user is not signed in refirect
+	//If user is not signed in redirect
 	if(!$user->signed) redirect("./?page=login");	
 ?>
 	<div id="chat">
@@ -21,12 +21,7 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 	
 	<!-- Load APS Client -->
-	<script type="text/javaScript" src="../../js/src/utilities.js"></script>
-	<script type="text/javaScript" src="../../js/src/client.js"></script>
-	<script type="text/javaScript" src="../../js/src/onMessage.js"></script>
-	<script type="text/javaScript" src="../../js/src/transport.js"></script>
-	<script type="text/javaScript" src="../../js/src/channel.js"></script>
-	<script type="text/javaScript" src="../../js/src/user.js"></script>
-	<script type="text/javaScript" src="../../js/src/session.js"></script>
+	<script type="text/javaScript" src="../../js/ApePubSub.min.js"></script>
+	<script type="text/javaScript" src="../global.js"></script>
 
 	<script type="text/javaScript" src="chat.js"></script>
