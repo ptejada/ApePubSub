@@ -1,7 +1,7 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * Built on 2013-07-08 @ 02:14
+ * Built on 2013-09-16 @ 01:57
  */
 
 /*
@@ -72,7 +72,7 @@ function APS( server, events, options ){
 		autoUpdate: true
 	}
 	this.identifier = "APS";
-	this.version = '1.6.0';
+	this.version = '1.6.1-dev';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
@@ -275,13 +275,14 @@ APS.prototype.on = function(ev, fn){
 
 /**
  * Get any object by its unique pubid, user or channel
+ *
+ * @param pubid A pubid string
  */
-APS.prototype.getPipe = function(user){
-	if(typeof user == 'string'){
-		return this.pipes[user];
-	} else {
-		return this.pipes[user.pubid];
+APS.prototype.getPipe = function( pubid ){
+	if(pubid in this.pipes){
+		return this.pipes[pubid];
 	}
+	return false;
 }
 
 /**
@@ -459,6 +460,7 @@ APS.prototype.sub = function(channel, Events, callback){
 
 	return this;
 }
+APS.prototype.subscribe = APS.prototype.sub;
 
 /*
  * Publish data/message in a channel or to a user
@@ -475,6 +477,7 @@ APS.prototype.pub = function(channel, data, sync, callback){
 		this.log("NO Channel " + channel);
 	}
 };
+APS.prototype.publish = APS.prototype.pub;
 
 /**
  * Get a channel object by its name
@@ -529,6 +532,7 @@ APS.prototype.unSub = function(channel){
 	if(channel == "") return;
 	this.getChannel(channel).leave();
 }
+APS.prototype.unSubscribe = APS.prototype.unSub;
 
 /*
  * Debug Function for Browsers console
@@ -755,7 +759,7 @@ APS.prototype.onMessage = function(data){
 
 				if(this.option.autoUpdate){
 					var pipe = this.pipes[args.pipe.pubid];
-					pipe.update(args.pipe.properties);
+					pipe._update(args.pipe.properties);
 				}
 
 			break;
@@ -1059,7 +1063,7 @@ APS.User = function(pipe, client){
 		 * properties specific events which can be ise observe/watch
 		 * property changes 
 		 */
-		update: {
+		_update: {
 			value: function(o, force){
 				if(!!!o) return false;
 
@@ -1102,6 +1106,9 @@ APS.User = function(pipe, client){
 		pub: {
 			value: client.pub.bind(client, pipe.pubid)
 		},
+		publish: {
+			value: client.pub.bind(client, pipe.pubid)
+		},
 		send: {
 			value: client.send.bind(client, pipe.pubid)
 		}
@@ -1132,7 +1139,7 @@ APS.CUser = function(pipe, client){
 		 * properties specific events which can be ise observe/watch
 		 * property changes 
 		 */
-		update: {
+		_update: {
 			value: function(o, force){
 				if(!!!o) return false;
 
@@ -1156,7 +1163,7 @@ APS.CUser = function(pipe, client){
 		 * server for propagation. In order for this method to work 
 		 * properly the option autoUpdate should enable
 		 */
-		change: {
+		update: {
 			value: function(name, value){
 				if(typeof name == "object"){
 					var data = name;
@@ -1165,7 +1172,7 @@ APS.CUser = function(pipe, client){
 					data[name] = value;
 				}
 				//NOTE: data has no revision number thus update will fail
-				this.update(data,true);
+				this._update(data,true);
 				this._client.sendCmd("userPropUpdate", data);
 			}
 		},
@@ -1235,7 +1242,7 @@ APS.Channel = function(pipe, client) {
 		 * properties specific events which can be ise observe/watch
 		 * property changes 
 		 */
-		update: {
+		_update: {
 			value: function(o){
 				if(!!!o) return false;
 				o._rev = parseInt(o._rev);
@@ -1348,7 +1355,7 @@ APS.Channel = function(pipe, client) {
 					 * Update object if autoUpdate is enabled
 					 */
 					if(client.option.autoUpdate)
-						user.update(u.properties);
+						user._update(u.properties);
 				}
 				
 				//Add channel reference to the user
@@ -1363,6 +1370,9 @@ APS.Channel = function(pipe, client) {
 		},
 		pub: {
 			value: client.pub.bind(client, this.name)
+		},
+		publish: {
+		    value: client.pub.bind(client, this.name)
 		}
 	})}
 	

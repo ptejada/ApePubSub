@@ -8,10 +8,10 @@ var ServerDomain = "ape.ptejada.com";
  * Toggle the debugging features
  * @type {boolean}
  */
-var EnableDebug = true;
+var EnableDebug = false;
 
 /**
  * Toggle whether to use user session
  * @type {boolean}
  */
-var EnableSession = false;
+var EnableSession = true;

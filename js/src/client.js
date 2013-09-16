@@ -226,13 +226,14 @@ APS.prototype.on = function(ev, fn){
 
 /**
  * Get any object by its unique pubid, user or channel
+ *
+ * @param pubid A pubid string
  */
-APS.prototype.getPipe = function(user){
-	if(typeof user == 'string'){
-		return this.pipes[user];
-	} else {
-		return this.pipes[user.pubid];
+APS.prototype.getPipe = function( pubid ){
+	if(pubid in this.pipes){
+		return this.pipes[pubid];
 	}
+	return false;
 }
 
 /**
