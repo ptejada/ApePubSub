@@ -155,12 +155,13 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
  *
  * @param {int|string} index The named key of the property
  * @param {*} value The new value of the property
- * @return {*}
+ * @return bool
  */
 Ape.user.update = Ape.channel.update = function(index, value){
-	if(!!index && !!value){
+	if(!!index){
 		this.prop(index, value);
 		var obj = this.pipe.toObject();
+
 		if(obj.casttype == "uni"){
 			for(var name in this.channels){
 				var channel = this.channels[name];
@@ -173,6 +174,7 @@ Ape.user.update = Ape.channel.update = function(index, value){
 				pipe: obj
 			})
 		}
+		return true;
 	}else{
 		return false;
 	}
@@ -188,14 +190,15 @@ Ape.user.update = Ape.channel.update = function(index, value){
  * @type {Function}
  */
 Ape.user.sendEvent = Ape.channel.sendEvent = function($event, $data, options){
+	var bodyParams = {};
 	if(!!options && "from" in options){
-		var bodyParams = {
+		bodyParams = {
 			event: $event,
 			data: $data
 		}
 		this.pipe.sendRaw("EVENT", bodyParams, options);
 	}else{
-		var bodyParams = {
+		bodyParams = {
 			event: $event,
 			data: $data,
 			pipe: this.pipe.toObject()
