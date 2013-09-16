@@ -106,7 +106,7 @@ $(document).ready(function(){
 
 	client.identifier = "ST";
 
-	if(EnableDebug)
+	//if(EnableDebug)
 		window.client = client;
 
 	var stock = new StockBridge();
