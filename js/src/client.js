@@ -23,7 +23,7 @@ function APS( server, events, options ){
 		autoUpdate: true
 	}
 	this.identifier = "APS";
-	this.version = '1.6.1-dev';
+	this.version = '1.6.1';
 	this.state = 0;
 	this._events = {};
 	this.chl = 0;
