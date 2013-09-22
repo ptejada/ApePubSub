@@ -21,8 +21,8 @@ APS.Channel = function(pipe, client) {
 					for(var i in o){
 						if(this[i] != o[i]){
 							this[i] = o[i];
-							this.trigger("user"+i+"Update",[o[i], this]);
-							this.trigger("userUpdate",[i, o[i], this]);
+							this.trigger("channel"+i+"Update",[o[i], this]);
+							this.trigger("channelUpdate",[i, o[i], this]);
 						}
 					}
 				}

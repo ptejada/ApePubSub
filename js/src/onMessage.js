@@ -21,7 +21,7 @@ APS.prototype.onMessage = function(data){
 	}
 	
 	//Initiate variables to be used in the loop below
-	var raw, args, pipe, isIdent = false, check = true;
+	var raw, args, pipe, info, isIdent = false, check = true;
 	
 	for(var i in data){
 		if(!data.hasOwnProperty(i)) continue;
@@ -61,7 +61,7 @@ APS.prototype.onMessage = function(data){
 				 * 
 				 * Initiate and store the current user object
 				 */
-				var user = new APS.CUser(args.user, this);
+				user = new APS.CUser(args.user, this);
 				this.pipes[user.pubid] = user;
 				
 				this.user = user;
@@ -90,7 +90,6 @@ APS.prototype.onMessage = function(data){
 				 * well as in the client general pipes array
 				 */
 				if(!!u){
-					var user;
 					//import users from channel to client if any
 					for(var i = 0; i < u.length; i++){
 						user = pipe.addUser(u[i]);
@@ -119,7 +118,7 @@ APS.prototype.onMessage = function(data){
 				/*
 				 * Synchronizes events across multiple client instances
 				 */
-				var user = this.user;
+				user = this.user;
 				
 				pipe = this.pipes[args.chanid];
 				
@@ -149,7 +148,7 @@ APS.prototype.onMessage = function(data){
 				/*
 				 * Parses and triggers an incoming Event
 				 */
-				var user = this.pipes[args.from.pubid];
+				user = this.pipes[args.from.pubid];
 				
 				if(typeof user == "undefined" && !!args.from){
 					//Create user it doesn't exists
@@ -183,7 +182,7 @@ APS.prototype.onMessage = function(data){
 				//pipe is the channel object
 				pipe = this.pipes[args.pipe.pubid];
 				//Add user to channel list
-				var user = pipe.addUser(args.user);
+				user = pipe.addUser(args.user);
 				
 				pipe.trigger('join', [user, pipe]);
 				
@@ -197,7 +196,7 @@ APS.prototype.onMessage = function(data){
 				 * use by another channel
 				 */
 				pipe = this.pipes[args.pipe.pubid];
-				var user = this.pipes[args.user.pubid];
+				user = this.pipes[args.user.pubid];
 				
 				delete pipe.users[args.user.pubid];
 				
@@ -207,7 +206,7 @@ APS.prototype.onMessage = function(data){
 			case "UPDATE":
 
 				if(this.option.autoUpdate){
-					var pipe = this.pipes[args.pipe.pubid];
+					pipe = this.pipes[args.pipe.pubid];
 					pipe._update(args.pipe.properties);
 				}
 
@@ -226,7 +225,7 @@ APS.prototype.onMessage = function(data){
 				 * friendly events
 				 */
 				check = false;
-				var info = [args.code, args.value, args];
+				info = [args.code, args.value, args];
 				
 				switch(args.code){
 					case "001":
@@ -253,7 +252,7 @@ APS.prototype.onMessage = function(data){
 			break;
 			default:
 				//trigger custom raws
-				var info = [];
+				info = [];
 				for(var i in args){
 					if(!args.hasOwnProperty(i)) continue;
 					info.push(args[i]);

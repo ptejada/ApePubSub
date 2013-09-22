@@ -14,13 +14,10 @@ APS.User = function(pipe, client){
 		 * property changes 
 		 */
 		_update: {
-			value: function(o, force){
+			value: function(o){
 				if(!!!o) return false;
-
-				if(!!!force)
-					o._rev = parseInt(o._rev);
-
-				if(o._rev > this._rev || !!force){
+				o._rev = parseInt(o._rev);
+				if(o._rev > this._rev){
 					for(var i in o){
 						if(this[i] != o[i]){
 							this[i] = o[i];
