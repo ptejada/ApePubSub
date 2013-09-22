@@ -157,23 +157,28 @@ Ape.user.prop = Ape.channel.prop = function(index, value){
  * @param {*} value The new value of the property
  * @return bool
  */
-Ape.user.update = Ape.channel.update = function(index, value){
+Ape.user.update = function(index, value){
 	if(!!index){
 		this.prop(index, value);
 		var obj = this.pipe.toObject();
-
-		if(obj.casttype == "uni"){
-			for(var name in this.channels){
-				var channel = this.channels[name];
-				channel.pipe.sendRaw("UPDATE", {
-					pipe: obj
-				});
-			}
-		}else{
-			this.pipe.sendRaw("UPDATE", {
+		for(var name in this.channels){
+			var channel = this.channels[name];
+			channel.pipe.sendRaw("UPDATE", {
 				pipe: obj
-			})
+			});
 		}
+		return true;
+	}else{
+		return false;
+	}
+}
+Ape.channel.update = function(index, value){
+	if(!!index){
+		this.prop(index, value);
+		var obj = this.pipe.toObject();
+		this.pipe.sendRaw("UPDATE", {
+			pipe: obj
+		})
 		return true;
 	}else{
 		return false;
