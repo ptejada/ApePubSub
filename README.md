@@ -14,6 +14,28 @@ See what is new in the [Changelog](https://github.com/ptejada/ApePubSub/wiki/Cha
 
 Checkout the [live demos](http://ptejada.com/script/ApePubSub/demo/), the demo sources can be found [here](https://github.com/ptejada/ApePubSub/tree/master/demo)
 
+Simple program example:
+```js
+
+// Initialize the client object
+var client = new APS('ape.ptejada.com');
+
+// Subscribe to the channel and add some event listeners
+client.sub('test', {
+  // Event triggered when a user joins channel
+  join: function(){
+    alert('A user has joined the channel :)');
+  },
+  // Event triggered when a user leaves a channel
+  left: function(){
+    alert('A user has left the channel :(')
+  }
+});
+
+```
+Is that simple and pretty much self explanatory what the above will do.
+
+
 ### For more information check the [wiki](https://github.com/ptejada/ApePubSub/wiki)
 
 **NOTE:** when updating the framework make sure that you update the server scripts as well, you can tell if the server scripts need updating if the the folder **APE_Server** has been changed in the commit or recently.
