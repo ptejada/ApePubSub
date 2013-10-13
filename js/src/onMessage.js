@@ -47,7 +47,7 @@ APS.prototype.onMessage = function(data){
 				 * Store its session ID
 				 */
 				this.state = this.state == 0 ? 1 : this.state;
-				this.session.id = args.sessid;
+				this.session.save(args.sessid);
 				this.trigger("login", [args.sessid]);
 				
 			break;
@@ -61,7 +61,7 @@ APS.prototype.onMessage = function(data){
 				 * 
 				 * Initiate and store the current user object
 				 */
-				user = new APS.CUser(args.user, this);
+				var user = new APS.CUser(args.user, this);
 				this.pipes[user.pubid] = user;
 				
 				this.user = user;
@@ -72,9 +72,7 @@ APS.prototype.onMessage = function(data){
 				 */
 				if(this.state == 1)
 					this.trigger('ready');
-				
-				this.session.save();
-				
+
 			break;
 			case 'CHANNEL':
 				//The pipe is the channel object
@@ -209,6 +207,11 @@ APS.prototype.onMessage = function(data){
 					pipe = this.pipes[args.pipe.pubid];
 					pipe._update(args.pipe.properties);
 				}
+
+			break;
+			case "SESSION_UPDATE":
+
+				this.session._update(args);
 
 			break;
 			case 'CLOSE':

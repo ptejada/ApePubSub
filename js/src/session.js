@@ -4,125 +4,247 @@
  * handlers to save session related data
  * as well as other persistent information
  * require by the framework.
- * 
+ *
  * The session object currently uses cookies
  * to store the required information but in
  * the future i would like to implement the
- * SessionStorage API with a fallback to 
+ * SessionStorage API with a fallback to
  * cookies.
  */
 APS.prototype.session = {
-	id: "",
-	chl: {},
 	_client: {},
-	cookie: {},
-	freq: {},
-	data: {},
-	
-	save: function(){
+	_data: {},
+	store: {},
+
+	init: function(client){
+		this._client = client;
+		this.store = new APS.Store(client.identifier + '_');
+		client.chl = this.getChl() || 0;
+	},
+
+	/**
+	 * Gets the current session ID
+	 * @returns {*}
+	 */
+	getID: function(){
+		return this.store.get('sid');
+	},
+	/**
+	 * Get the current frequency number
+	 * @returns {*}
+	 */
+	getFreq: function(){
+		return this.store.get('freq');
+	},
+	/**
+	 * Get the current frequency number
+	 * @returns {*}
+	 */
+	getChl: function(){
+		return this.store.get('chl');
+	},
+
+	/**
+	 * Saves all the values required for persistent session
+	 */
+	save: function(id){
 		if(!this._client.option.session) return;
-		
-		var pubid = this._client.user.pubid;
-		
-		this.cookie.change(this.id + ":" + pubid);
+
+		this.store.set('sid', id);
 		this.saveChl();
 	},
-	 
+
+	/**
+	 * Increments the challenge number by one and saves it
+	 */
+
 	saveChl: function(){
 		if(!this._client.option.session) return;
-		
+
 		this._client.chl++;
-		this.chl.change(this._client.chl);
+		this.store.set('chl',this._client.chl);
 	},
-	
+
+	/**
+	 * Increments the frequency number by one and saves it
+	 */
+	saveFreq: function(){
+		if(!this._client.option.session) return;
+
+		var current = parseInt(this.store.get('freq') || 0);
+		this.store.set('freq',++current);
+	},
+
+	/**
+	 * Destroys the session and all its data/cookies
+	 * @param Keepfreq Flag whether to keep the frequency cookie
+	 */
 	destroy: function(Keepfreq){
 		if(!this._client.option.session) return;
-		
-		this.cookie.destroy();
-		this.chl.destroy();
-		if(!!!Keepfreq)
-			this.freq.change(0);
-		this._client.chl = 0;
-		this.id = null;
-		this.properties = {};
+
+		this.store.remove('sid');
+		this.store.remove('chl');
+
+		if(!Keepfreq)
+			this.store.set('freq',0);
+
+		this._data = {};
 	},
-	
-	get: function(index){
-		return this.data[index];
+
+	/**
+	 * Get a value from the session
+	 * @param key The key of the value to get
+	 * @returns {*}
+	 */
+	get: function(key){
+		return this._data[key];
 	},
-	
-	set: function(index, val){
-		this.data[index] = val;
+
+	/**
+	 * Assign value to a session key
+	 * @param key The value key, identifier
+	 * @param val The value to store in session
+	 */
+	set: function(key, val){
+		var obj = {};
+		if ( typeof key == 'object' )
+		{
+			obj = key;
+		}
+		else
+		{
+			obj[key] = val;
+		}
+		this._client.sendCmd('SESSION_SET', obj);
+
+		this._update(obj);
 	},
-	
+
+	/**
+	 * Used to updates the internal session storage cache _data
+	 * @param updates
+	 * @private
+	 */
+	_update: function(updates){
+		for ( var key in updates)
+		{
+			this._data[key] = updates[key];
+		}
+	},
+
+	/**
+	 * Restores all the the necessary values from cookies to restore a session
+	 * @returns {*}
+	 */
 	restore: function(){
 		var client = this._client;
 		
-		//Load cookies
-		this.chl = new APS.cookie(client.identifier + "_chl");
-		this.cookie = new APS.cookie(client.identifier + "_session");
-		this.freq = new APS.cookie(client.identifier + "_frequency");
-		
-		client.chl = this.chl.value || 0;
-		
 		//Initial frequency value
-		if(!this.freq.value) this.freq.change("0");
+		if( ! this.store.get('freq') ) this.store.set('freq','0');
+
+		var sid = this.store.get('sid');
 		
-		if(typeof this.cookie.value == "string" && this.cookie.value.length >= 32){
-			var data = this.cookie.value.split(":");
-			this.id = data[0];
-		}else{
+		if(typeof sid != "string" || sid.length !== 32){
 			return false;
 		}
 		
 		//Restoring session state == 2
 		client.state = 2;
-		return {sid: data[0], pubid: data[1]};
+
+		// return data
+		return {sid: sid};
 	}
 }
 
-/*
- * the cookie object constructor
+/**
+ * A persistent storage object
+ * @param _prefix the store identifier
+ * @constructor
  */
-APS.cookie = function(name,value,days){
-	this.change = function(value,days){
-		var name = this.name;
-		if(days){
+APS.Store = function(_prefix){
+	if (typeof _prefix == 'undefined' )
+	{
+		_prefix = '';
+	}
+
+	if ( 'Storage' in window )
+	{
+		// Use the HTML5 storage
+
+		/**
+		 * Get a value from the store
+		 * @param key The value key
+		 * @returns {*}
+		 */
+		this.get = function(key){
+			key = _prefix + key;
+			return localStorage.getItem(key);
+		}
+
+		/**
+		 * Set value to a store key
+		 * @param key The value key
+		 * @param value The key value
+		 */
+		this.set = function(key, value){
+			key = _prefix + key;
+			localStorage.setItem(key, value);
+		}
+
+		/**
+		 * Removes a key and its value from the store
+		 * @param key
+		 */
+		this.remove = function(key){
+			key = _prefix + key;
+			localStorage.removeItem(key);
+		}
+	}
+	else
+	{
+		// Use cookies as a storage
+
+		/**
+		 * Get a value from the store
+		 * @param key The value key
+		 * @returns {*}
+		 */
+		this.get = function(key){
+			key = _prefix + key;
+			var nameEQ = key + "=";
+			var ca = document.cookie.split(';');
+			for(var i=0;i < ca.length;i++) {
+				var c = ca[i];
+				while (c.charAt(0)==' ') c = c.substring(1,c.length);
+				if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+			}
+			return null;
+		}
+
+		/**
+		 * Set value to a store key
+		 * @param key The value key
+		 * @param value The key value
+		 */
+		this.set = function(key, value){
+			key = _prefix + key;
+
+			document.cookie = key+"="+value+"; path=/";
+
+		}
+
+		/**
+		 * Removes a key and its value from the store
+		 * @param key
+		 */
+		this.remove = function(key){
+			key = _prefix + key;
+
 			var date = new Date();
-			date.setTime(date.getTime()+(days*24*60*60*1000));
+			date.setTime(date.getTime()-1);
 			var expires = "; expires="+date.toGMTString();
-		}else{
-			var expires = "";
+
+			document.cookie = key+"= "+expires+"; path=/";
 		}
-		document.cookie = name+"="+value+expires+"; path="+this.path;
-		this.value = value;
 	}
-	
-	this.read = function(name){
-		var nameEQ = name + "=";
-		var ca = document.cookie.split(';');
-		for(var i=0;i < ca.length;i++) {
-			var c = ca[i];
-			while (c.charAt(0)==' ') c = c.substring(1,c.length);
-			if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-		}
-		return null;
-	}
-	
-	this.destroy = function(){
-		this.change("", -1);
-	}
-	
-	this.path = "/";
-	var exists = this.read(name);
-	
-	this.name = name;
-	
-	if(exists && typeof value == "undefined"){
-		this.value = exists;
-	}else{
-		this.value = value || "";
-		this.change(this.value, days);
-	}
-	return this;
 }

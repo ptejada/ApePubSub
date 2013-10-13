@@ -14,5 +14,14 @@ Ape.registerCmd("RESTORE", true, function(params, info){
 		var channel = info.user.channels[name];
 		Ape.triggerChannelEvent(channel, "restored", [info.user, channel]);
 	}
+
+	/*
+     * Send the session information only if it has content
+     * TODO: When the the bug of the subuser is fixed send raw only to subuser
+	 */
+	if ( Object.keys(info.user.sessionData).length !== 0)
+	{
+		info.user.pipe.sendRaw('SESSION_UPDATE', info.user.sessionData);
+	}
 	return 1;
 });

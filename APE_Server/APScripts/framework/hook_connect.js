@@ -8,7 +8,10 @@ Ape.registerHookCmd("CONNECT", function(params, cmd){
 
 	//IMPORTANT! create channels property
 	cmd.user.channels = {};
-	
+
+	//IMPORTANT! create sessionData property
+	cmd.user.sessionData = {};
+
 	if(!params) return 1;
 	
 	if(params.user){

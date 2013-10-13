@@ -60,7 +60,7 @@ function APS( server, events, options ){
 		}
 	}
 	
-	this.session._client = this;
+	this.session.init(this);
 	return this;
 }
 
@@ -92,11 +92,11 @@ APS.prototype.connect = function(args){
 	
 	var restore = this.session.restore();
 	//increase frequency
-	this.session.freq.change(parseInt(this.session.freq.value) + 1);
+	this.session.saveFreq();
 	
 	//Handle sessions
 	if(this.option.session == true){
-		
+
 		if(typeof restore == "object"){
 			args = restore;
 			//Change initial command CONNECT by RESTORE
@@ -109,7 +109,7 @@ APS.prototype.connect = function(args){
 		
 		//Apply frequency to the server
 		if(this.option.addFrequency)
-			fserver = this.session.freq.value + "." + fserver;
+			fserver = this.session.getFreq() + "." + fserver;
 			
 	}else{
 		//Fresh Connect
@@ -281,14 +281,14 @@ APS.prototype.sendCmd = function(cmd, args, pipe, callback){
 		var tmp = {
 			'cmd': cmd,
 			'chl': this.chl,
-			'freq': this.session.freq.value
+			'freq': this.session.getFreq()
 		}
 		
 		if(args) tmp.params = args;
 		if(pipe) {
 			tmp.params.pipe = typeof pipe == 'string' ? pipe : pipe.pubid;
 		}
-		if(this.session.id) tmp.sessid = this.session.id;
+		if(this.session.getID()) tmp.sessid = this.session.getID();
 		
 		this.log('<<<< ', cmd.toUpperCase() , " >>>> ", tmp);
 		
