@@ -1,0 +1,38 @@
+{
+	"tags": {
+		"allowUnknownTags": true
+	},
+	"source": {
+		"include": ["./js/src/","./APE_Server/APScripts/framework/","./README.md"],
+		"includePattern": ".+\\.js(doc)?$",
+		"excludePattern": "docs"
+	},
+	"plugins": ["plugins/markdown"],
+	"markdown": {
+	    "parser": "gfm",
+        "githubRepoName": "ApePubSub",
+        "githubRepoOwner ": "ptejada"
+	},
+	"templates": {
+		"cleverLinks"     : false,
+		"monospaceLinks"  : false,
+		"default"         : {
+			"outputSourceFiles" : true
+		},
+		"systemName"      : "ApePubSub",
+		"footer"          : "Version 1.6.1",
+		"copyright"       : "Pablo Tejada Copyright © 2012-2013.",
+		"navType"         : "inline",
+		"theme"           : "spacelab",
+		"linenums"        : true,
+		"collapseSymbols" : false,
+		"inverseNav"      : true
+	},
+	"opts": {
+		"template": "C:\\Users\\Pablo\\AppData\\Roaming\\npm\\node_modules\\jsdoc\\templates\\docstrap",
+		"encoding": "utf8",
+		"destination": "docs",
+		"recurse": true,
+		"private": false
+	}
+}

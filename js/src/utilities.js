@@ -1,11 +1,13 @@
-/*
- * Generates a random string
- *  - First parameter(integer) determines the length
- *  - Second parameter(string) an optional string of alternative keys to use
+/**
+ * Client function to generates a random string
+ *
+ * @param {number} length - determines the length
+ * @param {string} [keys] - an optional string of alternative characters to use
+ * @returns {string}
  */
-function randomString(l, keys){
+function randomString(length, keys){
 	var chars = keys || "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-	var string_length = l || 32;
+	var string_length = length || 32;
 	var randomstring = '';
 	for (var i=0; i<string_length; i++) {
 		var rnum = Math.floor(Math.random() * chars.length);

@@ -14,6 +14,10 @@ See what is new in the [Changelog](https://github.com/ptejada/ApePubSub/wiki/Cha
 
 Checkout the [live demos](http://ptejada.com/script/ApePubSub/demo/), the demo sources can be found [here](https://github.com/ptejada/ApePubSub/tree/master/demo)
 
+[Code documentation](http://ptejada.com/script/ApePubSub/docs/)
+
+[Public Documentation - wiki](https://github.com/ptejada/ApePubSub/wiki/API)
+
 Simple program example:
 ```js
 

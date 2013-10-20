@@ -2,6 +2,7 @@ APS.Transport = function(server, callback, client){
 	this.state = 0;//0 = Not initialized, 1 = Initialized and ready to exchange data, 2 = Request is running
 	this.stack = [];
 	this.callback = callback;
+	this.chl = 0;
 	
 	var trans = client.option.transport;
 	var args = Array.prototype.slice.call(arguments);
