@@ -7,16 +7,19 @@
 	$path = "js/src/";
 	$sufix = ".js";
 	$files = array("utilities","client", "onMessage", "transport", "user", "channel", "session");
+
+	$version = file_get_contents('VERSION');
 	
 	$date = date("Y-m-d \@ h:i");
 	$pre = "/**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
+ * @version {$version}
  * Built on {$date}
  */\n"
  ;
 	function build($list, $output){
-		global $path, $sufix, $pre;
+		global $path, $sufix, $pre, $version;
 		
 		
 		$res = $pre . "\n";
@@ -24,6 +27,8 @@
 			$res .= file_get_contents($path . $file . $sufix);
 			$res .= "\n\n";
 		}
+
+		$res = str_replace("{{VERSION}}", $version, $res);
 		
 		file_put_contents($output, $res);
 		return $res;

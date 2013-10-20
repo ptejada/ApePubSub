@@ -1,7 +1,7 @@
 /**
  * The client constructor
  *
- * @version 1.6.1
+ * @version {{VERSION}}
  *
  * @param {string} server - The APE Server domain name including port number if other than 80
  * @param {object} [events] - Event handlers to be added to the client
@@ -47,7 +47,7 @@ function APS( server, events, options ){
 	 * The client version
 	 * @type {string}
 	 */
-	this.version = '1.6.1';
+	this.version = '{{VERSION}}';
 	/**
 	 * The state of the client: 0=disconnected, 1=connected, 2=connecting
 	 * @type {number}
