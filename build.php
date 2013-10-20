@@ -57,6 +57,14 @@
 	
 	$contentMin = curl_exec($ch);
 	file_put_contents("js/ApePubSub.min.js", $pre.$contentMin);
+
+	/*
+	 * Change the version on conf.json
+	 */
+	$conf = file_get_contents('conf.json');
+	$conf = preg_replace('/Version [\.\d]{3,5}/',"Version $version",$conf);
+	file_put_contents('conf.json',$conf);
+
 	
 ?>
 <center>

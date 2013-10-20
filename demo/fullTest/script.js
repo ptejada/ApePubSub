@@ -32,7 +32,7 @@ function start(server){
 	
 	window.chanName = "test_" + randomString(4).toLowerCase();
 	window.client = new APS(server);
-	client.option.session = EnableSession;
+	client.option.session = false;
 
 	var bot = {};
 	

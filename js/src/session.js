@@ -20,7 +20,7 @@ APS.Session = function(client){
 		}
 		else
 		{
-			return this.id;
+			return this._id;
 		}
 	}
 	/**
@@ -49,7 +49,7 @@ APS.Session = function(client){
 		}
 		else
 		{
-			this.id = id;
+			this._id = id;
 		}
 	}
 
