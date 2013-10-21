@@ -1,8 +1,8 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * @version 1.6.2
- * Built on 2013-10-20 @ 07:06
+ * @version 1.6.3b1
+ * Built on 2013-10-21 @ 04:03
  */
 
 /**
@@ -53,7 +53,7 @@ if(!Function.prototype.bind){
 /**
  * The client constructor
  *
- * @version 1.6.2
+ * @version 1.6.3b1
  *
  * @param {string} server - The APE Server domain name including port number if other than 80
  * @param {object} [events] - Event handlers to be added to the client
@@ -99,7 +99,7 @@ function APS( server, events, options ){
 	 * The client version
 	 * @type {string}
 	 */
-	this.version = '1.6.2';
+	this.version = '1.6.3b1';
 	/**
 	 * The state of the client: 0=disconnected, 1=connected, 2=connecting
 	 * @type {number}
@@ -1728,7 +1728,7 @@ APS.Channel = function(pipe, client) {
 APS.Session = function(client){
 	this._client = client;
 	this._data = {};
-	this.store = new APS.Store(client.identifier + '_');
+	this.store = {};
 
 	/**
 	 * Gets the current session ID
@@ -1741,7 +1741,7 @@ APS.Session = function(client){
 		}
 		else
 		{
-			return this.id;
+			return this._id;
 		}
 	}
 	/**
@@ -1770,7 +1770,7 @@ APS.Session = function(client){
 		}
 		else
 		{
-			this.id = id;
+			this._id = id;
 		}
 	}
 
@@ -1848,6 +1848,9 @@ APS.Session = function(client){
 	 */
 	this.restore = function(){
 		var client = this._client;
+
+		// Initialize the store object
+		this.store = new APS.Store(client.identifier + '_');
 		
 		//Initial frequency value
 		if( ! this.store.get('freq') ) this.store.set('freq','0');
