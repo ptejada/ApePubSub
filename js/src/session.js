@@ -7,7 +7,7 @@
 APS.Session = function(client){
 	this._client = client;
 	this._data = {};
-	this.store = new APS.Store(client.identifier + '_');
+	this.store = {};
 
 	/**
 	 * Gets the current session ID
@@ -127,6 +127,9 @@ APS.Session = function(client){
 	 */
 	this.restore = function(){
 		var client = this._client;
+
+		// Initialize the store object
+		this.store = new APS.Store(client.identifier + '_');
 		
 		//Initial frequency value
 		if( ! this.store.get('freq') ) this.store.set('freq','0');
