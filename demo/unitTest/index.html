@@ -4,11 +4,12 @@
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-	<title>Full Test | Demo</title>
+	<title>UnitTest | Demo</title>
 	<meta name="description" content="" />
 	<meta name="author" content="Pablo" />
 
 	<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+	<link href="http://code.jquery.com/qunit/qunit-1.12.0.css" rel="stylesheet">
 	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
 	<link href="../style.css" rel="stylesheet">
 </head>
@@ -16,29 +17,27 @@
 <body>
 	<div align="center" id="wrap" class="container">
 		<nav class="navbar navbar-default" role="navigation">
-			<strong class="navbar-brand">Full Test | Demo</strong>
+			<strong class="navbar-brand">Unit Test | Demo</strong>
 			<a class="btn btn-default navbar-btn" href="../">
 				<span class="glyphicon glyphicon-arrow-left"></span> Back List
 			</a>
 		</nav>
-		<div align="left" id="console">
-			<div align="center">
-				<h1>APS Framework tester</h1>
-				<h3>
-					This app will attempt to fully test the framework from the dev files at
-					<a style="color: #eee" href="../../js/src/">../../js/src/</a>
-				</h3>
-				<hr>
-			</div>
-		</div>
+
+
 	</div>
+	<div class="container">
+		<div id="qunit"></div>
+		<div id="qunit-fixture"></div>
+	</div>
+
 	<br><br><br><br><br><br>
 
+	<script src="http://code.jquery.com/qunit/qunit-1.12.0.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 
 	<!-- Load APS Client -->
-	<script type="text/javaScript" src="../../js/ApePubSub.min.js"></script>
+	<script type="text/javaScript" src="../../js/ApePubSub.js"></script>
 	<!-- Load Demo globals -->
 	<script type="text/javaScript" src="../global.js"></script>
 	<!-- Load Demo Script -->
