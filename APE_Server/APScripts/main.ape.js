@@ -7,6 +7,7 @@ Ape.addEvent("init", function() {
 	 * APS framework essentials
 	 */
 	include("framework/utils.js");
+	include("framework/Request.js");
 	include("framework/cmd_frame.js");
 	include("framework/cmd_eventpush.js");
 	include("framework/cmd_restore.js");
