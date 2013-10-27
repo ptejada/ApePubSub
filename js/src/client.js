@@ -1,4 +1,8 @@
 /**
+ * Groups all client side classes documentation and definition
+ * @module Client
+ */
+/**
  * The client constructor
  *
  * @version {{VERSION}}
@@ -9,6 +13,7 @@
  *
  * @returns {APS} An APS client instance
  * @constructor
+ * @memberOf module:Client~
  */
 function APS( server, events, options ){
 	/**

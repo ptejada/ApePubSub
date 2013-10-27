@@ -6,6 +6,7 @@
  * @param {object} pipe The server pipe object
  * @param {APS} client The client instance for internal reference
  * @constructor
+ * @memberOf module:Client~
  */
 APS.Channel = function(pipe, client) {
 	Object.defineProperties(this, {
@@ -20,7 +21,7 @@ APS.Channel = function(pipe, client) {
 		 * properties specific events which can be observe/watch
 		 * property changes
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @method _update
 		 * @private
 		 *
@@ -49,7 +50,7 @@ APS.Channel = function(pipe, client) {
 		 * The function makes a user exit/unsubsribe from a channel
 		 * no parameters are required for this method
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @method leave
 		 */
 		leave: {
@@ -74,7 +75,7 @@ APS.Channel = function(pipe, client) {
 		/**
 		 * Holds the channel object revision number
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @property _rev
 		 * @type {number}
 		 * @private
@@ -88,7 +89,7 @@ APS.Channel = function(pipe, client) {
 		/**
 		 * Stack of all the channel events
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @property _events
 		 * @private
 		 * @ignore
@@ -100,7 +101,7 @@ APS.Channel = function(pipe, client) {
 		/**
 		 * Stack of all the channel events
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @property _events
 		 * @type {APS}
 		 * @private
@@ -112,7 +113,7 @@ APS.Channel = function(pipe, client) {
 		/**
 		 * The unique channel publisher id hash
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @property pubid
 		 * @type {string}
 		 * @private
@@ -124,7 +125,7 @@ APS.Channel = function(pipe, client) {
 		/**
 		 * Add event handler(s) to the channel
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @method on
 		 *
 		 * @param {string} ev Name of the event handler to add, not case sensitive
@@ -138,7 +139,7 @@ APS.Channel = function(pipe, client) {
 		/**
 		 * Trigger event handlers on the channel
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @method trigger
 		 * @see APS#trigger
 		 */
@@ -148,7 +149,7 @@ APS.Channel = function(pipe, client) {
 		/**
 		 * Logs data to the console
 		 * It is specified in the out from which channel the call originated from
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @method log
 		 * @see APS#log
 		 */
@@ -179,7 +180,7 @@ APS.Channel = function(pipe, client) {
 		 *
 		 * Every item in the collection is an instance of {@link APS.User}
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @property users
 		 * @type {object}
 		 */
@@ -190,7 +191,7 @@ APS.Channel = function(pipe, client) {
 		/**
 		 * Adds a use the channel {@link APS.Channel#users} stack
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @method addUser
 		 * @private
 		 */
@@ -231,7 +232,7 @@ APS.Channel = function(pipe, client) {
 		 * @param {bool} [sync=false] Weather to sync event across the user's session or not
 		 * @param {function} [callback] Function to call after the event has been sent
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @method send
 		 *
 		 * @return {APS.Channel}
@@ -250,7 +251,7 @@ APS.Channel = function(pipe, client) {
 		 * @param {bool} [sync=false] Weather to sync event across the user's session or not
 		 * @param {function} [callback] Function to call after the event has been sent
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @method pub
 		 *
 		 * @return {APS.Channel}
@@ -261,7 +262,7 @@ APS.Channel = function(pipe, client) {
 		/**
 		 * Alias for {@link APS.Channel#pub}
 		 *
-		 * @memberOf APS.Channel.prototype
+		 * @memberOf module:Client~APS.Channel#
 		 * @method publish
 		 *
 		 * @see APS.Channel#pub

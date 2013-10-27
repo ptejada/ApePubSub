@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>ApePubSub Class: User</title>
+	<title>ApePubSub Class: Session</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -29,23 +29,25 @@
 					<ul class="dropdown-menu inline">
 						
 						<li>
-							<a href="Ape.html">Ape</a>
+							<a href="module-Server-Ape.html">Ape</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu inline">
+						
+						<li>
+							<a href="module-Client.html">Client</a>
 						</li>
 						
 						<li>
-							<a href="Ape.channel.html">channel</a>
-						</li>
-						
-						<li>
-							<a href="Ape.pipe.html">pipe</a>
-						</li>
-						
-						<li>
-							<a href="Ape.subuser.html">subuser</a>
-						</li>
-						
-						<li>
-							<a href="Ape.user.html">user</a>
+							<a href="module-Server.html">Server</a>
 						</li>
 						
 
@@ -59,37 +61,51 @@
 					<ul class="dropdown-menu inline">
 						
 						<li>
-							<a href="APS.html">APS</a>
+							<a href="module-Client-APS.html">APS</a>
 						</li>
 						
 						<li>
-							<a href="APS.Channel.html">Channel</a>
+							<a href="module-Client-APS.Channel.html">Channel</a>
 						</li>
 						
 						<li>
-							<a href="APS.CUser.html">CUser</a>
+							<a href="module-Client-APS.CUser.html">CUser</a>
 						</li>
 						
 						<li>
-							<a href="APS.Session.html">Session</a>
+							<a href="module-Client-APS.Session.html">Session</a>
 						</li>
 						
 						<li>
-							<a href="APS.User.html">User</a>
+							<a href="module-Client-APS.User.html">User</a>
 						</li>
 						
-
-					</ul>
-				</li>
-				
-				<li class="dropdown">
-					<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
-						class="caret"></b></a>
-
-					<ul class="dropdown-menu inline">
+						<li>
+							<a href="module-Server-Ape.channel.html">channel</a>
+						</li>
 						
 						<li>
-							<a href="global.html#randomString">randomString</a>
+							<a href="module-Server-Ape.pipe.html">pipe</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-Ape.subuser.html">subuser</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-Ape.user.html">user</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-GetRequest.html">GetRequest</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-PostRequest.html">PostRequest</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-Request.html">Request</a>
 						</li>
 						
 
@@ -109,14 +125,14 @@
 					
 
 
-	<h1 class="page-title">Class: User</h1>
+	<h1 class="page-title">Class: Session</h1>
 <section>
 
 <header>
     <h2>
-        <span class="ancestors"><a href="APS.html">APS</a>.</span>
+        <span class="ancestors"><a href="module-Client.html">Client</a><a href="module-Client-APS.html">~APS</a>.</span>
     
-    User
+    Session
     </h2>
     
 </header>
@@ -128,7 +144,7 @@
     
         
 <dt>
-    <h4 class="name" id="User"><span class="type-signature"></span>new User<span class="signature">(pipe, client)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Session"><span class="type-signature"></span>new Session<span class="signature">(client)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -136,7 +152,7 @@
     
     
     <div class="description">
-        <p>The user object constructor</p>
+        <p>The session object constructor</p>
     </div>
     
 
@@ -170,169 +186,15 @@
 
         <tr>
             
-                <td class="name"><code>pipe</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The pip object as sent by the server</p></td>
-        </tr>
-
-	
-
-        <tr>
-            
                 <td class="name"><code>client</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="APS.html">APS</a></span>
+<span class="param-type">APS</span>
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Instance of the client for internal reference</p></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">js/src/user.js</a>, <a href="user.js.html#sunlight-1-line-7">line 7</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
-        <dl>
-            
-<dt>
-    <h4 class="name" id="pubid"><span class="type-signature"></span>pubid<span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>The user publisher id
-Note this property is not enumerable.</p>
-    </div>
-    
-    
-    
-
-    
-<dl class="details">
-    
-
-        <h5 class="subsection-title">Properties:</h5>
-
-        <dl>
-
-<table class="props table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>pubid</code></td>
-            
-
-            <td class="type">
             
             </td>
 
@@ -346,8 +208,11 @@ Note this property is not enumerable.</p>
 	
 	</tbody>
 </table>
-</dl>
 
+    
+    
+    
+<dl class="details">
     
 
     
@@ -369,7 +234,7 @@ Note this property is not enumerable.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">js/src/user.js</a>, <a href="user.js.html#sunlight-1-line-63">line 63</a>
+        <a href="ApePubSub.js.html">js/ApePubSub.js</a>, <a href="ApePubSub.js.html#sunlight-1-line-1738">line 1738</a>
     </li></ul></dd>
     
 
@@ -382,9 +247,31 @@ Note this property is not enumerable.</p>
 
     
     
+
+    
+
+    
+    
+    
+    
+    
+    
+    
 </dd>
 
-        </dl>
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
     
 
     
@@ -393,7 +280,7 @@ Note this property is not enumerable.</p>
         <dl>
             
 <dt>
-    <h4 class="name" id="pub"><span class="type-signature"></span>pub<span class="signature">(data, sync, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="get"><span class="type-signature"></span>get<span class="signature">(key)</span><span class="type-signature"> &rarr; {*}</span></h4>
     
     
 </dt>
@@ -401,7 +288,7 @@ Note this property is not enumerable.</p>
     
     
     <div class="description">
-        <p>Publishes/sends anything to the user, a string, object, array or integer</p>
+        <p>Get a value from the session</p>
     </div>
     
 
@@ -435,247 +322,7 @@ Note this property is not enumerable.</p>
 
         <tr>
             
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Data to send to the channel</p></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>sync</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">bool</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Whether to to synchronize the event across the user session</p></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Function called after the event is sent</p></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">js/src/user.js</a>, <a href="user.js.html#sunlight-1-line-68">line 68</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="publish"><span class="type-signature"></span>publish<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Alias for <a href="APS.User.html#pub">APS.User#pub</a></p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">js/src/user.js</a>, <a href="user.js.html#sunlight-1-line-84">line 84</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="APS.User.html#pub">APS.User#pub</a></li>
-        </ul>
-    </dd>
-    
-
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="send"><span class="type-signature"></span>send<span class="signature">($event, data, sync, callback)</span><span class="type-signature"> &rarr; {<a href="APS.html">APS</a>}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Sends a custom event to the user</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>$event</code></td>
+                <td class="name"><code>key</code></td>
             
 
             <td class="type">
@@ -691,76 +338,7 @@ Note this property is not enumerable.</p>
 
             
 
-            <td class="description last"><p>The name of the event to send</p></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The data to send with the event</p></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>sync</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">bool</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Weather to sync event across the user's session or not</p></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Function to call after the event has been sent</p></td>
+            <td class="description last"><p>The key of the value to get</p></td>
         </tr>
 
 	
@@ -792,7 +370,7 @@ Note this property is not enumerable.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="user.js.html">js/src/user.js</a>, <a href="user.js.html#sunlight-1-line-94">line 94</a>
+        <a href="ApePubSub.js.html">js/ApePubSub.js</a>, <a href="ApePubSub.js.html#sunlight-1-line-1818">line 1818</a>
     </li></ul></dd>
     
 
@@ -816,10 +394,6 @@ Note this property is not enumerable.</p>
     <h5>Returns:</h5>
     
             
-<div class="param-desc">
-    <p>client or parent object reference</p>
-</div>
-
 
 
 <dl>
@@ -828,7 +402,7 @@ Note this property is not enumerable.</p>
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="APS.html">APS</a></span>
+<span class="param-type">*</span>
 
 
 	</dd>
@@ -836,6 +410,414 @@ Note this property is not enumerable.</p>
 
 
         
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="getChl"><span class="type-signature"></span>getChl<span class="signature">()</span><span class="type-signature"> &rarr; {*}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Get the current challenge number</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ApePubSub.js.html">js/ApePubSub.js</a>, <a href="ApePubSub.js.html#sunlight-1-line-1768">line 1768</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="getFreq"><span class="type-signature"></span>getFreq<span class="signature">()</span><span class="type-signature"> &rarr; {*}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Get the current frequency number</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ApePubSub.js.html">js/ApePubSub.js</a>, <a href="ApePubSub.js.html#sunlight-1-line-1761">line 1761</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="getID"><span class="type-signature"></span>getID<span class="signature">()</span><span class="type-signature"> &rarr; {bool|string}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Gets the current session ID</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ApePubSub.js.html">js/ApePubSub.js</a>, <a href="ApePubSub.js.html#sunlight-1-line-1747">line 1747</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">bool</span>
+|
+
+<span class="param-type">string</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="set"><span class="type-signature"></span>set<span class="signature">(key, val)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Assign value to a session key</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The value key, identifier</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>val</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The value to store in session</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ApePubSub.js.html">js/ApePubSub.js</a>, <a href="ApePubSub.js.html#sunlight-1-line-1827">line 1827</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
     
     
 </dd>
@@ -858,7 +840,7 @@ Note this property is not enumerable.</p>
 				<div class="clearfix"></div>
 				<footer>
 					
-					Version 1.6.1
+					Version 1.6.3
 					<br />
 					
 					
@@ -869,7 +851,7 @@ Note this property is not enumerable.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a>
-		on Sun Oct 20 2013 13:52:11 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		on Sun Oct 27 2013 01:48:11 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
 			</div>

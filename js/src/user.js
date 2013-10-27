@@ -3,6 +3,7 @@
  * @param {object} pipe - The pip object as sent by the server
  * @param {APS} client - Instance of the client for internal reference
  * @constructor
+ * @memberOf module:Client~
  */
 APS.User = function(pipe, client){
 	Object.defineProperties(this, {
@@ -16,7 +17,7 @@ APS.User = function(pipe, client){
 		 * properties specific events which can be ise observe/watch
 		 * property changes 
 		 *
-		 * @memberOf APS.User.prototype
+		 * @memberOf module:Client~APS.User#
 		 * @method _update
 		 * @private
 		 *
@@ -57,7 +58,7 @@ APS.User = function(pipe, client){
 		 * The user publisher id
 		 * Note this property is not enumerable.
 		 *
-		 * @memberOf APS.User.prototype
+		 * @memberOf module:Client~APS.User#
 		 * @property pubid
 		 */
 		pubid: {
@@ -75,7 +76,7 @@ APS.User = function(pipe, client){
 		 * @param {bool} sync - Whether to to synchronize the event across the user session
 		 * @param {function} callback - Function called after the event is sent
 		 *
-		 * @memberOf APS.User.prototype
+		 * @memberOf module:Client~APS.User#
 		 * @method pub
 		 */
 		pub: {
@@ -84,7 +85,7 @@ APS.User = function(pipe, client){
 		/**
 		 * Alias for {@link APS.User#pub}
 		 *
-		 * @memberOf APS.User.prototype
+		 * @memberOf module:Client~APS.User#
 		 * @method publish
 		 * @see APS.User#pub
 		 */
@@ -94,7 +95,7 @@ APS.User = function(pipe, client){
 		/**
 		 * Sends a custom event to the user
 		 *
-		 * @memberOf APS.User.prototype
+		 * @memberOf module:Client~APS.User#
 		 * @method send
 		 *
 		 * @param {string} $event -  The name of the event to send
@@ -124,6 +125,7 @@ APS.User = function(pipe, client){
  * @param {object} pipe - The pip object as sent by the server
  * @param {APS} client - Instance of the client for internal reference
  * @constructor
+ * @memberOf module:Client~
  */
 APS.CUser = function(pipe, client){
 	Object.defineProperties(this, {
@@ -137,7 +139,7 @@ APS.CUser = function(pipe, client){
 		 * properties specific events which can be ise observe/watch
 		 * property changes
 		 *
-		 * @memberOf APS.CUser.prototype
+		 * @memberOf module:Client~APS.CUser#
 		 * @method _update
 		 * @private
 		 *
@@ -168,7 +170,7 @@ APS.CUser = function(pipe, client){
 		 * server for propagation. In order for this method to work
 		 * properly the option {@link APS.option.autoUpdate} should be enabled
 		 *
-		 * @memberOf APS.CUser.prototype
+		 * @memberOf module:Client~APS.CUser#
 		 * @method update
 		 *
 		 * @param {string} name -  The name of the property to update
@@ -209,7 +211,7 @@ APS.CUser = function(pipe, client){
 		 * The user publisher id.
 		 * Note this property is not enumerable.
 		 *
-		 * @memberOf APS.CUser.prototype
+		 * @memberOf module:Client~APS.CUser#
 		 * @property pubid
 		 */
 		pubid: {
@@ -220,7 +222,7 @@ APS.CUser = function(pipe, client){
 		 * is an instance of {@link APS.Channel}.
 		 * Note this property is not enumerable.
 		 *
-		 * @memberOf APS.CUser.prototype
+		 * @memberOf module:Client~APS.CUser#
 		 * @property channels
 		 */
 		channels: {
@@ -235,7 +237,7 @@ APS.CUser = function(pipe, client){
 		/**
 		 * Add event handler(s) to the channel
 		 *
-		 * @memberOf APS.CUser.prototype
+		 * @memberOf module:Client~APS.CUser#
 		 * @method on
 		 *
 		 * @param {string} ev - Name of the event handler to add, not case sensitive
@@ -249,7 +251,7 @@ APS.CUser = function(pipe, client){
 		/**
 		 * Trigger event handlers on the user
 		 *
-		 * @memberOf APS.CUser.prototype
+		 * @memberOf module:Client~APS.CUser#
 		 * @method trigger
 		 * @see APS#trigger
 		 */
@@ -259,7 +261,7 @@ APS.CUser = function(pipe, client){
 		/**
 		 * Logs data to the console
 		 * It is specified in the out from the call originated from the current user object
-		 * @memberOf APS.CUser.prototype
+		 * @memberOf module:Client~APS.CUser#
 		 * @method log
 		 * @see APS#log
 		 */

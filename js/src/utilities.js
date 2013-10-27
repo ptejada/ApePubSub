@@ -4,6 +4,7 @@
  * @param {number} length - determines the length
  * @param {string} [keys] - an optional string of alternative characters to use
  * @returns {string}
+ * @memberOf module:Client~
  */
 function randomString(length, keys){
 	var chars = keys || "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";

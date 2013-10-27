@@ -29,23 +29,25 @@
 					<ul class="dropdown-menu inline">
 						
 						<li>
-							<a href="Ape.html">Ape</a>
+							<a href="module-Server-Ape.html">Ape</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu inline">
+						
+						<li>
+							<a href="module-Client.html">Client</a>
 						</li>
 						
 						<li>
-							<a href="Ape.channel.html">channel</a>
-						</li>
-						
-						<li>
-							<a href="Ape.pipe.html">pipe</a>
-						</li>
-						
-						<li>
-							<a href="Ape.subuser.html">subuser</a>
-						</li>
-						
-						<li>
-							<a href="Ape.user.html">user</a>
+							<a href="module-Server.html">Server</a>
 						</li>
 						
 
@@ -59,37 +61,51 @@
 					<ul class="dropdown-menu inline">
 						
 						<li>
-							<a href="APS.html">APS</a>
+							<a href="module-Client-APS.html">APS</a>
 						</li>
 						
 						<li>
-							<a href="APS.Channel.html">Channel</a>
+							<a href="module-Client-APS.Channel.html">Channel</a>
 						</li>
 						
 						<li>
-							<a href="APS.CUser.html">CUser</a>
+							<a href="module-Client-APS.CUser.html">CUser</a>
 						</li>
 						
 						<li>
-							<a href="APS.Session.html">Session</a>
+							<a href="module-Client-APS.Session.html">Session</a>
 						</li>
 						
 						<li>
-							<a href="APS.User.html">User</a>
+							<a href="module-Client-APS.User.html">User</a>
 						</li>
 						
-
-					</ul>
-				</li>
-				
-				<li class="dropdown">
-					<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
-						class="caret"></b></a>
-
-					<ul class="dropdown-menu inline">
+						<li>
+							<a href="module-Server-Ape.channel.html">channel</a>
+						</li>
 						
 						<li>
-							<a href="global.html#randomString">randomString</a>
+							<a href="module-Server-Ape.pipe.html">pipe</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-Ape.subuser.html">subuser</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-Ape.user.html">user</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-GetRequest.html">GetRequest</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-PostRequest.html">PostRequest</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-Request.html">Request</a>
 						</li>
 						
 
@@ -113,8 +129,9 @@
     
     <section>
         <article>
-            <pre class="sunlight-highlight-javascript linenums">/*
- * Initialize Ape variables
+            <pre class="sunlight-highlight-javascript linenums">/**
+ * Groups all server side classes and objects documentation and definitions
+ * @module Server
  */
 /**
  * Holds all the connected users by their name property
@@ -244,7 +261,7 @@ var clearInterval = Ape.clearInterval;
  *
  * @instance
  * @method prop
- * @memberOf Ape.user
+ * @memberOf module:Server~Ape.user
  *
  * @param {int|string} index - The named key of the property
  * @param {*} value - The new value of the property
@@ -287,7 +304,7 @@ Ape.user.prop = function(index, value){
  *
  * @instance
  * @method prop
- * @memberOf Ape.channel
+ * @memberOf module:Server~Ape.channel
  *
  * @param {int|string} index - The named key of the property
  * @param {*} value - The new value of the property
@@ -309,7 +326,7 @@ Ape.channel.prop = Ape.user.prop;
  *
  * @instance
  * @method update
- * @memberOf Ape.user
+ * @memberOf module:Server~Ape.user
  *
  * @param {int|string} index The named key of the property
  * @param {*} value The new value of the property
@@ -344,7 +361,7 @@ Ape.user.update = function(index, value){
  *
  * @instance
  * @method update
- * @memberOf Ape.channel
+ * @memberOf module:Server~Ape.channel
  *
  * @param {int|string} index The named key of the property
  * @param {*} value The new value of the property
@@ -374,7 +391,7 @@ Ape.channel.update = function(index, value){
  *
  * @instance
  * @method sendEvent
- * @memberOf Ape.user
+ * @memberOf module:Server~Ape.user
  */
 Ape.user.sendEvent = function($event, $data, options){
 	var bodyParams = {};
@@ -404,7 +421,7 @@ Ape.user.sendEvent = function($event, $data, options){
  *
  * @instance
  * @method sendEvent
- * @memberOf Ape.channel
+ * @memberOf module:Server~Ape.channel
  */
 Ape.channel.sendEvent = Ape.user.sendEvent;
 
@@ -529,30 +546,35 @@ if(!Function.prototype.bind){
  * The main scope/namespace in the APE Server environment. It is initiated on the server startup.
  *
  * @namespace Ape
+ * @memberOf module:Server~
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.html Ape}
  */
 /**
  * The APE Server user object constructor prototype.
  *
- * @namespace Ape.user
+ * @constructor user
+ * @memberOf module:Server~Ape
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.user.html Ape.user}
  */
 /**
  * The APE Server user object constructor prototype.
  *
- * @namespace Ape.subuser
+ * @constructor subuser
+ * @memberOf module:Server~Ape
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.subuser.html Ape.subuser}
  */
 /**
  * The APE Server channel object constructor prototype.
  *
- * @namespace Ape.channel
+ * @constructor channel
+ * @memberOf module:Server~Ape
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.channel.html Ape.channel}
  */
 /**
  * The APE Server pipe object constructor prototype.
  *
- * @namespace Ape.pipe
+ * @constructor pipe
+ * @memberOf module:Server~Ape
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.pipe.html Ape.pipe}
  */
 /**
@@ -560,7 +582,7 @@ if(!Function.prototype.bind){
  *
  * @constructor MySQL
  * @method MySQL
- * @memberOf Ape
+ * @memberOf module:Server~Ape
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.MySQL.html Ape.MySQL}
  */</pre>
         </article>
@@ -575,7 +597,7 @@ if(!Function.prototype.bind){
 				<div class="clearfix"></div>
 				<footer>
 					
-					Version 1.6.1
+					Version 1.6.3
 					<br />
 					
 					
@@ -586,7 +608,7 @@ if(!Function.prototype.bind){
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a>
-		on Sun Oct 20 2013 13:52:10 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		on Sun Oct 27 2013 01:48:10 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
 			</div>

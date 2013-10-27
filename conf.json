@@ -3,7 +3,7 @@
 		"allowUnknownTags": true
 	},
 	"source": {
-		"include": ["./js/src/","./APE_Server/APScripts/framework/","./README.md"],
+		"include": ["./js/ApePubSub.js","./APE_Server/APScripts/framework/","./README.md"],
 		"includePattern": ".+\\.js(doc)?$",
 		"excludePattern": "docs"
 	},
@@ -20,7 +20,7 @@
 			"outputSourceFiles" : true
 		},
 		"systemName"      : "ApePubSub",
-		"footer"          : "Version 1.6.2",
+		"footer"          : "Version 1.6.3",
 		"copyright"       : "Pablo Tejada Copyright © 2012-2013.",
 		"navType"         : "inline",
 		"theme"           : "spacelab",

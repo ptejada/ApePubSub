@@ -1,5 +1,6 @@
-/*
- * Initialize Ape variables
+/**
+ * Groups all server side classes and objects documentation and definitions
+ * @module Server
  */
 /**
  * Holds all the connected users by their name property
@@ -129,7 +130,7 @@ var clearInterval = Ape.clearInterval;
  *
  * @instance
  * @method prop
- * @memberOf Ape.user
+ * @memberOf module:Server~Ape.user
  *
  * @param {int|string} index - The named key of the property
  * @param {*} value - The new value of the property
@@ -172,7 +173,7 @@ Ape.user.prop = function(index, value){
  *
  * @instance
  * @method prop
- * @memberOf Ape.channel
+ * @memberOf module:Server~Ape.channel
  *
  * @param {int|string} index - The named key of the property
  * @param {*} value - The new value of the property
@@ -194,7 +195,7 @@ Ape.channel.prop = Ape.user.prop;
  *
  * @instance
  * @method update
- * @memberOf Ape.user
+ * @memberOf module:Server~Ape.user
  *
  * @param {int|string} index The named key of the property
  * @param {*} value The new value of the property
@@ -229,7 +230,7 @@ Ape.user.update = function(index, value){
  *
  * @instance
  * @method update
- * @memberOf Ape.channel
+ * @memberOf module:Server~Ape.channel
  *
  * @param {int|string} index The named key of the property
  * @param {*} value The new value of the property
@@ -259,7 +260,7 @@ Ape.channel.update = function(index, value){
  *
  * @instance
  * @method sendEvent
- * @memberOf Ape.user
+ * @memberOf module:Server~Ape.user
  */
 Ape.user.sendEvent = function($event, $data, options){
 	var bodyParams = {};
@@ -289,7 +290,7 @@ Ape.user.sendEvent = function($event, $data, options){
  *
  * @instance
  * @method sendEvent
- * @memberOf Ape.channel
+ * @memberOf module:Server~Ape.channel
  */
 Ape.channel.sendEvent = Ape.user.sendEvent;
 
@@ -414,30 +415,35 @@ if(!Function.prototype.bind){
  * The main scope/namespace in the APE Server environment. It is initiated on the server startup.
  *
  * @namespace Ape
+ * @memberOf module:Server~
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.html Ape}
  */
 /**
  * The APE Server user object constructor prototype.
  *
- * @namespace Ape.user
+ * @constructor user
+ * @memberOf module:Server~Ape
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.user.html Ape.user}
  */
 /**
  * The APE Server user object constructor prototype.
  *
- * @namespace Ape.subuser
+ * @constructor subuser
+ * @memberOf module:Server~Ape
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.subuser.html Ape.subuser}
  */
 /**
  * The APE Server channel object constructor prototype.
  *
- * @namespace Ape.channel
+ * @constructor channel
+ * @memberOf module:Server~Ape
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.channel.html Ape.channel}
  */
 /**
  * The APE Server pipe object constructor prototype.
  *
- * @namespace Ape.pipe
+ * @constructor pipe
+ * @memberOf module:Server~Ape
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.pipe.html Ape.pipe}
  */
 /**
@@ -445,6 +451,6 @@ if(!Function.prototype.bind){
  *
  * @constructor MySQL
  * @method MySQL
- * @memberOf Ape
+ * @memberOf module:Server~Ape
  * @see {@link http://ape-project.org/static/jsdocs/server/symbols/Ape.MySQL.html Ape.MySQL}
  */

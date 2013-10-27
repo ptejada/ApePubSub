@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>ApePubSub Index</title>
+	<title>ApePubSub Modules</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -125,75 +125,124 @@
 					
 
 
-	
-	<span class="page-title">Index</span>
-	
-	
+	<h1 class="page-title">Modules</h1>
+<section>
+
+<header>
+    <h2>
+    
+    </h2>
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+
+    
+        
+
+        
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
 
 
+        
+    
+    </div>
 
+    
 
+    
 
+    
 
+    
+        <h3 class="subsection-title">Classes</h3>
 
+        <dl>
+            <dt><a href="module-Client-APS.html">APS</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Client-APS.Channel.html">Channel</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Client-APS.CUser.html">CUser</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Client-APS.Session.html">Session</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Client-APS.User.html">User</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Server-Ape.channel.html">channel</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Server-Ape.pipe.html">pipe</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Server-Ape.subuser.html">subuser</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Server-Ape.user.html">user</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Server-GetRequest.html">GetRequest</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Server-PostRequest.html">PostRequest</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-Server-Request.html">Request</a></dt>
+            <dd></dd>
+        </dl>
+    
 
+    
+        <h3 class="subsection-title">Namespaces</h3>
 
+        <dl>
+            <dt><a href="namespaces.html#module:Server~Ape"><a href="module-Server-Ape.html">Ape</a></a></dt>
+            <dd></dd>
+        </dl>
+    
 
+    
 
+    
 
-	
-	
+    
 
+    
+</article>
 
-
-
-
-    <section>
-        <article><h2>What is it?</h2>
-<p>ApePubSub is an alternative event driven pub/sub framework to the official <a href="https://github.com/APE-Project/APE_JSF">APE_JSF</a> for the <a href="https://github.com/APE-Project/APE_Server">APE Server</a>. It is written in plain javascript.</p>
-<p>The client framework is based on @paraboul's next generation <a href="https://github.com/paraboul/APE-Client-JavaScript/tree/31dd239394af8a574667c8228ed8c004d6866973">APE_JSF</a> draft and the server framework is a compilation of custom commads, hooks and rewrites from the official <a href="https://github.com/APE-Project/APE_Server/scripts/">framework</a>, the actual server binary do not requires modification.</p>
-<h2>Getting Started</h2>
-<p><a href="https://github.com/ptejada/ApePubSub/wiki/Intro">Read more about the project</a></p>
-<p><a href="https://github.com/ptejada/ApePubSub/wiki/Getting-started">Get Started</a></p>
-<p>See what is new in the <a href="https://github.com/ptejada/ApePubSub/wiki/Changelog">Changelog</a></p>
-<p>Checkout the <a href="http://ptejada.com/script/ApePubSub/demo/">live demos</a>, the demo sources can be found <a href="https://github.com/ptejada/ApePubSub/tree/master/demo">here</a></p>
-<p><a href="http://ptejada.com/script/ApePubSub/docs/">Code documentation</a></p>
-<p><a href="https://github.com/ptejada/ApePubSub/wiki/API">Public Documentation - wiki</a></p>
-<p>Simple program example:</p>
-<pre><code class="lang-js">
-// Initialize the client object
-var client = new APS('ape.ptejada.com');
-
-// Subscribe to the channel and add some event listeners
-client.sub('test', {
-  // Event triggered when a user joins channel
-  join: function(){
-    alert('A user has joined the channel :)');
-  },
-  // Event triggered when a user leaves a channel
-  left: function(){
-    alert('A user has left the channel :(')
-  }
-});</code></pre>
-<p>Is that simple and pretty much self explanatory what the above will do.</p>
-<h3>For more information check the <a href="https://github.com/ptejada/ApePubSub/wiki">wiki</a></h3>
-<p><strong>NOTE:</strong> when updating the framework make sure that you update the server scripts as well, you can tell if the server scripts need updating if the the folder <strong>APE_Server</strong> has been changed in the commit or recently.</p>
-<h2>Browser Support</h2>
-<p>The framework is tested and developed in the following modern browers:</p>
-<ul>
-<li>Internet Explorer 9+</li>
-<li>Google Chrome</li>
-<li>Mozilla Firefox</li>
-</ul>
-<p>It should also work in other webkit and mobile browsers such as Opera, Safari, Safari Mobile and the stock Android Browser.
-Internet Explorer 8 and below is not supported.</p>
-<h2>Feedback?</h2>
-<p>For reporting issues use the github <a href="https://github.com/ptejada/ApePubSub/issues?state=open">issues system</a>, is really good and organized :)</p>
-<p>For discussions, join the <a href="https://groups.google.com/forum/?fromgroups#!forum/apepubsub">Google Group</a></p></article>
-    </section>
-
-
-
+</section>
 
 
 

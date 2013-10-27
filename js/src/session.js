@@ -3,6 +3,7 @@
  *
  * @param {APS} client
  * @constructor
+ * @memberOf module:Client~
  */
 APS.Session = function(client){
 	this._client = client;
@@ -153,6 +154,7 @@ APS.Session = function(client){
  * @param _prefix the store identifier
  * @constructor
  * @private
+ * @memberOf module:Client~
  */
 APS.Store = function(_prefix){
 	if (typeof _prefix == 'undefined' )
