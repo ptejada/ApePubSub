@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>ApePubSub Class: PostRequest</title>
+	<title>ApePubSub Class: Request</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -85,7 +85,19 @@
 						</li>
 						
 						<li>
+							<a href="module-Server-Ape.GetRequest.html">GetRequest</a>
+						</li>
+						
+						<li>
 							<a href="module-Server-Ape.pipe.html">pipe</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-Ape.PostRequest.html">PostRequest</a>
+						</li>
+						
+						<li>
+							<a href="module-Server-Ape.Request.html">Request</a>
 						</li>
 						
 						<li>
@@ -94,18 +106,6 @@
 						
 						<li>
 							<a href="module-Server-Ape.user.html">user</a>
-						</li>
-						
-						<li>
-							<a href="module-Server-GetRequest.html">GetRequest</a>
-						</li>
-						
-						<li>
-							<a href="module-Server-PostRequest.html">PostRequest</a>
-						</li>
-						
-						<li>
-							<a href="module-Server-Request.html">Request</a>
 						</li>
 						
 
@@ -125,14 +125,14 @@
 					
 
 
-	<h1 class="page-title">Class: PostRequest</h1>
+	<h1 class="page-title">Class: Request</h1>
 <section>
 
 <header>
     <h2>
-        <span class="ancestors"><a href="module-Server.html">Server</a>~</span>
+        <span class="ancestors"><a href="module-Server.html">Server</a><a href="module-Server-Ape.html">~Ape</a>.</span>
     
-    PostRequest
+    Request
     </h2>
     
 </header>
@@ -144,7 +144,7 @@
     
         
 <dt>
-    <h4 class="name" id="PostRequest"><span class="type-signature"></span>new PostRequest<span class="signature">(url)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Request"><span class="type-signature"></span>new Request<span class="signature">(method, url, <span class="optional">params</span>, <span class="optional">responseHandler</span>)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -152,7 +152,7 @@
     
     
     <div class="description">
-        <p>Constructor to make a POST HTTP request on the server</p>
+        <p>Constructor to make a HTTP request on the server</p>
     </div>
     
 
@@ -174,6 +174,8 @@
 		<th>Type</th>
 
 		
+		<th>Argument</th>
+		
 
 		
 
@@ -182,6 +184,37 @@
 	</thead>
 
 	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>method</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>GET or POST</p></td>
+        </tr>
+
 	
 
         <tr>
@@ -199,10 +232,84 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last"><p>The request url</p></td>
+            <td class="description last"><p>URL to make the request to</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Key paired values of parameters to sent in the request</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>responseHandler</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Key paired values of parameters to sent in the request</p></td>
         </tr>
 
 	
@@ -234,7 +341,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">APE_Server/APScripts/framework/Request.js</a>, <a href="Request.js.html#sunlight-1-line-235">line 235</a>
+        <a href="Request.js.html">APE_Server/APScripts/framework/Request.js</a>, <a href="Request.js.html#sunlight-1-line-1">line 1</a>
     </li></ul></dd>
     
 
@@ -263,12 +370,6 @@
     </div>
 
     
-        <h3 class="subsection-title">Extends</h3>
-
-        <ul>
-            <li><a href="module-Server-Request.html">module:Server~Request</a></li>
-        </ul>
-    
 
     
 
@@ -286,7 +387,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="addParam"><span class="type-signature"></span>addParam<span class="signature">(dataORkey, value)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="addParam"><span class="type-signature">&lt;static> </span>addParam<span class="signature">(dataORkey, <span class="optional">value</span>)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -316,6 +417,8 @@
 		<th>Type</th>
 
 		
+		<th>Argument</th>
+		
 
 		
 
@@ -344,6 +447,14 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -367,6 +478,16 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -388,11 +509,6 @@
     
 
     
-    <dt class="inherited-from">Inherited From:</dt>
-    <dd class="inherited-from"><ul class="dummy"><li>
-        <a href="module-Server-Request.html#addParam">module:Server~Request#addParam</a>
-    </li></dd>
-    
 
     
 
@@ -407,7 +523,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">APE_Server/APScripts/framework/Request.js</a>, <a href="Request.js.html#sunlight-1-line-64">line 64</a>
+        <a href="Request.js.html">APE_Server/APScripts/framework/Request.js</a>, <a href="Request.js.html#sunlight-1-line-70">line 70</a>
     </li></ul></dd>
     
 
@@ -435,7 +551,7 @@
         
             
 <dt>
-    <h4 class="name" id="getResponse"><span class="type-signature"></span>getResponse<span class="signature">(callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getResponse"><span class="type-signature">&lt;static> </span>getResponse<span class="signature">(callback)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -512,11 +628,6 @@
     
 
     
-    <dt class="inherited-from">Inherited From:</dt>
-    <dd class="inherited-from"><ul class="dummy"><li>
-        <a href="module-Server-Request.html#getResponse">module:Server~Request#getResponse</a>
-    </li></dd>
-    
 
     
 
@@ -531,7 +642,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">APE_Server/APScripts/framework/Request.js</a>, <a href="Request.js.html#sunlight-1-line-30">line 30</a>
+        <a href="Request.js.html">APE_Server/APScripts/framework/Request.js</a>, <a href="Request.js.html#sunlight-1-line-27">line 27</a>
     </li></ul></dd>
     
 
@@ -559,173 +670,7 @@
         
             
 <dt>
-    <h4 class="name" id="serialize"><span class="type-signature"></span>serialize<span class="signature">(obj, <span class="optional">prefix</span>)</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Serializes a JS object</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-		<th>Argument</th>
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>obj</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Object to serialize</p></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>prefix</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-    
-
-    
-
-    
-
-    
-    <dt class="inherited-from">Inherited From:</dt>
-    <dd class="inherited-from"><ul class="dummy"><li>
-        <a href="module-Server-Request.html#serialize">module:Server~Request#serialize</a>
-    </li></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">APE_Server/APScripts/framework/Request.js</a>, <a href="Request.js.html#sunlight-1-line-84">line 84</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="setHeader"><span class="type-signature"></span>setHeader<span class="signature">(key, value)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setHeader"><span class="type-signature">&lt;static> </span>setHeader<span class="signature">(key, value)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -827,11 +772,6 @@
     
 
     
-    <dt class="inherited-from">Inherited From:</dt>
-    <dd class="inherited-from"><ul class="dummy"><li>
-        <a href="module-Server-Request.html#setHeader">module:Server~Request#setHeader</a>
-    </li></dd>
-    
 
     
 
@@ -874,7 +814,7 @@
         
             
 <dt>
-    <h4 class="name" id="setHeaders"><span class="type-signature"></span>setHeaders<span class="signature">(object)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setHeaders"><span class="type-signature">&lt;static> </span>setHeaders<span class="signature">(object)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -951,11 +891,6 @@ Note: this method overwrite any existing headers</p>
     
 
     
-    <dt class="inherited-from">Inherited From:</dt>
-    <dd class="inherited-from"><ul class="dummy"><li>
-        <a href="module-Server-Request.html#setHeaders">module:Server~Request#setHeaders</a>
-    </li></dd>
-    
 
     
 
@@ -970,7 +905,7 @@ Note: this method overwrite any existing headers</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Request.js.html">APE_Server/APScripts/framework/Request.js</a>, <a href="Request.js.html#sunlight-1-line-53">line 53</a>
+        <a href="Request.js.html">APE_Server/APScripts/framework/Request.js</a>, <a href="Request.js.html#sunlight-1-line-56">line 56</a>
     </li></ul></dd>
     
 
@@ -1023,8 +958,8 @@ Note: this method overwrite any existing headers</p>
 					<br />
 					
 		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-dev</a>
-		on Sun Oct 27 2013 01:48:11 GMT-0400 (EDT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
+		on Sat Nov 16 2013 13:22:34 GMT-0500 (EST) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
 			</div>

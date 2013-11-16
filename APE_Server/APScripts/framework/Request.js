@@ -2,11 +2,14 @@
  * Constructor to make a HTTP request on the server
  *
  * @param {string} method - GET or POST
- * @param {string} url
- * @constructor
- * @memberOf module:Server~
+ * @param {string} url - URL to make the request to
+ * @param {object} [params] - Key paired values of parameters to sent in the request
+ * @param {Function} [responseHandler] - Key paired values of parameters to sent in the request
+ *
+ * @memberOf module:Server~Ape
+ * @constructor Request
  */
-function Request(method, url){
+Ape.Request = function(method, url, params, responseHandler){
 
 	// Parses the URL
 	var result  = url.match(/^.*?:\/\/(.*?)(:([0-9]+))?((\/.*)|)$/);
@@ -26,6 +29,9 @@ function Request(method, url){
 	 *
 	 * @param {Function} callback - Three parameter are passed to the callback
 	 *                              responseBody, responseStatusCode, responseHeaders
+	 *
+	 * @memberOf module:Server~Ape.Request
+	 * @method getResponse
 	 */
 	this.getResponse = function(callback)
 	{
@@ -38,6 +44,9 @@ function Request(method, url){
 	 *
 	 * @param {string} key - The header name
 	 * @param {string|Number} value - The header value
+	 *
+	 * @memberOf module:Server~Ape.Request
+	 * @method setHeader
 	 */
 	this.setHeader = function(key, value)
 	{
@@ -49,6 +58,9 @@ function Request(method, url){
 	 * Note: this method overwrite any existing headers
 	 *
 	 * @param {Object} object - Key pair of headers
+	 *
+	 * @memberOf module:Server~Ape.Request
+	 * @method setHeaders
 	 */
 	this.setHeaders = function(object)
 	{
@@ -59,19 +71,37 @@ function Request(method, url){
 	 * Assign parameter to send with the request
 	 *
 	 * @param {Object|String} dataORkey - A key pair object of parameters
-	 * @param {*} value - The value of the parameter
+	 * @param {*} [value] - The value of the parameter
+	 *
+	 * @memberOf module:Server~Ape.Request
+	 * @method addParam
 	 */
 	this.addParam = function(dataORkey, value)
 	{
-		if (typeof dataORkey == "object")
+		var tmp = {}
+		if ( this.method == 'POST')
 		{
-			this.write(this.serialize(dataORkey));
+			if (typeof dataORkey == "object")
+			{
+				this.write(this.serialize(dataORkey));
+			}
+			else
+			{
+				tmp[dataORkey] = value;
+				this.write(this.serialize(tmp));
+			}
 		}
 		else
 		{
-			var tmp = {};
-			tmp[dataORkey] = value;
-			this.write(this.serialize(tmp));
+			if (typeof dataORkey == "object")
+			{
+				this.query += '&' + this.serialize(dataORkey);
+			}
+			else
+			{
+				tmp[dataORkey] = value;
+				this.query += '&' + this.serialize(tmp);
+			}
 		}
 	}
 
@@ -80,6 +110,10 @@ function Request(method, url){
 	 *
 	 * @param {Object} obj - Object to serialize
 	 * @param {String} [prefix]
+	 *
+	 * @memberOf module:Server~Ape.Request
+	 * @method serialize
+	 * @private
 	 */
 	this.serialize = function(obj, prefix) {
 		var str = [];
@@ -102,13 +136,13 @@ function Request(method, url){
 
 	this.connect = function()
 	{
-		if (this.method == 'POST')
+		if (this.method.toUpperCase() == 'POST')
 		{
 			this.setHeader('Content-length', this.body.join('&').length);
 			this.setHeader('Content-Type', 'application/x-www-form-urlencoded');
 		}
 
-		this.setHeader('User-Agent', 'APE JS Client');
+		this.setHeader('User-Agent', 'APE Server');
 		this.setHeader('Accept', '*/*');
 
 		this.socket = new Ape.sockClient(this.port, this.host, { flushlf: false });
@@ -214,22 +248,52 @@ function Request(method, url){
 			}
 		}.bind(this, callback);
 	}
+
+	/*
+	 * Adds parameter from the constructor or/and the handler
+	 */
+	switch (typeof params)
+	{
+		case "function":
+			this.getResponse(params);
+			break;
+		case "object":
+			this.addParam(params);
+			if ( typeof responseHandler == 'function' )
+			{
+				this.getResponse(responseHandler);
+			}
+			break;
+	}
 }
 
 /**
  * Constructor to make a GET HTTP request on the server
  * @param {string} url - The request url
- * @constructor
- * @memberOf module:Server~
- * @extends module:Server~Request
+ * @param {object} params - Key paired values of parameters to sent in the request
+ * @param {Function} [responseHandler] - Key paired values of parameters to sent in the request
+ *
+ * @memberOf module:Server~Ape
+ * @class GetRequest
+ * @extends module:Server~Ape.Request
  */
-var GetRequest = Request.bind('GET');
+Ape.GetRequest = Ape.Request.bind(Ape.Request,'GET');
 
 /**
  * Constructor to make a POST HTTP request on the server
  * @param {string} url - The request url
- * @constructor
- * @memberOf module:Server~
- * @extends module:Server~Request
+ * @param {object} params - Key paired values of parameters to sent in the request
+ * @param {Function} [responseHandler] - Key paired values of parameters to sent in the request
+ *
+ * @memberOf module:Server~Ape
+ * @class PostRequest
+ * @extends module:Server~Ape.Request
  */
-var PostRequest = Request.bind('POST');
+Ape.PostRequest = Ape.Request.bind(Ape.Request,'POST');
+
+/*
+ * Add backward comparability to the original global objects
+ */
+var Request = Ape.Request;
+var GetRequest = Ape.GetRequest;
+var PostRequest = Ape.PostRequest;
