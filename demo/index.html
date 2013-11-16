@@ -19,6 +19,9 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<dl class="dl-horizontal">
+					<dt><a href="colorChange">Color Change</a></dt>
+					<dd>Users pick a color and their color is shared through a channel in realtime</dd>
+
 					<dt><a href="singleChannel">Single Channel</a></dt>
 					<dd>The user joins a simple text chat channel</dd>
 
@@ -53,7 +56,14 @@
 		</div>
 		<hr>
 		<p>
-			<b>NOTE:</b> This demos by default run in a public APE Server( <a href="http://ape.ptejada.com">ape.ptejada.com</a> ) for demonstration
+			<span class="label label-default">NOTE:</span>
+			Most demos have session enable, meaning that if you open multiple tabs of the same demo you will still be the same user.
+			To disabled this behavior and treat each tab as a new user you can disabled sessions by appending the <i>#nosession</i>
+			hash to the url of the demo. For example try this link <a href="singleChannel/#nosession">Single Channel (noSession)</a>
+		</p>
+		<p>
+			<span class="label label-default">NOTE:</span>
+			This demos by default run in a public APE Server( <a href="http://ape.ptejada.com">ape.ptejada.com</a> ) for demonstration
 			purposes only. In order to test this demos with your own server installation you must install the APS server framework on your APE server.
 			<a href="https://github.com/ptejada/ApePubSub/wiki/Installing-server-scripts">Installing the APS server framework.</a>
 		</p>
