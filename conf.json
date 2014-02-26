@@ -20,8 +20,8 @@
 			"outputSourceFiles" : true
 		},
 		"systemName"      : "ApePubSub",
-		"footer"          : "Version 1.6.3",
-		"copyright"       : "Pablo Tejada Copyright © 2012-2013.",
+		"footer"          : "Version 1.6.4",
+		"copyright"       : "Pablo Tejada Copyright © 2012-2014.",
 		"navType"         : "inline",
 		"theme"           : "spacelab",
 		"linenums"        : true,

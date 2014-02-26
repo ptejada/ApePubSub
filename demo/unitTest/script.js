@@ -187,13 +187,45 @@ function testEssential(description, options){
 	})
 
 	/*
-	TODO: Add additional test for session server side storage
+	    Is session is enabled then queue the session storage test
 	 */
+	if ( options.session )
+	{
+		asyncTest("Checking server side session storage", 3, function(){
+			// Set session values for client2
+			var value1 ={t: 4543, saf: '123@$1'};
+			client2.session.set('value1', value1);
+
+			deepEqual(client2.session.get('value1'), value1, 'Session storage content is valid within the session');
+
+			// Cache the client identifier
+			var identifierCache = client2.identifier;
+
+			// Closes the client2 transport while the user is logged in in server
+			client2.transport.close();
+			equal(client2.state, 0, 'Current session disconnected from the remote server');
+
+			// Destroys the client2 object
+			client2 = null;
+
+			//Re-initializes the client2 with the cache identifier
+			client2 = new APS(ServerDomain, null, options);
+			client2.identifier = identifierCache;
+
+			client2.on('ready', function(){
+				deepEqual(client2.session.get('value1'), value1, 'Session restored, session storage is still valid');
+				start();
+			});
+
+			client2.connect();
+		});
+	}
 }
 
 testEssential("Long Polling with sessions disabled", {session: false, debug: false, transport: 'lp'});
 testEssential("Websocket with sessions disabled", {session: false, debug: false, transport: 'ws'});
 
-
 testEssential("Long Polling with sessions enabled", {session: true, debug: false, transport: 'lp'});
 testEssential("Websocket with sessions enabled", {session: true, debug: false, transport: 'ws'});
+
+// Add any other test suites using testEssential() with different APS client configuration

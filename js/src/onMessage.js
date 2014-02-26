@@ -147,11 +147,11 @@ APS.prototype.onMessage = function(data){
 				 * Parses and triggers an incoming Event
 				 */
 				user = this.pipes[args.from.pubid];
-				
+
 				if(typeof user == "undefined" && !!args.from){
 					//Create user it doesn't exists
-					client.pipe[args.from.pubid] = new APS.User(args.from, client);
-					user = client.pipe[args.from.pubid];
+					this.pipe[args.from.pubid] = new APS.User(args.from, this);
+					user = this.pipe[args.from.pubid];
 				}
 				
 				pipe = this.pipes[args.pipe.pubid];
