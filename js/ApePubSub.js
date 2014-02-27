@@ -1,8 +1,8 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * @version 1.6.4
- * Built on 2014-02-26 @ 02:39
+ * @version 1.6.5
+ * Built on 2014-02-27 @ 03:09
  */
 
 /**
@@ -58,7 +58,7 @@ if(!Function.prototype.bind){
 /**
  * The client constructor
  *
- * @version 1.6.4
+ * @version 1.6.5
  *
  * @param {string} server - The APE Server domain name including port number if other than 80
  * @param {object} [events] - Event handlers to be added to the client
@@ -105,7 +105,7 @@ function APS( server, events, options ){
 	 * The client version
 	 * @type {string}
 	 */
-	this.version = '1.6.4';
+	this.version = '1.6.5';
 	/**
 	 * The state of the client: 0=disconnected, 1=connected, 2=connecting
 	 * @type {number}
@@ -818,8 +818,8 @@ APS.prototype.onMessage = function(data){
 
 				if(typeof user == "undefined" && !!args.from){
 					//Create user it doesn't exists
-					this.pipe[args.from.pubid] = new APS.User(args.from, this);
-					user = this.pipe[args.from.pubid];
+					this.pipes[args.from.pubid] = new APS.User(args.from, this);
+					user = this.pipes[args.from.pubid];
 				}
 				
 				pipe = this.pipes[args.pipe.pubid];

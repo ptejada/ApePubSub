@@ -12,6 +12,9 @@ function testEssential(description, options){
 	var client2 = new APS(ServerDomain, null, options);
 	client2.identifier = "client" + randomString(5,"123456789");
 
+	var client3 = new APS(ServerDomain, null, options);
+	client3.identifier = "client" + randomString(5,"123456789");
+
 	var channelName = "UT_" + randomString(6);
 
 	module(description);
@@ -187,7 +190,7 @@ function testEssential(description, options){
 	})
 
 	/*
-	    Is session is enabled then queue the session storage test
+	 * If session is enabled then queue the session storage test
 	 */
 	if ( options.session )
 	{
@@ -220,6 +223,45 @@ function testEssential(description, options){
 			client2.connect();
 		});
 	}
+
+	/*
+	 * Test users dynamically created from an event
+	 */
+	asyncTest("Dynamically creating a user from an event", 2, function(){
+		client3.on({
+			ready: function(){
+				// Client3 was connected
+				equal(1, this.state, 'Client3 user is connected to the server')
+
+				var run = function()
+				{
+					// From client2 send message/event to the client3 user
+					// Note: client2 and client3 have no channel in common
+					client2.send(client3.user.pubid, 'ping', 1);
+					client3.check(); // Forces a check on long polling since it might get stuck when not in a channel
+				}
+
+				if(client2.state == 1)
+				{
+					run()
+				}
+				else
+				{
+					client2.on('ready', run);
+				}
+			},
+			ping: function(data, user){
+				// Confirms the user was created
+				equal(client2.user.pubid, client3.getPipe(user.pubid).pubid, 'A user user was dynamically created from an event.')
+				start();
+			}
+		});
+
+		// Connects client3 to the server
+		client3.connect();
+		//client2.quit();
+		client2.connect();
+	});
 }
 
 testEssential("Long Polling with sessions disabled", {session: false, debug: false, transport: 'lp'});

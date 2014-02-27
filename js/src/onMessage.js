@@ -150,8 +150,8 @@ APS.prototype.onMessage = function(data){
 
 				if(typeof user == "undefined" && !!args.from){
 					//Create user it doesn't exists
-					this.pipe[args.from.pubid] = new APS.User(args.from, this);
-					user = this.pipe[args.from.pubid];
+					this.pipes[args.from.pubid] = new APS.User(args.from, this);
+					user = this.pipes[args.from.pubid];
 				}
 				
 				pipe = this.pipes[args.pipe.pubid];
