@@ -55,8 +55,31 @@ The framework is tested and developed in the following modern browers:
 It should also work in other webkit and mobile browsers such as Opera, Safari, Safari Mobile and the stock Android Browser.
 Internet Explorer 8 and below is not supported.
 
-Feedback?
------------------------
+## Setting up APE on Windows ##
+
+To setup a test environment on windows a Vagrant box is bundled on this repo. To use the bundled box you must have [Vagrant](http://docs.vagrantup.com/v2/installation/index.html) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads) install on your machine. Note that this setup might also on nay other environment when where Vagrant is supported.
+
+To initialize the Vagrant box simply run this command from the root of the directory:
+
+    vagrant up
+
+The process might take some time as a file of about 500MB will be downloaded. Once installed and running, login in to the virtual machine running the following command
+
+    vagrant ssh
+
+Once you are ssh in the virtual machine a clone of [APS-deploy](https://github.com/ptejada/APS-Deploy) will be on the */home/vagrant/ape* directory with a pre-compiled version of the APE server. To run it execute this commands on the virtual machine:
+
+    cd ape
+    ./start
+
+For more commands available for the APS-Deploy project refer to https://github.com/ptejada/APS-Deploy#commands
+
+Once the APE server is running in the virtual machine it is accessible to the host machine via http://localhost:6969
+
+**Note:** Subdomains might still need to setup om your local machine https://github.com/ptejada/ApePubSub/wiki/APE-Server-setup#wiki-using-session
+
+## Feedback? ##
+
 For reporting issues use the github [issues system](https://github.com/ptejada/ApePubSub/issues?state=open), is really good and organized :)
 
 For discussions, join the [Google Group](https://groups.google.com/forum/?fromgroups#!forum/apepubsub)
