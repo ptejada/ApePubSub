@@ -74,9 +74,11 @@ Once you are ssh in the virtual machine a clone of [APS-deploy](https://github.c
 
 For more commands available for the APS-Deploy project refer to https://github.com/ptejada/APS-Deploy#commands
 
-Once the APE server is running in the virtual machine it is accessible to the host machine via http://localhost:6969
+Once the APE server is running in the virtual machine it is accessible to the host machine via ` http://localhost:6969 `
 
 **Note:** Subdomains might still need to setup om your local machine https://github.com/ptejada/ApePubSub/wiki/APE-Server-setup#wiki-using-session
+
+**Note:** Since running the server locally, the [localhost-plugin](https://github.com/ptejada/ApePubSub/blob/master/js/localhost-plugin.js) script can be included in your application to avoid manually adding fake subdomains to the ` host ` file.
 
 ## Feedback? ##
 
