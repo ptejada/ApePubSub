@@ -12,6 +12,7 @@ Ape.addEvent("init", function() {
 	include("framework/cmd_eventpush.js");
 	include("framework/cmd_restore.js");
 	include("framework/cmd_event.js");
+	include("framework/cmd_inlinepush.js");
 	include("framework/cmd_propupdate.js");
 	include("framework/cmd_session_set.js");
 	include("framework/hook_join.js");
