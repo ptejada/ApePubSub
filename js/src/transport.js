@@ -208,6 +208,6 @@ APS.Transport.lp = function(server, callback, client){
 		 * reused in case of reconnect
 		 */
 		//frame.parentElement.removeChild(frame);
-		client.state = 0;
+		this.state = client.state = 0;
 	}
 }

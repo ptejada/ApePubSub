@@ -139,6 +139,11 @@ APS.prototype.connect = function(args){
 	function TransportError(e){
 		this.trigger("dead", [e]);
 		this.transport.close();
+        /*
+         * Destroys the session
+         */
+        this.session.destroy();
+        this.state = 0;
 	}
 	
 	var cb = {

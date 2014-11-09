@@ -21,21 +21,20 @@ Checkout the [live demos](http://ptejada.com/script/ApePubSub/demo/), the demo s
 Simple program example:
 ```js
 
-// Initialize the client object
-var client = new APS('ape.ptejada.com');
+    // Initialize the client object
+    var client = new APS('ape.ptejada.com');
 
-// Subscribe to the channel and add some event listeners
-client.sub('test', {
-  // Event triggered when a user joins channel
-  join: function(){
-    alert('A user has joined the channel :)');
-  },
-  // Event triggered when a user leaves a channel
-  left: function(){
-    alert('A user has left the channel :(')
-  }
-});
-
+    // Subscribe to the channel and add some event listeners
+    client.sub('test', {
+      // Event triggered when a user joins channel
+      join: function(){
+        alert('A user has joined the channel :)');
+      },
+      // Event triggered when a user leaves a channel
+      left: function(){
+        alert('A user has left the channel :(')
+      }
+    });
 ```
 Is that simple and pretty much self explanatory what the above will do.
 
@@ -81,6 +80,6 @@ Internet Explorer 8 and below is not supported.
 
 ## Feedback? ##
 
-For reporting issues use the github [issues system](https://github.com/ptejada/ApePubSub/issues?state=open), is really good and organized :)
+For reporting issues use the GitHub [issues system](https://github.com/ptejada/ApePubSub/issues?state=open), is really good and organized :)
 
 For discussions, join the [Google Group](https://groups.google.com/forum/?fromgroups#!forum/apepubsub)

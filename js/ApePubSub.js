@@ -1,8 +1,8 @@
 /**
  * @author Pablo Tejada
  * @repo https://github.com/ptejada/ApePubSub
- * @version 1.6.5
- * Built on 2014-02-27 @ 03:09
+ * @version 1.6.6
+ * Built on 2014-11-09 @ 10:16
  */
 
 /**
@@ -58,7 +58,7 @@ if(!Function.prototype.bind){
 /**
  * The client constructor
  *
- * @version 1.6.5
+ * @version 1.6.6
  *
  * @param {string} server - The APE Server domain name including port number if other than 80
  * @param {object} [events] - Event handlers to be added to the client
@@ -105,7 +105,7 @@ function APS( server, events, options ){
 	 * The client version
 	 * @type {string}
 	 */
-	this.version = '1.6.5';
+	this.version = '1.6.6';
 	/**
 	 * The state of the client: 0=disconnected, 1=connected, 2=connecting
 	 * @type {number}
@@ -192,6 +192,11 @@ APS.prototype.connect = function(args){
 	function TransportError(e){
 		this.trigger("dead", [e]);
 		this.transport.close();
+        /*
+         * Destroys the session
+         */
+        this.session.destroy();
+        this.state = 0;
 	}
 	
 	var cb = {
@@ -674,7 +679,7 @@ if(navigator.appName != "Microsoft Internet Explorer"){
  * framework
  */
 APS.prototype.onMessage = function(data){
-	try { 
+	try {
 		data = JSON.parse(data)
 	}catch(e){
 		//Temporary FIX for malformed JSON with escape single quotes
@@ -1164,7 +1169,7 @@ APS.Transport.lp = function(server, callback, client){
 		 * reused in case of reconnect
 		 */
 		//frame.parentElement.removeChild(frame);
-		client.state = 0;
+		this.state = client.state = 0;
 	}
 }
 

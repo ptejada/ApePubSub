@@ -6,7 +6,7 @@
  * framework
  */
 APS.prototype.onMessage = function(data){
-	try { 
+	try {
 		data = JSON.parse(data)
 	}catch(e){
 		//Temporary FIX for malformed JSON with escape single quotes
