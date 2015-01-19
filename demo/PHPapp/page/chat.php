@@ -1,6 +1,8 @@
 <?php
-	//If user is not signed in redirect
-	if(!$user->signed) redirect("./?page=login");	
+//If user is not signed in redirect
+if (!$user->isSigned()) {
+	redirect("./login");
+}
 ?>
 	<div id="chat">
 		<h1>ApePubSub Chatter</h1>
@@ -21,7 +23,7 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 	
 	<!-- Load APS Client -->
-	<script type="text/javaScript" src="../../js/ApePubSub.min.js"></script>
+	<script type="text/javaScript" src="../../js/ApePubSub.js"></script>
 	<script type="text/javaScript" src="../global.js"></script>
 
-	<script type="text/javaScript" src="chat.js"></script>
+	<script type="text/javaScript" src="<?php echo $base?>/static/js/chat.js"></script>

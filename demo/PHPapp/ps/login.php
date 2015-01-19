@@ -1,17 +1,28 @@
 <?php
-	include("../core/config.php");
-	
-	//Proccess Login
-	if(count($_POST)){
-		$username = isset($_POST['username']) ? $_POST['username'] : false;
-		$password = isset($_POST['password']) ? $_POST['password'] : false;
-		$auto = isset($_POST['auto']) ? $_POST['auto'] : false;
-		
-		$user->login($username,$password,$auto);
-		if($user->has_error()){
-			$_SESSION['NoteMsgs'] = $user->error();
-		}
+
+include('../core/config.php');
+
+//Process Login
+if(count($_POST)){
+    /*
+     * Covert POST into a Collection object
+     * for better value handling
+     */
+    $input = new \ptejada\uFlex\Collection($_POST);
+
+	$user->login($input->Username, $input->Password, $input->auto);
+
+	$errMsg = '';
+
+	if($user->log->hasError()){
+		$errMsg = $user->log->getErrors();
+		$errMsg = $errMsg[0];
 	}
-	
-	redirect();
-?>
+
+	echo json_encode(array(
+		'error'    => $user->log->getErrors(),
+		'confirm'  => "You are now login as <b>$user->Username</b>",
+		'form'     => $user->log->getFormErrors(),
+	));
+}
+

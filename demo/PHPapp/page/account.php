@@ -1,26 +1,23 @@
 <?php
-	//If user is not signed in refirect
-	if(!$user->signed) redirect("./?page=login");	
+//If user is not signed in redirect
+if (!$user->isSigned()) {
+    redirect("./login");
+}
 ?>
-
-	<h1>My Account</h1>
-	
-	<div class="report">
-		<?php echo showMsg()?>
-	</div>
-	
-	<a class="md_bnt" href="?page=account-update">Update Information</a>
-	<a class="md_bnt" href="?page=change-password">Change Password</a>
-	<a class="md_bnt" href="ps/logout.php">Logout</a>
-	<hr>
-	<img src="http://www.gravatar.com/avatar/<?php echo md5($user->username)?>?d=monsterid">
-	<br>
-	<br>
-	<form class="uf">
-		
-		<?php
-			foreach($user->data as $field=>$val){
-				echo "<label><b>{$field}</b></label> <input type='text' value='{$val}' disabled='disabled' />";
-			}
-		?>
-	</form>
+<div class="row">
+    <div class="col-xs-12">
+        <?php echo gravatar($user->Email, 50); ?>
+        <div class="btn-group pull-right2">
+            <a class="btn btn-primary" href="account/update">Update Information</a>
+            <a class="btn btn-primary" href="account/update/password">Change Password</a>
+        </div>
+        <table class="table">
+            <?php foreach ($user->toArray() as $name => $value): ?>
+                <tr>
+                    <th><?php echo $name ?></th>
+                    <td><?php echo $value ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    </div>
+</div>

@@ -1,65 +1,41 @@
 <?php
-	if(!file_exists("core/config.php")){
-		header("Location: install/");
-	}
-	
-	include("core/config.php");
-	
-	$page = @$_GET['page'];
-	
-	$page = !$page ? "home" : $page;
-	
-	$ext = ".php";
-	
-	$page_inc = "page/" . str_replace("-", "_", $page) . $ext;
-	
-	//Page not found
-	if(!file_exists($page_inc)) send404();
-		
-	$page_title = ucfirst($page);
-?>
-<html>
-<head>
-	<link rel=stylesheet type=text/css href="style/chat.css" />
-	<link rel=stylesheet type=text/css href="style/style.css" />
-	<title><?php echo $page_title?> | uFlex</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-</head>
-<body>
-	<div id="wrapper">
-		<div id="banner">
-			<h1>uFlex - Demo</h1>
-			<div id="nav">
-				<?php
-					if($user->signed){
-						?>
-						<span>
-							<a href="ps/logout.php">
-								Logout(<?php echo $user->username?>)
-							</a>
-						</span>
-						<?php
-					}
-				?>
-				<a href=".">Home</a>
-				<a> | </a>
-				<a href="?page=user">Users</a>
-				<a> | </a>
-				<a href="?page=chat">Chat</a>
-			</div>	
-			<hr>		
-		</div>
-		<div id="content">
-			<?php include($page_inc); ?>
-		</div>
-		<div id="footer">
-			<hr>
-			Copyright Test &copy; 2012 - 
-			<a href="http://ptejada.com/projects/uFlex/">uFlex Home</a> -
-			v<?php echo uFlex::version?>
-			<hr>
-		</div>
-	</div>
+/*
+ * This index file servers as a simple unified request
+ * controller and route handler
+ */
 
-</body>
-</html>
+if(!file_exists("core/config.php")){
+	header("Location: install/");
+}
+
+$base = dirname($_SERVER['PHP_SELF']);
+$pagePath = substr($_SERVER['REQUEST_URI'], strlen($base)+1);
+
+include('core/config.php');
+
+// Remove any URI variables
+$pagePath = explode('?', $pagePath);
+$pagePath = $pagePath[0];
+
+// Trim any leading forward slash
+$pagePath = trim($pagePath,"/");
+
+if ( ! $pagePath )
+{
+	$pagePath = 'home';
+}
+
+$pageInclude = "page/$pagePath.php";
+
+//Page not found
+if(!file_exists($pageInclude) || strpos($pageInclude, ".."))
+{
+	send404();
+}
+
+$pageTitle = str_replace('/', ' ', $pagePath);
+$pageTitle = ucfirst($pageTitle);
+
+include 'page/header.php';
+include $pageInclude;
+include 'page/footer.php';

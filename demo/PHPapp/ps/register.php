@@ -1,24 +1,32 @@
 <?php
-	include("../core/config.php");
-	include("../core/validations.php");
+include('../core/config.php');
+include('../core/validations.php');
 
-	if($user->signed) redirect("../");
-	
-	//Proccess Registration
-	if(count($_POST)){
-		//Register User
-		$registered = $user->register($_POST);
-		if(!$registered){
-			$_SESSION['NoteMsgs'] = $user->error();
-			$_SESSION["regData"] = $_POST;
-			redirect();		
-		}else{
-			$_SESSION['NoteMsgs'][] = "User Registered Successfully";
-			$_SESSION['NoteMsgs'][] = "You may login now!";
-			redirect("../?page=login");
-		}
-	}else{
-		redirect();
-	}
-	
-?>
+//Process Registration
+if (count($_POST)) {
+    /*
+     * Covert POST into a Collection object
+     * for better values handling
+     */
+    $input = new \ptejada\uFlex\Collection($_POST);
+
+    /*
+     * If the form fields names match your DB columns then you can reduce the collection
+     * to only those expected fields using the filter() function
+     */
+    $input->filter('Username', 'first_name', 'last_name', 'Email', 'Password', 'Password2', 'website', 'GroupID');
+
+    /*
+     * Register the user
+     * The register method takes either an array or a Collection
+     */
+    $user->register($input);
+
+    echo json_encode(
+        array(
+            'error'   => $user->log->getErrors(),
+            'confirm' => 'User Registered Successfully. You may login now!',
+            'form'    => $user->log->getFormErrors(),
+        )
+    );
+}

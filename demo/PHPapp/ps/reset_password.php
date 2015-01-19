@@ -1,25 +1,37 @@
 <?php
 	include("../core/config.php");
 	
-	//Proccess Update
+	//Process Update
 	if(count($_POST)){
-		$res = $user->pass_reset($_POST['email']);
-		
+        /*
+         * Covert POST into a Collection object
+         * for better handling
+         */
+        $input = new \ptejada\uFlex\Collection($_POST);
+
+		$res = $user->resetPassword($input->Email);
+
+		$errorMessage = '';
+		$confirmMessage = '';
+
 		if($res){
 			//Hash succesfully generated
-			//You would send an email to $res['email'] with the URL+HASH $res['hash'] to enter the new password
+			//You would send an email to $res['Email'] with the URL+HASH $res['hash'] to enter the new Password
 			//In this demo we will just redirect the user directly
 			
-			$url = "../?page=change-password&c=" . $res['hash'];
-			$_SESSION["NoteMsgs"][] = "You may change your password";
-			
-			//Redirect
-			redirect($url);
+			$url = 'account/update/password?c=' . $res->Confirmation;
+			$confirmMessage = "Use the link below to change your password <a href='{$url}'>Change Password</a>";
+
 		}else{
-			$_SESSION["NoteMsgs"] = $user->error();
-			
-			redirect();
+			$errorMessage = $user->log->getErrors();
+			$errorMessage = $errorMessage[0];
 		}
+
+		echo json_encode(array(
+			'error'    => $user->log->getErrors(),
+			'confirm'  => $confirmMessage,
+			'form'    => array(
+				'Email' => $errorMessage
+			)
+		));
 	}
-	
-?>

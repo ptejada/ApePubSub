@@ -1,28 +1,31 @@
 <?php
-	if($user->signed) redirect("./?page=account");
-?>	
-	<h1>Login</h1>
-	
-	<div class="report">
-		<?php echo showMsg()?>
+	if($user->isSigned()) redirect("./account");
+?>
+<div class="row">
+	<div class="col-sm-6 col-sm-offset-3">
+		<h2>Login</h2>
+
+		<hr/>
+
+		<form method="post" action="ps/login.php" data-success="<?php echo $base?>/account">
+			<div class="form-group">
+				<label>Username or Email:</label>
+				<input name="Username" type="text" class="form-control" required autofocus>
+			</div>
+
+			<div class="form-group">
+				<label>Password:</label>
+				<input name="Password" type="password" class="form-control" required>
+			</div>
+
+			<div class="form-group text-center">
+				<button type="submit" class="btn btn-primary">Sign In</button>
+				<br/><br/>
+				<a href="register">Register a New Account</a>
+				<br>
+				<a href="resetPassword">Forgot Password?</a>
+			</div>
+		</form>
+
 	</div>
-	
-	<form class="uf" method="post" action="ps/login.php">
-		<label>Username or Email:</label>
-		<input name="username" type="text" value="">
-		
-		
-		<label>Password:</label>
-		<input name="password" type="password">
-		
-		
-		<label>Remember me?:</label>
-		<input name="auto" type="checkbox" style="display: inline-block">
-		
-		
-		<input value="SignIn" type="submit">
-	</form>
-	
-	<a href="?page=register">Register a New Account</a>
-	<br>
-	<a href="?page=forgot-password">Forgot password?</a>
+</div>

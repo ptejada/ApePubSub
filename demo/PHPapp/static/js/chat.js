@@ -1,8 +1,18 @@
 /*
  * Initialize and configure the client object
  */
-var inst = new APS.cookie("PHPSESSID").value;
-inst = inst.substring(11,15) + ".";
+function getCookie(cname) {
+	var name = cname + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0; i<ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1);
+		if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+	}
+	return "";
+}
+
+var inst = getCookie("PHPSESSID").substring(11,15) + ".";
 
 var client = new APS(inst + ServerDomain, false, {
 	debug: EnableDebug,
@@ -22,7 +32,7 @@ client.on({
 		if(!!this.user.name) return;
 		$.getJSON("ps/connect.php", function(data){
 			//client.session.id = data.sessid;
-			client.session.cookie.change(data.sessid);
+			client.session.save(data.sessid);
 			client.user = data.user;
 			client.sub(channelName);
 		})
@@ -57,7 +67,7 @@ client.onChannel(channelName, {
 		var chan = client.getChannel(channelName);
 		
 		//Enable chat form
-		$("#chat-form input").removeProp("disabled");
+		$("#chat-form input").removeAttr("disabled");
 		
 		//Add DOM event to send the typing event to server
 		formInput.one("keyup", function(e){
@@ -169,9 +179,10 @@ $(document).ready(function(){
 	/*
 	 * Add DOM event 'submit' to the form
 	 */
-	$("#chat-form").on("submit", function(e){
+	$("#chat-form").off('submit').on("submit", function(e){
+		e.stopImmediatePropagation();
 		e.preventDefault();
-		
+
 		var formInput = $("#chat-form [name='message']");
 		
 		var chan = client.getChannel(channelName);

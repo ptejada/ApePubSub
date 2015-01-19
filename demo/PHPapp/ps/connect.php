@@ -2,14 +2,14 @@
 	include("../core/config.php");
 	
 	//Proccess Login
-	if($user->signed){
-		$u = $user->getRow(array("user_id" => $user->id));
+	if($user->isSigned()){
+		$u = $user->table->getRow(array("ID" => $user->ID));
 		$data = array(
-			"sessid" => $u["ape_session"],
+			"sessid" => $u->ape_session,
 			"user" => array(
-				"name" => $u["username"],
-				"id" => $u["user_id"],
-				"avatar" => md5($u["username"])
+				"name" => $u->Username,
+				"id" => $u->ID,
+				"avatar" => md5($u->Username)
 			)
 		);
 		echo json_encode($data);

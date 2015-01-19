@@ -1,124 +1,147 @@
 <?php
-	//error_reporting(E_ALL);
-	//ini_set('display_errors', false);
+if (file_exists("../core/config.php")) {
+    header("Location: ../");
+}
+if ($_POST) {
 
-	$R = array();
-	$S = array();
-	
-	if($_POST){
-		
-		$db_host = $_POST['db_host'];
-		$db_user = $_POST['db_user'];
-		$db_pass = $_POST['db_pass'];
-		$db_name = $_POST['db_name'];
-		
-		$db = $con = new mysqli($db_host,$db_user,$db_pass, $db_name);
-		
-		if($db->connect_errno){
-			print_r($db->connect_error);
-			$R['connection'] = "Could not connect to <b>{$db_host}</b> with username <b>{$db_user}</b> and password <b>{$db_pass}</b>";
-		}else{
-			//Import database
-			$sql = file_get_contents("uFlex_database.sql");
-			
-			$import = $db->query($sql);
-			
-			if($import) $S[] = "Database Populated OK!";
-			
-			//Create Configuration file
-			if($import){				
-				$config = file_get_contents("config.tpl");
-				
-				foreach($_POST as $tag=>$val){
-					$config = str_replace("#!".$tag,$val,$config);
-				}
-				
-				$file = fopen("../core/config.php","w+");
-				
-				if(fwrite($file,$config) == false){
-					$R["config"] = "Could not generate <b>config.php</b>";
-				}else{
-					$S[] = "Configuration File generated OK!";
-					$S[] = "<a href='../'>CLICK HERE YOU ARE DONE!</a>";
-					//All completed Ok!
-				}
-				
-				fclose($file);
-			}
-			
-		}
-		
-	}
+    $db_host = $_POST['host'];
+    $db_user = $_POST['user'];
+    $db_pass = $_POST['pass'];
+    $db_name = $_POST['name'];
+
+    $response = array(
+        'error' => true,
+        'form'  => array('error' => ''),
+    );
+
+    try{
+        $dbh = new PDO("mysql:host=$db_host", $db_user, $db_pass);
+    } catch ( PDOException $e ){
+        $response['form']['error'] = "Unable to connect to <b>{$db_host}</b> with username <b>{$db_user}</b> and password <b>{$db_pass}</b>";
+        $dbh = false;
+    }
+
+    $confirm = array();
+
+    if ($dbh) {
+        if ($dbh->query("USE {$db_name};")) {
+            $dbAccess = true;
+            $confirm[] = "Using Existing Database!";
+        } else {
+            if ($dbh->exec("CREATE DATABASE {$db_name}")) {
+                // Database created
+                $dbAccess = true;
+                $confirm[] = "Database Created OK!";
+            } else {
+                $dbAccess = false;
+                $response['form']['error'] = "Database <b>{$db_name}</b> does not exists and we are unable to created. Make sure the user <b>{$db_user}</b> has permission to create the database or manually create it.";
+            }
+        }
+
+    }
+
+    if ($dbAccess) {
+        //Import database
+        $sql = file_get_contents("users_table.sql");
+        $import1 = $dbh->query($sql);
+
+        $sql = file_get_contents("demo.sql");
+        $import2 = $dbh->query($sql);
+
+        //Create Configuration file
+        if ($import1) {
+            $confirm[] = "Database Populated OK!";
+
+            $config = file_get_contents("config.tpl");
+
+            foreach ($_POST as $tag => $val) {
+                $config = str_replace("#!db_" . $tag, $val, $config);
+            }
+
+            $file = fopen("../core/config.php", "w+");
+
+            if (fwrite($file, $config) == false) {
+                $response['form']['error'] = "Could not generate <b>config.php</b>";
+            } else {
+                $confirm[] = "Configuration File generated OK!";
+                $confirm[] = "<a href='../'>CLICK HERE YOU ARE DONE!</a>";
+            }
+
+            fclose($file);
+        } else {
+            $response['form']['error'] = "Can not create tables in the <b>{$db_name}</b> database. Double check the user permission.";
+        }
+    }
+
+    $response['error'] = $response['form']['error'] ? true : false;
+
+    $response['confirm'] = '<ul><li>' . implode('</li><li>', $confirm) . '</li><ul>';
+
+    echo json_encode($response);
+    exit();
+}
 ?>
 <html>
 <head>
-	<link rel=stylesheet type=text/css href="style" />
-	<title>uFlex Demo Installation</title>
-	<style>
-		label, input {
-			font-size: 1.3em;
-		}
-		label+input {
-			background: #000;
-			color: #fff;
-			padding: 2px 5px;
-		}
-		label {
-			font-weight: bold;
-		}
-		.success {
-			background: #88ff88;
-			font-size: 1em;
-			margin: 5px auto;
-		}
-		.error {
-			font-size: 1em;
-			padding: ;
-			background: #ffaaaa;
-			margin: 5px auto;
-		}
-		.error > div, .success > div {
-			padding: 10px;
-		}
-		.error .type {
-			padding-right: 5px;
-			font-size: 1.2em;
-		}
-	</style>
+    <title>uFlex Demo Installation</title>
+
+    <meta name="robots" content="noindex">
+    <link href="http://bootswatch.com/readable/bootstrap.min.css" rel="stylesheet">
+
 </head>
 <body>
-	<h1>uFlex DEMO configuration</h1>
-	<div class="success">
-		<?php
-			foreach($S as $msg){
-				echo "<div>{$msg}</div>";
-			}
-		?>
-	</div>
-	<div class="error">
-		<?php
-			foreach($R as $name=>$error){
-				echo "<div><b class=type>{$name}:</b>{$error}</div>";
-			}
-		?>
-	</div>
-	<form method="post" action="">
-		<label>Database Host:</label>
-		<input type="text" name="db_host" value="<?php echo @$_POST['db_host']?>" />
-		<hr />
-		
-		<label>Database User:</label>
-		<input type="text" name="db_user" value="<?php echo @$_POST['db_user']?>" />
-		<hr />
-		
-		<label>Database Password:</label>
-		<input type="password" name="db_pass" value="<?php echo @$_POST['db_pass']?>" />
-		<hr />
-		
-		<label>Database Name:</label>
-		<input type="text" name="db_name" value="<?php echo @$_POST['db_name']?>" />
-		<hr />
-		
-		<input type="submit" value="Generate Configuration" />		
-	</form>
+<div class="container">
+    <h1>uFlex DEMO configuration</h1>
+    <hr/>
+    <form method="post" action="" class="form-horizontal" autocomplete="off">
+        <div class="form-group">
+            <label class="control-label col-sm-3">Database Host:</label>
+
+            <div class="col-sm-5">
+                <input type="text" required name="host" class="form-control" value="localhost"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-sm-3">Database User:</label>
+
+            <div class="col-sm-5">
+                <input type="text" required name="user" class="form-control" value="root"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-sm-3">User Password:</label>
+
+            <div class="col-sm-5">
+                <input type="password" name="pass" class="form-control"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-sm-3">Database Name:</label>
+
+            <div class="col-sm-5">
+                <input type="text" required name="name" class="form-control"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-5 col-sm-offset-3">
+                <input type="hidden" required name="error" class="form-control"/>
+            </div>
+        </div>
+
+        <div class="form-group text-left">
+            <div class="col-sm-5 col-sm-offset-3">
+                <button type="submit" class="btn btn-primary">Generate Configuration</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.1/js/bootstrap.min.js"></script>
+<script src="../static/js/main.js"></script>
+
 </body>

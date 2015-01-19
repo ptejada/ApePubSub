@@ -1,37 +1,50 @@
 <?php
-	include("../core/config.php");
-	include("../core/validations.php");
+	include('../core/config.php');
+	include('../core/validations.php');
 	
-	//Proccess Update
+	//Process Update
 	if(count($_POST)){
-		
-		foreach($_POST as $name=>$val){
-			if($user->data[$name] == $val){
-			
-				unset($_POST[$name]);
-			}
+        /*
+        * Covert POST into a Collection object
+        * for better value handling
+        */
+        $input = new \ptejada\uFlex\Collection($_POST);
+
+        /*
+         * Updates queue
+         */
+		foreach($input->toArray() as $name=>$val){
+            if (is_null($user->getProperty($name))) {
+                /*
+                 * If the field is not part of the user properties
+                 * then reject the update
+                 */
+                unset($input->$name);
+            }
+            else
+            {
+                /*
+                 * If the value is the same as the tha value stored
+                 * on the user properties then reject the update
+                 */
+                if ($user->$name == $val) {
+                    unset($input->$name);
+                }
+
+            }
 		}
-		
-		if(count($_POST)){
+
+		if( ! $input->isEmpty() ){
 			//Update info
-			$user->update($_POST);
+			$user->update($input->toArray());
 		}else{
 			//Nothing has changed
-			$_SESSION['NoteMsgs'][0] = "No need to update!";
+			$user->log->error('No need to update!');
 		}
-		
-		//If there are errors
-		if($user->has_error()){
-			//There were errors while updating information
-			$_SESSION['NoteMsgs'] = $user->error();
-		}elseif(count($_POST)){
-			//Updates have been saved successfully!
-			$_SESSION['NoteMsgs'][0] = "Information Updated!";
-		}
+
+		echo json_encode(array(
+			'error'    => $user->log->getErrors(),
+			'confirm'  => 'Account Updated!',
+			'form'    => $user->log->getFormErrors(),
+		));
 	}
-	
-	if(!isset($_GET['noredirect'])){
-		redirect();
-	}
-	
-?>
