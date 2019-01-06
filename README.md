@@ -1,4 +1,8 @@
-## What is it? ##
+End Of Life
+---
+This library was made specifically for APE server as the backend which unfortunately is no longer maintain. For backend and front-end solutions I recommend checking out [Socket.IO](https://socket.io/)
+
+## ApePubSub ##
 
 ApePubSub is an alternative event driven pub/sub framework to the official [APE_JSF](https://github.com/APE-Project/APE_JSF) for the [APE Server](https://github.com/APE-Project/APE_Server). It is written in plain javascript.
 
